@@ -17,6 +17,13 @@
     "build": "node scripts/build.mjs"
   },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lovezi0/dsh-model-extension.git"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
   "dsh": {
     "adapter": "0.1.1-rc.2",
     "bundle": {
