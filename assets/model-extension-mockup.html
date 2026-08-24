@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>模型扩展字段 · 新排版效果图（移除默认挡位后）</title>
+<style>
+  :root {
+    --font-sans: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --color-text-primary: #1a1a1a;
+    --color-text-secondary: #666;
+    --color-text-tertiary: #999;
+    --color-background-primary: #fff;
+    --color-background-secondary: #f5f5f5;
+    --color-border-tertiary: rgba(0, 0, 0, 0.15);
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --dsw-alias-brand-primary: #4f46e5;
+  }
+  body { margin: 0; padding: 32px; background: #fafafa; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+</style>
+</head>
+<body>
+
+<div style="max-width: 680px; font-family: var(--font-sans); color: var(--color-text-primary);">
+  <h2 class="sr-only" style="">模型扩展字段新排版效果图：总开关、推理挡位表格、思考格式与输入模态四个分区（默认思考挡位控件已移除）</h2>
+
+  <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 16px 18px;">
+
+    <div style="font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 2px;">模型扩展</div>
+    <div style="font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 14px;">展开「容量」区后的扩展字段，新排版（共四个分区）</div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+
+      <!-- 分区① 总开关 -->
+      <div style="border-top: 0.5px solid var(--color-border-tertiary); padding-top: 12px;">
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+          <input type="checkbox" checked style="width:15px;height:15px;accent-color:var(--dsw-alias-brand-primary)" />
+          <span style="font-size: 13px;">端点接受推理挡位参数</span>
+        </label>
+      </div>
+
+      <!-- 分区②~④ 受总开关门控，一处平铺 -->
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+
+        <!-- 分区② 推理挡位表格 -->
+        <div>
+          <div style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px;">推理挡位（勾选即声明，线上取值可改）</div>
+          <div style="border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); overflow: hidden;">
+            <div style="display: grid; grid-template-columns: 90px 1fr 1fr; font-size: 12px; color: var(--color-text-secondary); background: var(--color-background-secondary);">
+              <div style="padding: 6px 10px;">声明</div>
+              <div style="padding: 6px 10px; border-left: 0.5px solid var(--color-border-tertiary);">挡位</div>
+              <div style="padding: 6px 10px; border-left: 0.5px solid var(--color-border-tertiary);">线上取值</div>
+            </div>
+            <div style="display: grid; grid-template-columns: 90px 1fr 1fr; align-items: center; font-size: 13px; border-top: 0.5px solid var(--color-border-tertiary);">
+              <div style="padding: 6px 10px;"><input type="checkbox" checked style="width:15px;height:15px;accent-color:var(--dsw-alias-brand-primary)" /></div>
+              <div style="padding: 6px 10px; border-left: 0.5px solid var(--color-border-tertiary);">关闭 (off)</div>
+              <div style="padding: 6px 10px; border-left: 0.5px solid var(--color-border-tertiary); color: var(--color-text-tertiary); font-size: 12px;">—（无取值）</div>
+            </div>
+            <div style="display: grid; grid-template-columns: 90px 1fr 1fr; align-items: center; font-size: 13px; border-top: 0.5px solid var(--color-border-tertiary);">
+              <div style="padding: 6px 10px;"><input type="checkbox" checked style="width:15px;height:15px;accent-color:var(--dsw-alias-brand-primary)" /></div>
+              <div style="padding: 6px 10px; border-left: 0.5px solid var(--color-border-tertiary);">低 (low)</div>
+              <div style="padding: 6px 10px; border-left: 0.5px solid var(--color-border-tertiary);"><input type="text" value="low" style="width:100%;padding:3px 6px;border:0.5px solid var(--color-border-tertiary);border-radius:4px;" /></div>
+            </div>
+            <div style="display: grid; grid-template-columns: 90px 1fr 1fr; align-items: center; font-size: 13px; border-top: 0.5px solid var(--color-border-tertiary);">
+              <div style="padding: 6px 10px;"><input type="checkbox" checked style="width:15px;height:15px;accent-color:var(--dsw-alias-brand-primary)" /></div>
+              <div style="padding: 6px 10px; border-left: 0.5px solid var(--color-border-tertiary);">中 (medium)</div>
+              <div style="padding: 6px 10px; border-left: 0.5px solid var(--color-border-tertiary);"><input type="text" value="medium" style="width:100%;padding:3px 6px;border:0.5px solid var(--color-border-tertiary);border-radius:4px;" /></div>
+            </div>
+            <div style="display: grid; grid-template-columns: 90px 1fr 1fr; align-items: center; font-size: 13px; border-top: 0.5px solid var(--color-border-tertiary);">
+              <div style="padding: 6px 10px;"><input type="checkbox" checked style="width:15px;height:15px;accent-color:var(--dsw-alias-brand-primary)" /></div>
+              <div style="padding: 6px 10px; border-left: 0.5px solid var(--color-border-tertiary);">高 (high)</div>
+              <div style="padding: 6px 10px; border-left: 0.5px solid var(--color-border-tertiary);"><input type="text" value="high" style="width:100%;padding:3px 6px;border:0.5px solid var(--color-border-tertiary);border-radius:4px;" /></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 分区③ 思考格式 -->
+        <div>
+          <div style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px;">思考格式</div>
+          <select style="width: 100%; padding: 6px 8px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); font-size: 13px;">
+            <option>openai</option>
+          </select>
+        </div>
+
+        <!-- 分区④ 输入模态 -->
+        <div>
+          <div style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px;">输入模态</div>
+          <label style="display: inline-flex; align-items: center; gap: 6px; margin-right: 20px; font-size: 13px; cursor: pointer;">
+            <input type="checkbox" checked style="width:15px;height:15px;accent-color:var(--dsw-alias-brand-primary)" />文本
+          </label>
+          <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer;">
+            <input type="checkbox" checked style="width:15px;height:15px;accent-color:var(--dsw-alias-brand-primary)" />图像
+          </label>
+        </div>
+
+      </div><!-- /门控子区 -->
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

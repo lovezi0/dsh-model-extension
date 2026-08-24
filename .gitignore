@@ -1,0 +1,13 @@
+AGENTS.md
+
+.workbuddy/
+
+node_modules/
+
+# 本机私有构建配置（含宿主源码路径）
+build.local.yaml
+
+# 升级计划
+upgrade plan/
+
+dsh-compatibility-check/
