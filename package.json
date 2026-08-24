@@ -11,6 +11,7 @@
   },
   "files": [
     "lib",
+    "assets",
     "cordis.patch.yml"
   ],
   "scripts": {
@@ -19,7 +20,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lovezi0/dsh-model-extension.git"
+    "url": "git+https://github.com/lovezi0/dsh-model-extension.git"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
