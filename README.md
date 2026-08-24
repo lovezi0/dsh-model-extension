@@ -22,6 +22,12 @@ dsh plugin --profile web add github:lovezi0/dsh-model-extension
 
 仓库自带构建产物 `lib/`，安装即用、无需本地构建。
 
+也可从 npm 安装（已发布至 npmjs）：
+
+```bash
+dsh plugin --profile web add dsh-model-extension
+```
+
 ## 从源码构建
 
 构建期需要 DeepSeek Harness 宿主源码（版本须与 `package.json` 的 `dsh.adapter` 锚点一致）：
