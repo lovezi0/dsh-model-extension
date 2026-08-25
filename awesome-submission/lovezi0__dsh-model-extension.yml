@@ -1,0 +1,6 @@
+url: https://github.com/lovezi0/dsh-model-extension
+name: lovezi0/dsh-model-extension
+category: model
+description:
+  en: 'Extends per-model LLM settings in DeepSeek Harness with reasoning efforts, input modalities, and compat flags.'
+  zh: '在 DeepSeek Harness 中扩展按模型的推理挡位、输入模态与兼容性配置。'

@@ -3,6 +3,8 @@
 
 ![模型扩展字段新排版效果图](assets/model-extension-mockup.png)
 
+> **作者建议（非AI编写）**
+> 安装该插件或该类型插件：clone仓库源码 -> 执行安全检查/扫描 -> 从源码构建 -> 安装
 
 ## 功能
 
@@ -54,6 +56,8 @@ dsh plugin --profile web add dsh-model-extension
 
 ## 版本历史
 
+- **0.1.1**
+    - 🐛修复peer范围bug
 - **0.1.0**
     - 🔥新增[模型+]开启dsh隐藏设置
 
