@@ -56,6 +56,8 @@ dsh plugin --profile web add dsh-model-extension
 
 ## 版本历史
 
+- **0.2.0**
+    - 🔥新增允许以 developer 角色发送系统提示
 - **0.1.1**
     - 🐛修复peer范围bug
 - **0.1.0**

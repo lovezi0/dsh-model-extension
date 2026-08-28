@@ -9,6 +9,8 @@
  *   input             Modality[]                  accepted input modalities
  *   compat.supportsReasoningEffort  boolean        endpoint accepts reasoning_effort
  *   compat.thinkingFormat           wire format    how reasoning is serialised
+ *   compat.supportsDeveloperRole    boolean        system prompt role for reasoning models
+ *                                                  (unset reads as checked = catalog/detection default)
  *
  * NOTE: there is deliberately NO "default effort" (model-level reasoningEffort)
  * control here. DSH's `modelFields` schema has no such key — the runtime derives
@@ -106,11 +108,15 @@ export function ModelExtensionFields(props: ModelExtensionFieldsProps): ReactNod
 
   const compat = compatOf(model)
   const supportsReasoningEffort = compat['supportsReasoningEffort'] === true
+  // Unset reads as the default (checked): the installed catalog / pi-ai's own
+  // URL detection stays in charge unless the deployment writes an explicit
+  // boolean. Only an explicit `false` renders the box unchecked.
+  const supportsDeveloperRole = compat['supportsDeveloperRole'] !== false
 
   /** Write one key into `compat`, merging into the row's existing compat and
    *  clearing the whole `compat` node when it would become empty. Used for
-   *  `supportsReasoningEffort` and `thinkingFormat` ONLY — those are the only
-   *  model extension fields that live under `compat`. */
+   *  `supportsReasoningEffort`, `thinkingFormat` and `supportsDeveloperRole`
+   *  ONLY — those are the only model extension fields that live under `compat`. */
   const setCompatKey = (key: string, value: unknown): void => {
     const next = { ...compat }
     if (value === undefined) delete next[key]
@@ -191,6 +197,28 @@ export function ModelExtensionFields(props: ModelExtensionFieldsProps): ReactNod
 
   return (
     <fieldset style={{ border: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
+      {/* --- compat: supportsDeveloperRole ---------------------------------- */}
+      <div style={{ borderTop: '0.5px solid var(--color-border-tertiary, rgba(0,0,0,0.15))', paddingTop: 12 }}>
+        <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: 'pointer' }}>
+          <input
+            type="checkbox"
+            style={checkboxStyle}
+            checked={supportsDeveloperRole}
+            disabled={disabled}
+            onChange={(event) => {
+              // Checked is the natural default, so a check REMOVES the key:
+              // the wire then follows the installed catalog / pi-ai detection
+              // instead of pinning `true` over a catalog's known `false`.
+              setCompatKey('supportsDeveloperRole', event.target.checked ? undefined : false)
+            }}
+          />
+          <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <span className={styles['modelFieldLabel']}>{t('supportsDeveloperRole')}</span>
+            <span style={{ fontSize: 12, color: 'var(--color-text-tertiary, #999)' }}>{t('supportsDeveloperRoleHint')}</span>
+          </span>
+        </label>
+      </div>
+
       {/* --- compat: supportsReasoningEffort ------------------------------ */}
       <div style={{ borderTop: '0.5px solid var(--color-border-tertiary, rgba(0,0,0,0.15))', paddingTop: 12 }}>
         <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
