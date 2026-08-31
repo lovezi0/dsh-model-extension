@@ -1,5 +1,7 @@
 # dsh-model-extension
 > 基于 deepseek-harness 的模型扩展插件
+> master分支已适配**deepseek harness 0.1.2-alpha.2+**
+> 旧版本已切换分支归档，见`dsh-v0.1.1`
 
 ![模型扩展字段新排版效果图](assets/model-extension-mockup.png)
 
@@ -56,6 +58,8 @@ dsh plugin --profile web add dsh-model-extension
 
 ## 版本历史
 
+- **0.3.0-rc1**
+    - 💪支持deepseek harness 0.1.2-alpha.2
 - **0.2.0**
     - 🔥新增允许以 developer 角色发送系统提示
 - **0.1.1**
