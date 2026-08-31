@@ -1,6 +1,6 @@
 {
   "name": "dsh-model-extension",
-  "version": "0.2.0",
+  "version": "0.3.0-rc1",
   "description": "DeepSeek Harness plugin: extended per-model LLM configuration (reasoning efforts, input modalities, compat flags) as a companion settings page",
   "type": "module",
   "main": "lib/index.js",
@@ -26,14 +26,13 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dsh": {
-    "adapter": "0.1.1-rc.2",
+    "adapter": "0.1.2-alpha.2",
     "bundle": {
       "patch": "./cordis.patch.yml"
     },
     "client": {
       "platform": "web",
       "inject": [
-        "@deepseek-ai/dsh-client-runtime",
         "@deepseek-ai/dsh-client-ui-settings",
         "@deepseek-ai/dsh-client-locale",
         "@deepseek-ai/dsh-api-remotes"
@@ -46,13 +45,13 @@
     }
   },
   "peerDependencies": {
-    "@deepseek-ai/cordis": ">=0.1.0-rc.1 <0.2.0-0 || >=0.1.1-rc.1 <0.2.0-0",
-    "@deepseek-ai/dsh-api-remotes": ">=0.1.0-rc.1 <0.2.0-0 || >=0.1.1-rc.1 <0.2.0-0",
-    "@deepseek-ai/dsh-client-connection": ">=0.1.0-rc.1 <0.2.0-0 || >=0.1.1-rc.1 <0.2.0-0",
-    "@deepseek-ai/dsh-client-locale": ">=0.1.0-rc.1 <0.2.0-0 || >=0.1.1-rc.1 <0.2.0-0",
-    "@deepseek-ai/dsh-client-runtime": ">=0.1.0-rc.1 <0.2.0-0 || >=0.1.1-rc.1 <0.2.0-0",
-    "@deepseek-ai/dsh-client-ui-settings": ">=0.1.0-rc.1 <0.2.0-0 || >=0.1.1-rc.1 <0.2.0-0",
-    "@deepseek-ai/dsh-invariants": ">=0.1.0-rc.1 <0.2.0-0 || >=0.1.1-rc.1 <0.2.0-0"
+    "@deepseek-ai/cordis": ">=0.1.2-a <0.2.0-0",
+    "@deepseek-ai/dsh-api-remotes": ">=0.1.2-a <0.2.0-0",
+    "@deepseek-ai/dsh-client-locale": ">=0.1.2-a <0.2.0-0",
+    "@deepseek-ai/dsh-client-store": ">=0.1.2-a <0.2.0-0",
+    "@deepseek-ai/dsh-client-ui-settings": ">=0.1.2-a <0.2.0-0",
+    "@deepseek-ai/dsh-client-ui-slots": ">=0.1.2-a <0.2.0-0",
+    "@deepseek-ai/dsh-client-ui-primitives": ">=0.1.2-a <0.2.0-0"
   },
   "devDependencies": {
     "@tsdown/css": "^0.22.14",

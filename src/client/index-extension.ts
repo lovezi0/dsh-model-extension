@@ -4,29 +4,34 @@
  * Registers a "Models+" settings section that renders the official Models
  * page (inlined from the host's ui-settings-models sources at build time,
  * with our .ext touch-point replacements) under its own nav id. The store,
- * schema operations, dictionaries, and invalidation wiring mirror the
- * upstream ui-settings-models client/index.ts exactly — the forked components
- * run unmodified, so the wiring must too.
+ * schema operations, Host operations, dictionaries, and invalidation wiring
+ * mirror the upstream ui-settings-models client/index.ts @ 0.1.2-alpha.2
+ * exactly — the forked components run unmodified, so the wiring must too.
  */
-import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
-import type { ConnectionHandle } from '@deepseek-ai/dsh-api-remotes/client'
+import type { Context as ClientContext } from '@deepseek-ai/cordis'
 // Type-only: pulls the shell's SlotMap merge ('settings.section') into this program.
 import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
 // Type-only: pulls the locale plugin's Context merge (ctx.locale).
 import type {} from '@deepseek-ai/dsh-client-locale/client'
+// Type-only: pulls the ui renderer's Context merge (useSnapshot and friends on inject faces).
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 // Type-only: pulls the ctx.remote merge and forwarded-event key face.
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
 import { ModelsSection } from './ModelsSection.ext.tsx'
 import type { ModelsSectionInjected } from './ModelsSection.ext.tsx'
 import { ModelsSettingsStore } from './store.ts'
+import { createModelsOperations } from './operations.ts'
 import { createSettingsSchemaOperations } from './schema-operations.ts'
 import { en as extensionEn, zh as extensionZh } from './extension-meta.ts'
 
 /** Cordis service name (distinct from the npm package name). */
 export const name = 'model-extension-client'
 
-/** Required services — mirrors the upstream Models section registration. */
-export const inject = ['slots', 'locale', 'connection', 'remote', 'settingsScope', 'settingsSchema']
+/** Required services — mirrors the upstream Models section registration @ 0.1.2-alpha.2. */
+export const inject = [
+  'slots', 'locale', 'remote', 'remote.credentials', 'remote.llm', 'remote.settings',
+  'settingsScope', 'settingsSchema',
+]
 
 /** Refetch the page snapshot only after its first load (upstream helper, inlined). */
 function refreshIfLoaded(controller: ModelsSettingsStore): void {
@@ -48,15 +53,15 @@ export function apply(ctx: ClientContext): void {
     en: { ...extensionEn },
   }), 'dsh-model-extension: copy dictionaries')
 
-  const connection = ctx.get('connection') as ConnectionHandle
   const schema = createSettingsSchemaOperations(ctx.settingsSchema)
-  const controller = new ModelsSettingsStore(connection.api, schema, ctx.settingsScope.describe())
+  const operations = createModelsOperations(ctx)
+  const controller = new ModelsSettingsStore(ctx, schema, ctx.settingsScope.describe())
   // Registration-time text (the nav label thunk) shares one bound translate.
   const t = ctx.locale.bind(NS) as ModelsSectionInjected['t']
   const injected = (): ModelsSectionInjected => ({
     controller,
     hooks: { snapshot: controller.store },
-    api: connection.api,
+    operations,
     schema,
     t,
   })

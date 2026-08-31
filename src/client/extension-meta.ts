@@ -9,20 +9,21 @@ declare const __DSH_ADAPTER_VERSION__: string
 export const ADAPTER_VERSION: string =
   typeof __DSH_ADAPTER_VERSION__ === 'string' ? __DSH_ADAPTER_VERSION__ : '0.0.0-unknown'
 
-/** Thinking levels offered by llm-pi-ai (THINKING_LEVEL_GATE @ rc.2). Only `off` may carry an empty wire value. */
+/** Thinking levels offered by llm-pi-ai (THINKING_LEVEL_GATE @ 0.1.2-alpha.2). Only `off` may carry an empty wire value. */
 export const THINKING_LEVELS = ['off', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'] as const
 export type ThinkingLevel = (typeof THINKING_LEVELS)[number]
 
-/** Input modalities accepted by llm-pi-ai (MODALITY_GATE @ rc.2). */
+/** Input modalities accepted by llm-pi-ai (MODALITY_GATE @ 0.1.2-alpha.2). */
 export const MODALITIES = ['text', 'image'] as const
 export type Modality = (typeof MODALITIES)[number]
 
-/** Reasoning wire formats understood by llm-pi-ai (SUPPORTED_THINKING_FORMATS @ rc.2). */
+/** Reasoning wire formats understood by llm-pi-ai (SUPPORTED_THINKING_FORMATS @ 0.1.2-alpha.2). */
 export const THINKING_FORMATS = [
   'openai',
   'deepseek',
   'openrouter',
   'together',
+  'baseten',
   'zai',
   'qwen',
   'chat-template',
@@ -118,6 +119,8 @@ export const en = {
   customApiUnset: 'Not selected',
   customNeedsBaseUrl: 'A custom provider needs a base URL.',
   customNeedsModels: 'A custom provider needs at least one model.',
+  customBaseUrlPlaceholder: 'https://gateway.example/v1',
+  settingsPathUnresolvable: 'unresolvable settings path',
   create: 'Create provider',
   creating: 'Creating…',
   onboardingTitle: 'Add an API key to get started',
@@ -234,6 +237,8 @@ export const zh: { [K in ExtensionKey]: string } = {
   customApiUnset: '未选择',
   customNeedsBaseUrl: '自定义提供方需要 API 地址。',
   customNeedsModels: '自定义提供方至少需要一个模型。',
+  customBaseUrlPlaceholder: 'https://gateway.example/v1',
+  settingsPathUnresolvable: '无法解析设置路径',
   create: '创建提供方',
   creating: '创建中…',
   onboardingTitle: '先添加一个 API 密钥即可开始',

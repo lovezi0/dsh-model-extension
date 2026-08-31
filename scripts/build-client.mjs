@@ -28,16 +28,16 @@ const EXT_REDIRECTS = new Map([
   ['client/ModelsSection.tsx', resolve(projectRoot, 'src/client/ModelsSection.ext.tsx')],
 ])
 
-/** Platform module-table baseline (mirrors host packages/client/web/src/platform.ts). */
+/** Platform module-table baseline (mirrors host packages/client/web/src/platform.ts @ 0.1.2-alpha.2). */
 const PLATFORM_EXTERNALS = [
   'react',
   'react/jsx-runtime',
   'react-dom',
   'react-dom/client',
   '@deepseek-ai/cordis',
+  '@deepseek-ai/dsh-client-store',
   '@deepseek-ai/dsh-client-ui-slots',
   '@deepseek-ai/dsh-client-ui-primitives',
-  '@deepseek-ai/dsh-client-runtime/client',
 ]
 
 const pkg = JSON.parse(readFileSync(join(projectRoot, 'package.json'), 'utf8'))
