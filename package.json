@@ -1,6 +1,6 @@
 {
   "name": "dsh-model-extension",
-  "version": "0.2.0",
+  "version": "0.3.1",
   "description": "DeepSeek Harness plugin: extended per-model LLM configuration (reasoning efforts, input modalities, compat flags) as a companion settings page",
   "type": "module",
   "main": "lib/index.js",

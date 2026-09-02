@@ -56,6 +56,10 @@ dsh plugin --profile web add dsh-model-extension
 
 ## 版本历史
 
+- **0.3.1**
+    - 原0.2.0发布
+- **0.2.0**
+    - 🔥新增允许以 developer 角色发送系统提示
 - **0.2.0**
     - 🔥新增允许以 developer 角色发送系统提示
 - **0.1.1**
