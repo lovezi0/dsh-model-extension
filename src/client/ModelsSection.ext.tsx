@@ -2,7 +2,7 @@
  * Models settings section (EXT fork for dsh-model-extension).
  *
  * Forked from deepseek-harness packages/client/ui-settings-models
- * src/client/ModelsSection.tsx @ 0.1.2-alpha.2.
+ * src/client/ModelsSection.tsx @ 0.1.2-alpha.4.
  * Differences vs upstream (keep this list exhaustive when merging drift):
  * 1. The h2 title row carries an adapter-version badge.
  * 2. No child-slot machinery: this is a standalone section (id

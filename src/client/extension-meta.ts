@@ -9,15 +9,15 @@ declare const __DSH_ADAPTER_VERSION__: string
 export const ADAPTER_VERSION: string =
   typeof __DSH_ADAPTER_VERSION__ === 'string' ? __DSH_ADAPTER_VERSION__ : '0.0.0-unknown'
 
-/** Thinking levels offered by llm-pi-ai (THINKING_LEVEL_GATE @ 0.1.2-alpha.2). Only `off` may carry an empty wire value. */
+/** Thinking levels offered by llm-pi-ai (THINKING_LEVEL_GATE @ 0.1.2-alpha.4). Only `off` may carry an empty wire value. */
 export const THINKING_LEVELS = ['off', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'] as const
 export type ThinkingLevel = (typeof THINKING_LEVELS)[number]
 
-/** Input modalities accepted by llm-pi-ai (MODALITY_GATE @ 0.1.2-alpha.2). */
+/** Input modalities accepted by llm-pi-ai (MODALITY_GATE @ 0.1.2-alpha.4). */
 export const MODALITIES = ['text', 'image'] as const
 export type Modality = (typeof MODALITIES)[number]
 
-/** Reasoning wire formats understood by llm-pi-ai (SUPPORTED_THINKING_FORMATS @ 0.1.2-alpha.2). */
+/** Reasoning wire formats understood by llm-pi-ai (SUPPORTED_THINKING_FORMATS @ 0.1.2-alpha.4). */
 export const THINKING_FORMATS = [
   'openai',
   'deepseek',

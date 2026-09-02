@@ -5,7 +5,7 @@
  * page (inlined from the host's ui-settings-models sources at build time,
  * with our .ext touch-point replacements) under its own nav id. The store,
  * schema operations, Host operations, dictionaries, and invalidation wiring
- * mirror the upstream ui-settings-models client/index.ts @ 0.1.2-alpha.2
+ * mirror the upstream ui-settings-models client/index.ts @ 0.1.2-alpha.4
  * exactly — the forked components run unmodified, so the wiring must too.
  */
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
@@ -27,7 +27,7 @@ import { en as extensionEn, zh as extensionZh } from './extension-meta.ts'
 /** Cordis service name (distinct from the npm package name). */
 export const name = 'model-extension-client'
 
-/** Required services — mirrors the upstream Models section registration @ 0.1.2-alpha.2. */
+/** Required services — mirrors the upstream Models section registration @ 0.1.2-alpha.4. */
 export const inject = [
   'slots', 'locale', 'remote', 'remote.credentials', 'remote.llm', 'remote.settings',
   'settingsScope', 'settingsSchema',

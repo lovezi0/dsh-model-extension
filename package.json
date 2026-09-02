@@ -1,6 +1,6 @@
 {
   "name": "dsh-model-extension",
-  "version": "0.3.0-rc1",
+  "version": "0.3.2-alpha.4",
   "description": "DeepSeek Harness plugin: extended per-model LLM configuration (reasoning efforts, input modalities, compat flags) as a companion settings page",
   "type": "module",
   "main": "lib/index.js",
@@ -26,7 +26,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dsh": {
-    "adapter": "0.1.2-alpha.2",
+    "adapter": "0.1.2-alpha.4",
     "bundle": {
       "patch": "./cordis.patch.yml"
     },

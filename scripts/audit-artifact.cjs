@@ -5,7 +5,7 @@ const srv = require('fs').readFileSync('lib/index.js', 'utf8')
 console.log('== server half ==')
 console.log('DSH_HOME candidate path logic:', srv.includes('profiles/web/node_modules'))
 console.log('dsh-base fallback:', srv.includes('dsh-base/package.json'))
-console.log('anchor constant:', srv.includes('0.1.1-rc.2'))
+console.log('anchor constant:', srv.includes(`"${require('../package.json').dsh.adapter}"`))
 
 console.log('== client half ==')
 // 字典 key 抽样：fork 组件实际用到的
