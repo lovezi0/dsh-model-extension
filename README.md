@@ -58,6 +58,8 @@ dsh plugin --profile web add dsh-model-extension
 
 ## 版本历史
 
+- **0.3.3**
+    - 🔥适配deepseek harness 0.1.2-rc.1
 - **0.3.2**
     - **0.3.2.alpha.4**
         - 🔥适配deepseek harness 0.1.2-alpha.4

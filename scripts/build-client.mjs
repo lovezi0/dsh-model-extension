@@ -28,7 +28,7 @@ const EXT_REDIRECTS = new Map([
   ['client/ModelsSection.tsx', resolve(projectRoot, 'src/client/ModelsSection.ext.tsx')],
 ])
 
-/** Platform module-table baseline (mirrors host packages/client/web/src/platform.ts @ 0.1.2-alpha.4). */
+/** Platform module-table baseline (mirrors host packages/client/web/src/platform.ts @ 0.1.2-rc.1). */
 const PLATFORM_EXTERNALS = [
   'react',
   'react/jsx-runtime',
