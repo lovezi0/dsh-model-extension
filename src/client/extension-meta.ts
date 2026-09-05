@@ -131,7 +131,6 @@ export const en = {
   keyRequired: 'Enter an API key to continue.',
 
   // --- extension-only keys ------------------------------------------------
-  adapterVersion: 'Current adapter: {version}',
   extDeclare: 'Declared',
   extSection: 'Model extensions',
   extSectionHint: 'Extra per-model fields that live in settings.yaml.',
@@ -249,7 +248,6 @@ export const zh: { [K in ExtensionKey]: string } = {
   keyRequired: '请输入 API 密钥以继续。',
 
   // --- extension-only keys ------------------------------------------------
-  adapterVersion: '当前适配器：{version}',
   extDeclare: '声明',
   extSection: '模型扩展',
   extSectionHint: 'settings.yaml 中按模型生效的扩展字段。',

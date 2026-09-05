@@ -1,12 +1,12 @@
 /**
- * dsh-model-extension — client entry.
+ * dsh-model-extension — client entry (v1.0.0).
  *
- * Registers a "Models+" settings section that renders the official Models
- * page (inlined from the host's ui-settings-models sources at build time,
- * with our .ext touch-point replacements) under its own nav id. The store,
+ * Registers the Models+ settings section rendering the fully plugin-owned
+ * models-plus component tree (no host component code is bundled). The store,
  * schema operations, Host operations, dictionaries, and invalidation wiring
- * mirror the upstream ui-settings-models client/index.ts @ 0.1.2-alpha.4
- * exactly — the forked components run unmodified, so the wiring must too.
+ * keep the upstream ui-settings-models contracts @ 0.1.2-rc.1 — the logic
+ * modules (store/operations/schema-operations) are still inlined from the
+ * host tree at build time, only the presentation is ours.
  */
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
 // Type-only: pulls the shell's SlotMap merge ('settings.section') into this program.
@@ -17,17 +17,17 @@ import type {} from '@deepseek-ai/dsh-client-locale/client'
 import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 // Type-only: pulls the ctx.remote merge and forwarded-event key face.
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
-import { ModelsSection } from './ModelsSection.ext.tsx'
-import type { ModelsSectionInjected } from './ModelsSection.ext.tsx'
-import { ModelsSettingsStore } from './store.ts'
-import { createModelsOperations } from './operations.ts'
-import { createSettingsSchemaOperations } from './schema-operations.ts'
+import { ModelsPlusSection } from './models-plus/ModelsPlusSection.tsx'
+import type { ModelsPlusInjected } from './models-plus/ModelsPlusSection.tsx'
+import { ModelsSettingsStore } from './vendor/store.ts'
+import { createModelsOperations } from './vendor/operations.ts'
+import { createSettingsSchemaOperations } from './vendor/schema-operations.ts'
 import { en as extensionEn, zh as extensionZh } from './extension-meta.ts'
 
 /** Cordis service name (distinct from the npm package name). */
 export const name = 'model-extension-client'
 
-/** Required services — mirrors the upstream Models section registration @ 0.1.2-alpha.4. */
+/** Required services — mirrors the upstream Models section registration @ 0.1.2-rc.1. */
 export const inject = [
   'slots', 'locale', 'remote', 'remote.credentials', 'remote.llm', 'remote.settings',
   'settingsScope', 'settingsSchema',
@@ -44,9 +44,6 @@ function refreshIfLoaded(controller: ModelsSettingsStore): void {
  * @param ctx - client root context.
  */
 export function apply(ctx: ClientContext): void {
-  // Extension copy rides its own namespace; the section declares it via
-  // `locale:` so the framework synthesizes the `t` seat for both the official
-  // keys (resolved through our merged dictionary) and the extension keys.
   const NS = 'settings.models-extension'
   ctx.effect(() => ctx.locale.register(NS, {
     zh: { ...extensionZh },
@@ -56,9 +53,8 @@ export function apply(ctx: ClientContext): void {
   const schema = createSettingsSchemaOperations(ctx.settingsSchema)
   const operations = createModelsOperations(ctx)
   const controller = new ModelsSettingsStore(ctx, schema, ctx.settingsScope.describe())
-  // Registration-time text (the nav label thunk) shares one bound translate.
-  const t = ctx.locale.bind(NS) as ModelsSectionInjected['t']
-  const injected = (): ModelsSectionInjected => ({
+  const t = ctx.locale.bind(NS) as ModelsPlusInjected['t']
+  const injected = (): ModelsPlusInjected => ({
     controller,
     hooks: { snapshot: controller.store },
     operations,
@@ -83,5 +79,5 @@ export function apply(ctx: ClientContext): void {
     order: 11,
     label: () => t('nav'),
     inject: injected,
-  }, ModelsSection))
+  }, ModelsPlusSection))
 }

@@ -1,3 +1,15 @@
 - insert:
     - id: model-extension-row
       name: dsh-model-extension
+# Hide the official Models page: this plugin's Models+ page replaces it.
+# Id-targeted override (a patch row WITHOUT `insert`) — applyEntryPatches
+# assigns `disabled: true` onto the ui-settings-models entry created by the
+# web-app bundle patch, so no new loader entry is created. An insert row with
+# the same id would be a duplicate loader entry and crash the boot.
+# Side effects (accepted): the official onboarding components living in that
+# package disappear too; if a future DSH release renames the entry, the
+# override no longer matches (warn + official page returns silently) and must
+# be re-checked on adapter-anchor bumps.
+- id: ui-settings-models
+  name: '@deepseek-ai/dsh-client-ui-settings-models'
+  disabled: true

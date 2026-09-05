@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="6TWPCV6onBnpYeKMNJB9Pk">
+<head data-page-node-id="aZFOG708EASabQQB9OomRy">
+<meta charset="UTF-8" data-page-node-id="cM7u1efvp5BCCYc6UGnF1Q" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="AFTEycj2IzY8PMXasH0pYc" />
+<title>DSH 模型+ 设置界面 · 可交互 Demo（官方样式精确还原）</title>
+<style>
+/* ============================================================
+   1) 官方设计 token —— 抄自 ui-theme/src/styles/design-platform.css
+      （浅色 body{} 与 body[data-ds-dark-theme]{} 两块）
+   ============================================================ */
+body {
+  --dsw-static-amber-100: rgb(254, 245, 231);
+  --dsw-static-amber-400: rgb(247, 173, 49);
+  --dsw-static-amber-500: rgb(245, 158, 11);
+  --dsw-static-amber-600: rgb(221, 134, 41);
+  --dsw-static-blue-100: rgb(219, 234, 254);
+  --dsw-static-blue-300: rgb(147, 197, 253);
+  --dsw-static-blue-400: rgb(96, 165, 250);
+  --dsw-static-blue-450: rgb(77, 147, 248);
+  --dsw-static-blue-500: rgb(59, 130, 246);
+  --dsw-static-blue-50: rgb(239, 246, 255);
+  --dsw-static-blue-600: rgb(37, 99, 235);
+  --dsw-static-blue-800: rgb(30, 64, 175);
+  --dsw-static-blue-900: rgb(14, 48, 116);
+  --dsw-static-deepseek-100: rgb(228, 237, 253);
+  --dsw-static-deepseek-200: rgb(211, 226, 255);
+  --dsw-static-deepseek-300: rgb(183, 200, 254);
+  --dsw-static-deepseek-400: rgb(103, 158, 254);
+  --dsw-static-deepseek-450: rgb(86, 134, 254);
+  --dsw-static-deepseek-500: rgb(65, 118, 230);
+  --dsw-static-deepseek-50: rgb(237, 243, 254);
+  --dsw-static-deepseek-600: rgb(72, 104, 178);
+  --dsw-static-deepseek-800: rgb(52, 65, 91);
+  --dsw-static-deepseek-900: rgb(40, 49, 66);
+  --dsw-static-green-100: rgb(230, 250, 237);
+  --dsw-static-green-400: rgb(78, 209, 126);
+  --dsw-static-green-500: rgb(34, 197, 94);
+  --dsw-static-green-900: rgb(35, 60, 44);
+  --dsw-static-neutral-200: rgb(212, 212, 212);
+  --dsw-static-neutral-300: rgb(212, 212, 212);
+  --dsw-static-neutral-550: rgb(101, 103, 107);
+  --dsw-static-neutral-600: rgb(84, 85, 87);
+  --dsw-static-neutral-700: rgb(60, 60, 61);
+  --dsw-static-neutral-800: rgb(41, 41, 41);
+  --dsw-static-neutral-850: rgb(33, 33, 35);
+  --dsw-static-red-100: rgb(254, 226, 226);
+  --dsw-static-red-400: rgb(242, 90, 90);
+  --dsw-static-red-500: rgb(239, 68, 68);
+  --dsw-static-red-600: rgb(236, 19, 19);
+  --dsw-static-red-900: rgb(87, 12, 12);
+  --dsw-static-neutral-bluish-00: rgb(255, 255, 255);
+  --dsw-static-neutral-bluish-1000: rgb(15, 17, 21);
+  --dsw-static-neutral-bluish-100: rgb(235, 238, 242);
+  --dsw-static-neutral-bluish-150: rgb(233, 236, 242);
+  --dsw-static-neutral-bluish-200: rgb(225, 229, 238);
+  --dsw-static-neutral-bluish-300: rgb(207, 211, 214);
+  --dsw-static-neutral-bluish-400: rgb(173, 178, 184);
+  --dsw-static-neutral-bluish-500: rgb(151, 157, 166);
+  --dsw-static-neutral-bluish-50: rgb(249, 250, 251);
+  --dsw-static-neutral-bluish-600: rgb(129, 133, 140);
+  --dsw-static-neutral-bluish-60: rgb(245, 246, 247);
+  --dsw-static-neutral-bluish-700: rgb(97, 102, 107);
+  --dsw-static-neutral-bluish-750: rgb(67, 69, 74);
+  --dsw-static-neutral-bluish-75: rgb(241, 243, 245);
+  --dsw-static-neutral-bluish-800: rgb(53, 54, 56);
+  --dsw-static-neutral-bluish-850: rgb(44, 44, 46);
+  --dsw-static-neutral-bluish-875: rgb(35, 35, 36);
+  --dsw-static-neutral-bluish-900: rgb(27, 27, 28);
+  --dsw-static-neutral-bluish-950: rgb(21, 21, 23);
+}
+body[data-ds-dark-theme] {
+  --dsw-static-neutral-bluish-00: rgb(255, 255, 255);
+  --dsw-static-neutral-bluish-60: rgb(249, 250, 251);
+  --dsw-static-neutral-bluish-75: rgb(241, 243, 245);
+  --dsw-static-neutral-bluish-100: rgb(235, 238, 242);
+  --dsw-static-neutral-bluish-150: rgb(233, 236, 242);
+  --dsw-static-neutral-bluish-200: rgb(225, 229, 238);
+  --dsw-static-neutral-bluish-300: rgb(207, 211, 214);
+  --dsw-static-neutral-bluish-400: rgb(173, 178, 184);
+}
+/* 浅色 alias */
+body {
+  --dsw-alias-bg-base: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-bg-layer-1: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-bg-layer-2: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-bg-layer-3: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-bg-mask-1: rgba(0, 0, 0, 0.24);
+  --dsw-alias-bg-module-platform: var(--dsw-static-neutral-bluish-60);
+  --dsw-alias-border-l1: rgba(0, 0, 0, 0.04);
+  --dsw-alias-border-l2: rgba(0, 0, 0, 0.1);
+  --dsw-alias-border-l3: rgba(0, 0, 0, 0.12);
+  --dsw-alias-border-l4: rgba(0, 0, 0, 0.16);
+  --dsw-alias-brand-primary: var(--dsw-static-neutral-bluish-1000);
+  --dsw-alias-button-primary-fill: var(--dsw-alias-brand-primary);
+  --dsw-alias-button-primary-hover: var(--dsw-static-neutral-bluish-750);
+  --dsw-alias-interactive-bg-hover-accent: rgba(38, 49, 72, 0.14);
+  --dsw-alias-interactive-bg-hover-danger: rgba(236, 19, 19, 0.05);
+  --dsw-alias-interactive-bg-hover-solid: var(--dsw-static-neutral-bluish-75);
+  --dsw-alias-interactive-bg-hover: rgba(38, 49, 72, 0.06);
+  --dsw-alias-label-caption: var(--dsw-static-neutral-bluish-400);
+  --dsw-alias-label-dimmed: var(--dsw-static-neutral-bluish-200);
+  --dsw-alias-label-primary-foreground: var(--dsw-static-neutral-bluish-00);
+  --dsw-alias-label-primary: var(--dsw-static-neutral-bluish-1000);
+  --dsw-alias-label-secondary: var(--dsw-static-neutral-bluish-700);
+  --dsw-alias-label-tertiary: var(--dsw-static-neutral-bluish-600);
+  --dsw-alias-state-error-primary: var(--dsw-static-red-600);
+  --dsw-alias-state-success-primary: var(--dsw-static-green-500);
+  --dsw-alias-state-warn-label: var(--dsw-static-amber-600);
+  --dsw-specific-menu: var(--dsw-alias-bg-layer-3);
+}
+/* 深色 alias（demo 可切换） */
+body[data-ds-dark-theme] {
+  --dsw-alias-bg-base: var(--dsw-static-neutral-bluish-950);
+  --dsw-alias-bg-layer-1: var(--dsw-static-neutral-bluish-875);
+  --dsw-alias-bg-layer-2: var(--dsw-static-neutral-bluish-850);
+  --dsw-alias-bg-layer-3: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-bg-mask-1: rgba(0, 0, 0, 0.5);
+  --dsw-alias-bg-module-platform: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-border-l1: rgba(255, 255, 255, 0.06);
+  --dsw-alias-border-l2: rgba(255, 255, 255, 0.12);
+  --dsw-alias-border-l3: rgba(255, 255, 255, 0.16);
+  --dsw-alias-border-l4: rgba(255, 255, 255, 0.2);
+  --dsw-alias-brand-primary: var(--dsw-static-neutral-bluish-50);
+  --dsw-alias-button-primary-fill: var(--dsw-alias-brand-primary);
+  --dsw-alias-button-primary-hover: var(--dsw-static-neutral-bluish-100);
+  --dsw-alias-interactive-bg-hover-accent: rgba(255, 255, 255, 0.24);
+  --dsw-alias-interactive-bg-hover-danger: rgba(242, 90, 90, 0.15);
+  --dsw-alias-interactive-bg-hover-solid: var(--dsw-static-neutral-bluish-800);
+  --dsw-alias-interactive-bg-hover: rgba(255, 255, 255, 0.08);
+  --dsw-alias-label-caption: var(--dsw-static-neutral-bluish-600);
+  --dsw-alias-label-dimmed: var(--dsw-static-neutral-bluish-750);
+  --dsw-alias-label-primary-foreground: var(--dsw-static-neutral-bluish-1000);
+  --dsw-alias-label-primary: var(--dsw-static-neutral-bluish-50);
+  --dsw-alias-label-secondary: var(--dsw-static-neutral-bluish-300);
+  --dsw-alias-label-tertiary: var(--dsw-static-neutral-bluish-400);
+  --dsw-alias-state-error-primary: var(--dsw-static-red-400);
+  --dsw-alias-state-success-primary: var(--dsw-static-green-500);
+}
+
+/* ============================================================
+   2) 官方 ModelsSection.module.css（原样抄）
+   ============================================================ */
+.section { display: flex; flex-direction: column; gap: 12px; max-width: 720px; color: var(--dsw-alias-label-primary); border: 0.5px solid var(--dsw-alias-border-l4); border-radius: 16px; padding: 14px 16px; }
+.titleRow { display: flex; align-items: center; gap: 10px; }
+.title { margin: 0; font-size: 16px; line-height: 24px; font-weight: 500; color: var(--dsw-alias-label-primary); }
+.intro { margin: 0; font-size: 14px; line-height: 22px; color: var(--dsw-alias-label-tertiary); }
+.notice { margin: 0; font-size: 12px; line-height: 18px; color: var(--dsw-alias-state-warn-label); }
+.savedNotice { margin: 0; font-size: 12px; line-height: 18px; color: var(--dsw-alias-state-success-primary); }
+.rows { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.rowCard { border: 0.5px solid var(--dsw-alias-border-l4); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; }
+.rowHead { display: flex; align-items: center; gap: 10px; }
+.rowIdentity { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.rowName { font-size: 14px; line-height: 22px; font-weight: 500; color: var(--dsw-alias-label-primary); }
+.rowTag { flex: none; padding: 1px 6px; border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 4px; font-size: 11px; line-height: 16px; color: var(--dsw-alias-label-secondary); }
+.credentialDot { box-sizing: border-box; display: inline-block; flex: none; width: 8px; height: 8px; border-radius: 50%; }
+.credentialDotConfigured { background: var(--dsw-alias-state-success-primary); }
+.credentialDotMissing { background: var(--dsw-alias-state-error-primary); }
+.rowActions { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; }
+.primaryButton, .secondaryButton, .addButton { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; gap: 4px; height: 36px; padding: 0 14px; border: none; border-radius: 18px; font: inherit; font-size: 14px; line-height: 22px; cursor: pointer; }
+.primaryButton { background: var(--dsw-alias-button-primary-fill); color: var(--dsw-alias-label-primary-foreground); }
+.primaryButton:hover:not(:disabled) { background: var(--dsw-alias-button-primary-hover); }
+.secondaryButton, .addButton { border: 0.5px solid var(--dsw-alias-border-l3); background: transparent; color: var(--dsw-alias-label-primary); }
+.secondaryButton:hover:not(:disabled), .addButton:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover); }
+.secondaryButton:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover-solid); }
+.dangerButton { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; height: 36px; padding: 0 14px; border: none; border-radius: 18px; background: transparent; color: var(--dsw-alias-state-error-primary); font: inherit; font-size: 14px; line-height: 22px; cursor: pointer; }
+.dangerButton:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover-danger); }
+.rowActions .secondaryButton, .rowActions .dangerButton { height: 28px; padding: 0 10px; border-radius: 14px; font-size: 12px; line-height: 18px; }
+.primaryButton:disabled, .secondaryButton:disabled, .dangerButton:disabled, .addButton:disabled, .linkButton:disabled, .addModelButton:disabled { opacity: 0.4; cursor: default; }
+.primaryButton:focus-visible, .secondaryButton:focus-visible, .dangerButton:focus-visible, .addButton:focus-visible, .linkButton:focus-visible, .addModelButton:focus-visible, .iconButton:focus-visible, .tabButton:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--dsw-alias-border-l3); }
+.editor { border-radius: 12px; background: var(--dsw-alias-bg-module-platform); padding: 14px 16px; display: flex; flex-direction: column; gap: 14px; }
+.editorRoute { font-size: 12px; line-height: 18px; color: var(--dsw-alias-label-tertiary); }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.fieldLabel { display: inline-flex; align-items: center; gap: 10px; font-size: 12px; line-height: 18px; font-weight: 500; color: var(--dsw-alias-label-secondary); }
+.linkButton { box-sizing: border-box; display: inline-flex; align-items: center; height: 28px; padding: 0 10px; border: none; border-radius: 14px; background: transparent; color: var(--dsw-alias-label-tertiary); font: inherit; font-size: 12px; line-height: 18px; cursor: pointer; }
+.linkButton:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-secondary); }
+.advancedHint { margin: 0; font-size: 12px; line-height: 18px; color: var(--dsw-alias-label-tertiary); }
+.editorActions { display: flex; justify-content: flex-end; gap: 8px; }
+.addBlock { display: flex; flex-direction: column; gap: 12px; }
+.addActions { display: flex; flex-wrap: wrap; gap: 10px; }
+.addButton { flex: 1 1 0; min-width: 180px; gap: 6px; height: 44px; border: 1px dashed var(--dsw-alias-border-l3); border-radius: 16px; }
+.addCard, .setupCard { border-radius: 12px; background: var(--dsw-alias-bg-module-platform); padding: 14px 16px; display: flex; flex-direction: column; gap: 14px; list-style: none; }
+.addCard .editor, .setupCard .editor { background: none; padding: 0; }
+.tabs { display: flex; flex-direction: column; gap: 12px; }
+.tabBar { display: flex; gap: 4px; border-bottom: 0.5px solid var(--dsw-alias-border-l2); }
+.tabButton { appearance: none; border: none; background: transparent; padding: 6px 12px 8px; font: inherit; font-size: 13px; line-height: 20px; color: var(--dsw-alias-label-tertiary); cursor: pointer; position: relative; }
+.tabButton:hover { color: var(--dsw-alias-label-primary); }
+.tabButtonActive { color: var(--dsw-alias-label-primary); font-weight: 500; }
+.tabButtonActive::after { content: ''; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 2px; border-radius: 2px; background: var(--dsw-alias-brand-primary); }
+.tabPanel { display: flex; flex-direction: column; gap: 12px; }
+.modelCatalog { display: flex; flex-direction: column; gap: 10px; }
+.modelCatalogHeading { display: flex; flex-direction: column; gap: 2px; }
+.modelCatalogTitle { font-size: 12px; line-height: 18px; font-weight: 500; color: var(--dsw-alias-label-secondary); }
+.modelCatalogMeta, .modelEmpty { margin: 0; color: var(--dsw-alias-label-tertiary); font-size: 12px; line-height: 18px; }
+.modelList { display: flex; flex-direction: column; gap: 8px; }
+.modelListHead { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.modelEntry { border: 0.5px solid var(--dsw-alias-border-l4); border-radius: 10px; padding: 6px; }
+.modelRow { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto auto; align-items: center; gap: 6px; }
+.iconButton { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: none; border-radius: 6px; background: transparent; color: var(--dsw-alias-label-tertiary); cursor: pointer; }
+.iconButton:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
+.iconButton:disabled { cursor: default; opacity: 0.4; }
+.iconButtonDanger:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover-danger); color: var(--dsw-alias-state-error-primary); }
+.modelAdvanced { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; padding: 8px 4px 2px; }
+.modelField { display: flex; flex-direction: column; gap: 4px; }
+.modelFieldLabel { color: var(--dsw-alias-label-tertiary); font-size: 12px; line-height: 18px; }
+.modelEmpty { padding: 12px; border: 1px dashed var(--dsw-alias-border-l3); border-radius: 8px; text-align: center; }
+.addModelButton { box-sizing: border-box; align-self: flex-start; display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 10px; border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 14px; background: transparent; color: var(--dsw-alias-label-primary); font: inherit; font-size: 12px; line-height: 18px; cursor: pointer; }
+.addModelButton:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover); }
+.input { box-sizing: border-box; width: 100%; height: 32px; padding: 0 10px; border: 0.5px solid var(--dsw-alias-border-l4); border-radius: 8px; font: inherit; font-size: 14px; line-height: 22px; background: var(--dsw-alias-bg-layer-1); color: var(--dsw-alias-label-primary); }
+select.input { max-width: 240px; cursor: pointer; }
+.input:focus { outline: none; border-color: var(--dsw-alias-brand-primary); }
+.input::placeholder { color: var(--dsw-alias-label-dimmed); }
+.input:disabled { opacity: 0.6; cursor: default; }
+.selectInput { appearance: none; padding-right: 32px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%2381858C' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 12px 12px; }
+.error { margin: 0; font-size: 12px; line-height: 18px; color: var(--dsw-alias-state-error-primary); }
+.deleteDialog { width: min(480px, 100%); }
+.deleteConfirm:not(:disabled) { border-color: var(--dsw-alias-state-error-primary); color: var(--dsw-alias-state-error-primary); }
+.deleteConfirm:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover-danger); }
+.hiddenLabel { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.fetchDialog { max-width: 520px; }
+.candidateToolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.candidateSearch { min-width: 0; flex: 1 1 240px; }
+.candidateList { display: flex; flex-direction: column; gap: 2px; max-height: 320px; margin: 0; overflow-y: auto; padding: 0; list-style: none; }
+.candidate { border-radius: 6px; }
+.candidateLabel { display: flex; align-items: center; gap: 8px; padding: 6px 8px; cursor: pointer; }
+.candidateId { flex: 1 1 auto; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; overflow-wrap: anywhere; }
+.candidateEmpty { margin: 24px 0; color: var(--dsw-alias-label-secondary); font-size: 13px; line-height: 20px; text-align: center; }
+
+/* ============================================================
+   3) Demo 外壳 + 本插件扩展字段（官方无此样式，用官方 token 协调配色）
+   ============================================================ */
+/* 关键修复：作者样式表里的 .modelAdvanced{display:grid} 与 .extBlock{display:flex}
+   会盖掉浏览器 UA 的 [hidden]{display:none}——作者样式优先于 UA 样式，与特异性无关。
+   结果是 hidden 属性形同虚设，容量面板/扩展块永远摊开、点箭头毫无反应。 */
+[hidden] { display: none !important; }
+body { margin: 0; padding: 28px; background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-primary); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; }
+.page { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+.demoNote { border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 12px; padding: 12px 14px; background: var(--dsw-alias-bg-module-platform); font-size: 12px; line-height: 20px; color: var(--dsw-alias-label-secondary); }
+.demoNote b { font-weight: 500; color: var(--dsw-alias-label-primary); }
+.extTag { flex: none; padding: 1px 6px; border: 0.5px solid rgba(65,118,230,0.35); border-radius: 4px; background: var(--dsw-static-deepseek-100); color: var(--dsw-static-deepseek-600); font-size: 11px; line-height: 16px; font-weight: 500; }
+.nativeTag { flex: none; padding: 1px 6px; border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 4px; font-size: 11px; line-height: 16px; color: var(--dsw-alias-label-tertiary); }
+.extBlock { border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 10px; padding: 10px; margin: 8px 4px 2px; background: var(--dsw-alias-bg-layer-1); display: flex; flex-direction: column; gap: 10px; }
+.extGroup { border-top: 0.5px solid var(--dsw-alias-border-l2); padding-top: 12px; }
+.extCheck { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; }
+.extCheckLabel { font-size: 14px; line-height: 22px; color: var(--dsw-alias-label-primary); }
+.extHint { font-size: 12px; line-height: 18px; color: var(--dsw-alias-label-tertiary); }
+/* 门控容器：整块 hidden（不是置灰），靠上面的 [hidden] 规则压过 display:flex */
+.extGated { display: flex; flex-direction: column; gap: 12px; padding-left: 2px; }
+.extGated[data-locked="true"] { opacity: 0.55; }
+.extField { display: flex; flex-direction: column; gap: 6px; }
+.extLabel { font-size: 12px; line-height: 18px; color: var(--dsw-alias-label-tertiary); }
+.extTable { border: 0.5px solid var(--dsw-alias-border-l4); border-radius: 8px; overflow: hidden; }
+.extTHead { display: grid; grid-template-columns: 64px minmax(0,1fr) minmax(0,1.2fr); font-size: 12px; line-height: 18px; color: var(--dsw-alias-label-tertiary); background: var(--dsw-alias-bg-module-platform); }
+.extTHead > div { padding: 6px 10px; }
+.extTHead > div + div { border-left: 0.5px solid var(--dsw-alias-border-l2); }
+.extTRow { display: grid; grid-template-columns: 64px minmax(0,1fr) minmax(0,1.2fr); align-items: center; border-top: 0.5px solid var(--dsw-alias-border-l2); }
+.extTRow > div { padding: 6px 10px; font-size: 14px; }
+.extTRow > div + div { border-left: 0.5px solid var(--dsw-alias-border-l2); }
+.extTRow input[type="text"] { box-sizing: border-box; width: 100%; height: 32px; padding: 0 10px; border: 0.5px solid var(--dsw-alias-border-l4); border-radius: 8px; font: inherit; font-size: 14px; background: var(--dsw-alias-bg-layer-1); color: var(--dsw-alias-label-primary); }
+.extTRow input[type="text"]:disabled { opacity: 0.6; cursor: default; }
+.switchRow { display: flex; align-items: center; gap: 8px; font-size: 14px; line-height: 22px; cursor: pointer; }
+.switchRow input { accent-color: var(--dsw-alias-brand-primary); width: 15px; height: 15px; }
+.modalMask { position: fixed; inset: 0; background: var(--dsw-alias-bg-mask-1); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 24px; }
+.modal { background: var(--dsw-specific-menu); border-radius: 16px; padding: 20px; width: 100%; box-shadow: 0 12px 40px rgba(0,0,0,0.18); }
+.modalTitle { font-size: 16px; line-height: 24px; font-weight: 500; margin-bottom: 8px; color: var(--dsw-alias-label-primary); }
+.modalDesc { font-size: 14px; line-height: 22px; color: var(--dsw-alias-label-secondary); margin-bottom: 16px; }
+.modalFoot { display: flex; justify-content: flex-end; gap: 8px; }
+.themeBtn { position: fixed; top: 16px; right: 16px; height: 28px; padding: 0 12px; border-radius: 14px; border: 0.5px solid var(--dsw-alias-border-l3); background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-secondary); font: inherit; font-size: 12px; cursor: pointer; z-index: 50; }
+</style>
+</head>
+<body data-page-node-id="xPFUvutkQ8fjJqWUWFbB3v">
+
+<button class="themeBtn" id="themeBtn" data-page-node-id="GWHDFdkMfi02t5ta6Kaoyk">切换深色</button>
+
+<div class="page" data-page-node-id="v6QajjmZR82vsWc6FlY0DJ">
+  <!-- Demo 说明（不属于界面本体，仅为评审标注归属） -->
+  <div class="demoNote" data-page-node-id="jTYhwSEhvC8XyVfjPC1kWg">
+    <b data-page-node-id="z4pYj64AcqmDgXYmIhpFD1">可交互 Demo</b>　界面为插件自写（样式 token 与类名沿用官方设计）；保存管线 vendor 自官方 <code data-page-node-id="QKGybnQtgsdT6B8jJ1JFxJ">ui-settings-models</code> @0.1.2-rc.1（store / operations / schema-operations）。<br data-page-node-id="35G8y7JADFZDvXvjDSoTvo"/>
+    「供应商」页（Tabs）：API 密钥 · API 地址 · 显示名称 / API 协议（仅自定义路由）。　
+    「模型」页：模型目录，条目展开区为一块扩展面板（容量 / 输入模态 / developer 角色 / 推理挡位 / 思考格式 / 快速装入），无标题。<br data-page-node-id="voZTgt0o7R2yfH9a8LcxJ1"/>
+    两级展开：点「编辑」展开编辑卡 → 编辑卡内是 <b>Tabs 标签页</b>（供应商 / 模型，默认停在「供应商」，切页不丢状态）→ 在「模型」页再点条目的「容量」箭头展开扩展区。<br/>
+    标题行：「模型+」+ 「下载/更新元数据」按钮（本 Demo 内为模拟；真实实现为点击后从 models.dev 下载并缓存到 DSH home，未就绪时快速装入提示不可用）。官方「模型」页已通过 bundle patch 禁用，本页为唯一模型设置页。<br/>
+    另可试：取消「端点接受推理挡位参数」→ 思考格式与推理挡位<b>整块隐藏</b>（且落盘时一并清除，不留孤儿参数）；
+    「允许以 developer 角色发送系统提示」与「输入模态」不受它控制 → 「获取可用模型」拉候选 → 「删除」走确认弹窗。<br/>
+    新模型行默认值（v1.0.0）：推理挡位开启且七档全声明、思考格式 openai、输入模态全选、developer 角色继承勾选。<br/>
+    「快速装入」：展开区顶部的可搜索下拉——只显示模型 id、忽略大小写模糊匹配、最多 10 条候选；真实数据源为 models.dev（本 Demo 用内置示例数据代替）。
+  </div>
+
+  <!-- ==================== 界面本体 ==================== -->
+  <div class="section" id="section" data-page-node-id="UCpijZYf0A8uOjRt8DTCUC">
+    <div class="titleRow">
+      <h2 class="title" data-page-node-id="g6O9OuUIZrCH7P8uVzoJ2o">模型+</h2>
+      <span class="rowActions">
+        <button class="linkButton" data-act="download-meta" title="下载/更新 models.dev 元数据（供快速装入预填）">下载/更新元数据</button>
+      </span>
+    </div>
+    <p class="intro" data-page-node-id="65pLmVSBtoZXn30lG4F3C4">填入各提供方的 API 密钥即可使用其模型。</p>
+    <p class="savedNotice" id="savedNotice" hidden data-page-node-id="qeTGqCU8GYR3Xu2kzZokHy"></p>
+    <ul class="rows" id="rows" data-page-node-id="wakCEJstxtFupCqkfwEYkT"></ul>
+    <div class="addBlock" id="addBlock" data-page-node-id="904sm50ZUzRBTyYRPnsd7c"></div>
+  </div>
+</div>
+
+<!-- 快速装入的可搜索下拉候选（datalist，选项由脚本按 QUICK_PRESETS 填充） -->
+<datalist id="quickPresetOptions"></datalist>
+
+<script>
+/* ============ 中文文案：抄自官方 locales.ts 的 zh 字典 ============ */
+const T = {
+  title:'模型', intro:'填入各提供方的 API 密钥即可使用其模型。',
+  edit:'编辑', editProvider:'编辑 {provider}', remove:'删除', removeProvider:'删除 {provider}',
+  deleteTitle:'删除 {provider}？',
+  deleteDescription:'删除 {provider} 会移除其配置；其使用的凭证（如有）由其他位置管理，将会保留。',
+  deleteDescriptionWithCredential:'删除 {provider} 会移除其配置和存储的 API 密钥。',
+  deleteConfirm:'删除 {provider}',
+  add:'添加提供方', provider:'提供方', cancel:'取消', apply:'保存', savedProvider:'已保存 {provider}。',
+  credentialConfigured:'API 密钥已配置', credentialMissing:'API 密钥缺失',
+  keyInput:'API 密钥', keyPlaceholder:'输入 API 密钥',
+  keyPlaceholderNative:'输入 API 密钥，或留空使用环境认证',
+  keyStored:'已配置——输入新值可替换',
+  customized:'自定义设置', baseUrl:'API 地址', baseUrlDefault:'提供方默认',
+  models:'模型目录', modelsInherited:'正在使用适配器默认模型', modelsCustomized:'已自定义模型目录',
+  resetModels:'恢复默认模型', modelId:'模型 ID', modelName:'显示名称',
+  modelAdvanced:'容量', addModel:'添加模型', removeModel:'删除模型',
+  modelContextWindow:'上下文窗口', modelMaxTokens:'最大输出 token',
+  contextWindowPlaceholder:'使用提供方默认值', maxTokensPlaceholder:'使用提供方默认值',
+  modelsEmpty:'模型选择器中将不显示任何模型；目录外 ID 仍可直接发送。',
+  fetchModels:'获取可用模型', fetchTitle:'选择要添加的模型',
+  fetchDescription:'以下是模型提供方的可用模型，勾选要添加的模型。',
+  fetchSearch:'搜索模型', fetchNoMatches:'没有匹配的模型。',
+  fetchSelectAll:'全选', fetchDeselectAll:'取消全选', fetchAdopt:'添加所选',
+  customAdd:'添加自定义提供方', customTitle:'自定义提供方', customTag:'自定义',
+  customRoute:'Provider ID',
+  customRouteHint:'以小写字母开头的标识，在请求中唯一标识该提供方，并用于派生凭据名。',
+  customDisplayName:'显示名称', customApi:'API 协议',
+  customBaseUrlPlaceholder:'https://gateway.example/v1',
+  create:'创建提供方',
+  /* 本 demo 新增的分区标题：官方只有单个「自定义设置」折叠区，
+     此处拆为「供应商 / 模型」两块，各自收拢对应字段。 */
+  sectionProvider:'供应商', sectionModel:'模型',
+};
+
+/* ============ 图标：抄自 ModelListEditor.tsx ============ */
+const CHEVRON = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" style="transition:transform 120ms ease"><path d="M6 3.5L10.5 8L6 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const TRASH = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 4h11M6.5 4V2.5h3V4M4 4l.7 9a1 1 0 001 .9h4.6a1 1 0 001-.9L12 4M6.5 6.8v4.4M9.5 6.8v4.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const PLUS = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
+
+/* ============ 状态 ============ */
+/* 推理挡位 / 思考格式 / 输入模态：抄自 src/client/extension-meta.ts，
+   与 llm-pi-ai 的枚举逐项对齐（挡位 7 档、格式 11 项）。 */
+const LEVELS = [
+  { key:'off', zh:'关闭' }, { key:'minimal', zh:'极小' }, { key:'low', zh:'低' },
+  { key:'medium', zh:'中' }, { key:'high', zh:'高' }, { key:'xhigh', zh:'超高' }, { key:'max', zh:'最大' },
+];
+const FORMATS = ['openai','deepseek','openrouter','together','baseten','zai','qwen',
+  'chat-template','qwen-chat-template','string-thinking','ant-ling'];
+const MODALITIES = [{ key:'text', zh:'文本' }, { key:'image', zh:'图像' }];
+
+/* 模型扩展字段草稿，结构与 ModelExtensionFields.tsx 读写的 draft 一致：
+   - developerRole   = compat.supportsDeveloperRole，三态：未写/true 皆勾选，仅显式 false 不勾
+   - reasoningEffort = compat.supportsReasoningEffort，严格 ===true 才算开（**默认关闭**，门控区隐藏）
+   - levels          = reasoningEfforts，{ [level]: wire|null }，**只含已声明的档位**（off 值为 null）
+   - thinkingFormat  = compat.thinkingFormat，空串 = 未设置
+   - input           = input 模态数组，与推理挡位互不隶属 */
+const extDefault = () => ({
+  // v1.0.0 默认值（升级计划 4-7 条）：推理挡位开启且七档全声明、思考格式 openai、
+  // 输入模态全选；developerRole 三态继承（勾选态不写键）。
+  developerRole: true,      // 勾选态 = 继承 catalog/检测
+  reasoningEffort: true,    // 默认开启 → 思考格式 + 推理挡位整块可见
+  levels: { off:null, minimal:'minimal', low:'low', medium:'medium', high:'high', xhigh:'xhigh', max:'max' },
+  thinkingFormat: 'openai',
+  input: ['text', 'image'],
+});
+
+/* 快速装入预设（demo 示例数据；真实实现可换成适配器目录 / 常用配置快照）。
+   套用语义：容量与扩展字段整份覆盖该模型行。 */
+const QUICK_PRESETS = {
+  'deepseek-chat · DeepSeek': {
+    context:'128K', max:'8K',
+    ext: { developerRole:false, reasoningEffort:false, levels:{}, thinkingFormat:'', input:['text'] },
+  },
+  'deepseek-reasoner · DeepSeek': {
+    context:'128K', max:'64K',
+    ext: { developerRole:true, reasoningEffort:true, thinkingFormat:'deepseek',
+           levels:{ off:null, minimal:'minimal', low:'low', medium:'medium', high:'high', xhigh:'xhigh', max:'max' },
+           input:['text'] },
+  },
+  'gpt-4o · OpenAI': {
+    context:'128K', max:'16K',
+    ext: { developerRole:true, reasoningEffort:false, levels:{}, thinkingFormat:'', input:['text','image'] },
+  },
+  'qwen-max · 阿里云': {
+    context:'32K', max:'8K',
+    ext: { developerRole:false, reasoningEffort:true, thinkingFormat:'qwen',
+           levels:{ off:null, low:'low', medium:'medium', high:'high' },
+           input:['text'] },
+  },
+};
+
+/** 按最新草稿重绘某条目的扩展块（保留展开状态）。 */
+function repaintExtBlock(entry) {
+  const p = P(entry.querySelector('[data-act="toggle-adv"]').dataset.p);
+  const m = p.models[Number(entry.dataset.entry)];
+  const old = entry.querySelector('[data-ext]');
+  const wasOpen = !old.hidden;
+  const fresh = document.createElement('div');
+  fresh.innerHTML = extBlockHtml(m);
+  const next = fresh.firstElementChild;
+  if (wasOpen) next.hidden = false;
+  old.replaceWith(next);
+}
+
+/** 从扩展块反查它所属的模型草稿对象。 */
+function modelOfExt(extEl) {
+  const entry = extEl.closest('.modelEntry');
+  const p = P(entry.querySelector('[data-act="toggle-adv"]').dataset.p);
+  return p.models[Number(entry.dataset.entry)];
+}
+/** 重算推理挡位的两条校验（与 ModelExtensionFields.tsx 的 hasEmptyWire / onlyOffDeclared 一致）。 */
+function updateEffortError(extEl) {
+  const m = modelOfExt(extEl);
+  const declared = Object.keys(m.ext.levels);
+  const hasEmptyWire = declared.some(k => k !== 'off' && String(m.ext.levels[k] ?? '').trim().length === 0);
+  const onlyOff = declared.length > 0 && !declared.some(k => k !== 'off');
+  const p = extEl.querySelector('[data-effort-error]');
+  if (!p) return;
+  p.hidden = !(hasEmptyWire || onlyOff);
+  p.textContent = hasEmptyWire ? '除 off 外勾选的挡位必须填写线上取值。' : '至少声明一个 off 以外的挡位。';
+}
+/** 重画某一档位行的「线上取值」单元格：已声明且非 off → 输入框，否则显示 —。 */
+function paintWireCell(rowEl, m) {
+  const key = rowEl.dataset.levelRow;
+  const declared = key in m.ext.levels;
+  const value = String(m.ext.levels[key] ?? '');
+  rowEl.children[1].style.opacity = declared ? '1' : '0.5';
+  rowEl.children[2].style.opacity = declared ? '1' : '0.4';
+  rowEl.children[2].innerHTML = declared && key !== 'off'
+    ? `<input type="text" data-act="ext-wire" data-level="${key}" value="${value.replace(/"/g, '&quot;')}" placeholder="${key}" aria-label="${key} 线上取值">`
+    : '<span style="font-size:12px;color:var(--dsw-alias-label-tertiary)">—</span>';
+}
+const state = {
+  providers: [
+    { id:'deepseek', name:'DeepSeek', route:'deepseek', declared:false, keyConfigured:true,
+      baseURL:'https://api.deepseek.com', overridden:false,
+      models:[ { id:'deepseek-chat', name:'DeepSeek Chat', context:'', max:'', ext:extDefault() },
+               { id:'deepseek-reasoner', name:'DeepSeek Reasoner', context:'', max:'', ext:extDefault() } ] },
+    { id:'acme-gateway', name:'Acme Gateway', route:'acme-gateway', declared:true, keyConfigured:true,
+      baseURL:'https://gateway.example/v1', overridden:true,
+      models:[ { id:'gpt-4o', name:'GPT-4o', context:'128K', max:'16K', ext:extDefault() } ] },
+  ],
+  editing: null,        // provider id | null（官方：一次只开一张卡）
+  addMode: null,        // null | 'add' | 'custom'
+  addRoute: 'moonshot',
+  deleteId: null,
+  fetchFor: null,       // provider id
+  fetchPicked: new Set(),
+  saved: null,
+};
+const addable = [
+  { id:'moonshot', name:'Moonshot' },
+  { id:'siliconflow', name:'SiliconFlow' },
+  { id:'zhipu', name:'智谱' },
+];
+const candidatePool = ['deepseek-chat','deepseek-reasoner','deepseek-coder','deepseek-v3-0324','deepseek-r1-0528'];
+
+/* 新建卡片（添加提供方 / 添加自定义提供方）的模型草稿。它不在 providers 列表里，
+   但必须能被 P() 找到：否则在这两张卡上点「添加模型」，P('__new') 返回 undefined，
+   undefined.models 抛 TypeError，整段脚本从此失效——后续所有交互（含容量展开）全废。 */
+const newProv = { id:'__new', name:'', route:'', declared:true, keyConfigured:false,
+  baseURL:'', overridden:false, models:[] };
+const P = (id) => state.providers.find(p => p.id === id) || (id === '__new' ? newProv : undefined);
+const esc = (s) => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ============ 片段模板 ============ */
+function extBlockHtml(m) {
+  const e = m.ext;
+  // 七档常显：真实实现渲染 THINKING_LEVELS 全部行，未声明的行取值列显示「—」。
+  const rows = LEVELS.map(l => {
+    const declared = l.key in e.levels;
+    const value = String(e.levels[l.key] ?? '');
+    const cell = declared && l.key !== 'off'
+      ? `<input type="text" data-act="ext-wire" data-level="${l.key}" value="${esc(value)}" placeholder="${l.key}" aria-label="${l.zh} (${l.key}) 线上取值">`
+      : '<span style="font-size:12px;color:var(--dsw-alias-label-tertiary)">—</span>';
+    return `
+    <div class="extTRow" data-level-row="${l.key}">
+      <div style="display:flex;justify-content:center">
+        <input type="checkbox" data-act="ext-level" data-level="${l.key}" ${declared ? 'checked' : ''}
+               aria-label="声明 ${l.zh} (${l.key})" style="accent-color:var(--dsw-alias-brand-primary);width:15px;height:15px">
+      </div>
+      <div style="opacity:${declared ? 1 : 0.5}">${l.zh} (${l.key})</div>
+      <div style="opacity:${declared ? 1 : 0.4}">${cell}</div>
+    </div>`;
+  }).join('');
+  return `
+  <div class="extBlock" hidden data-ext>
+    <!-- ⓪ 快速装入：可搜索下拉，选中后整份套用预设（容量 + 扩展字段） -->
+    <div class="extGroup" style="border-top:none;padding-top:0">
+      <span class="extLabel" style="margin-bottom:6px">快速装入</span>
+      <input class="input" list="quickPresetOptions" data-act="quick-load"
+             placeholder="搜索预设（示例数据）…" aria-label="快速装入">
+    </div>
+    <!-- ① 容量字段并入块顶：上下文窗口 / 最大输出 token -->
+    <div class="modelAdvanced" style="padding:0">
+      <label class="modelField"><span class="modelFieldLabel">${T.modelContextWindow}</span>
+        <input class="input" type="text" value="${esc(m.context || '')}" placeholder="${T.contextWindowPlaceholder}" aria-label="${T.modelContextWindow}"></label>
+      <label class="modelField"><span class="modelFieldLabel">${T.modelMaxTokens}</span>
+        <input class="input" type="text" value="${esc(m.max || '')}" placeholder="${T.maxTokensPlaceholder}" aria-label="${T.modelMaxTokens}"></label>
+    </div>
+
+    <!-- ① 输入模态：与推理挡位互不隶属，不受总开关控制 -->
+    <div class="extGroup">
+      <span class="extLabel" style="margin-bottom:6px">输入模态</span>
+      <div style="display:flex;gap:18px">
+        ${MODALITIES.map(md => `
+          <label class="switchRow">
+            <input type="checkbox" data-act="ext-modal" data-modal="${md.key}" ${e.input.includes(md.key) ? 'checked' : ''}>${md.zh}
+          </label>`).join('')}
+      </div>
+    </div>
+
+    <!-- ② developer 角色：三态，不受「端点接受推理挡位参数」控制 -->
+    <div class="extGroup">
+      <label class="extCheck">
+        <input type="checkbox" data-act="ext-devrole" ${e.developerRole ? 'checked' : ''}
+               style="accent-color:var(--dsw-alias-brand-primary);width:15px;height:15px;flex:none;margin-top:3px"
+               aria-label="允许以 developer 角色发送系统提示">
+        <span style="display:flex;flex-direction:column;gap:2px">
+          <span class="extCheckLabel">允许以 developer 角色发送系统提示</span>
+          <span class="extHint">推理模型的系统提示将以 developer 角色发出；网关拒绝该角色时取消勾选，改用 system。</span>
+        </span>
+      </label>
+    </div>
+
+    <!-- ③ 总开关：仅在 compat.supportsReasoningEffort === true 时为真（默认关闭） -->
+    <div class="extGroup">
+      <label class="switchRow">
+        <input type="checkbox" data-act="ext-master" ${e.reasoningEffort ? 'checked' : ''}>
+        端点接受推理挡位参数（reasoning_effort）
+      </label>
+    </div>
+
+    <!-- ④ 受总开关门控：真实实现是 !supportsReasoningEffort ? null : (…) —— 整块隐藏，不是置灰；门控内先思考格式、后推理挡位 -->
+    <div class="extGated" data-gated ${e.reasoningEffort ? '' : 'hidden'}>
+      <div class="extField">
+        <span class="extLabel">思考格式</span>
+        <select class="input selectInput" data-act="ext-thinking" aria-label="思考格式">
+          <option value="" ${e.thinkingFormat === '' ? 'selected' : ''}>—</option>
+          ${FORMATS.map(f => `<option value="${f}" ${e.thinkingFormat === f ? 'selected' : ''}>${f}</option>`).join('')}
+        </select>
+      </div>
+      <div class="extField">
+        <span class="extLabel">推理挡位</span>
+        <div class="extTable">
+          <div class="extTHead"><div>声明</div><div>挡位</div><div>线上取值</div></div>
+          ${rows}
+        </div>
+        <p class="error" data-effort-error hidden style="margin-top:6px"></p>
+      </div>
+    </div>
+  </div>`;
+}
+
+function modelEntryHtml(p, m, i) {
+  return `
+  <div class="modelEntry" data-entry="${i}">
+    <div class="modelRow">
+      <input class="input" type="text" value="${esc(m.id)}" placeholder="${T.modelId}" aria-label="${T.modelId} ${i+1}">
+      <input class="input" type="text" value="${esc(m.name || '')}" placeholder="${T.modelName}" aria-label="${T.modelName} ${i+1}">
+      <button class="iconButton" data-act="toggle-adv" data-p="${p.id}" aria-label="${T.modelAdvanced} ${i+1}" aria-expanded="false" title="${T.modelAdvanced}">${CHEVRON}</button>
+      <button class="iconButton iconButtonDanger" data-act="remove-model" data-p="${p.id}" data-i="${i}" aria-label="${T.removeModel} ${i+1}" title="${T.removeModel}">${TRASH}</button>
+    </div>
+    ${extBlockHtml(m)}
+  </div>`;
+}
+
+function catalogHtml(p) {
+  const list = p.models.length === 0
+    ? `<p class="modelEmpty">${T.modelsEmpty}</p>`
+    : `<div class="modelList">${p.models.map((m,i) => modelEntryHtml(p,m,i)).join('')}</div>`;
+  return `
+  <section class="modelCatalog" aria-label="${T.models}">
+    <div class="modelListHead">
+      <div class="modelCatalogHeading">
+        <span class="modelCatalogTitle">${T.models}</span>
+        <span class="modelCatalogMeta">${p.overridden ? T.modelsCustomized : T.modelsInherited}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;">
+        ${p.overridden ? `<button class="linkButton" data-act="reset-models" data-p="${p.id}">${T.resetModels}</button>` : ''}
+        <button class="linkButton" data-act="fetch" data-p="${p.id}">${T.fetchModels}</button>
+      </div>
+    </div>
+    ${list}
+    <button class="addModelButton" data-act="add-model" data-p="${p.id}">${PLUS}${T.addModel}</button>
+  </section>`;
+}
+
+function editorHtml(p) {
+  const keyPlaceholder = p.keyConfigured ? T.keyStored
+    : (p.declared ? T.keyPlaceholderNative : T.keyPlaceholder);
+  return `
+  <div class="editor">
+    <!-- 分区一：供应商——端点身份与凭据（默认收起） -->
+    <div class="tabs">
+      <div class="tabBar" role="tablist">
+        <button type="button" class="tabButton tabButtonActive" data-act="tab" data-tab="provider" role="tab" aria-selected="true">${T.sectionProvider}</button>
+        <button type="button" class="tabButton" data-act="tab" data-tab="models" role="tab" aria-selected="false">${T.sectionModel}</button>
+      </div>
+      <div class="tabPanel" data-panel="provider">
+        ${p.declared ? `
+        <div class="field">
+          <span class="fieldLabel">${T.customDisplayName}</span>
+          <input class="input" type="text" value="${esc(p.name)}" placeholder="${esc(p.route)}" aria-label="${T.customDisplayName}">
+        </div>` : ''}
+        <div class="field">
+          <span class="fieldLabel">${T.keyInput}</span>
+          <input class="input" type="password" autocomplete="off" placeholder="${esc(keyPlaceholder)}" aria-label="${T.keyInput}">
+        </div>
+        <div class="field">
+          <span class="fieldLabel">${T.baseUrl}</span>
+          <input class="input" type="text" value="${esc(p.baseURL)}" placeholder="${T.baseUrlDefault}" aria-label="${T.baseUrl}">
+        </div>
+        ${p.declared ? `
+        <div class="field">
+          <span class="fieldLabel">${T.customApi}</span>
+          <select class="input selectInput" aria-label="${T.customApi}"><option>openai</option></select>
+        </div>` : ''}
+      </div>
+    
+    <!-- 分区二：模型——模型目录与每条目的容量/扩展字段（默认收起） -->
+      <div class="tabPanel" data-panel="models" hidden>
+        ${catalogHtml(p)}
+      </div>
+    </div>
+    <div class="editorActions">
+      <button class="secondaryButton" data-act="cancel-edit">${T.cancel}</button>
+      <button class="primaryButton" data-act="save" data-p="${p.id}">${T.apply}</button>
+    </div>
+  </div>`;
+}
+
+function rowHtml(p) {
+  const open = state.editing === p.id;
+  return `
+  <li class="rowCard" data-row="${p.id}">
+    <div class="rowHead">
+      <span class="rowIdentity">
+        <span class="rowName">${esc(p.name)}</span>
+        ${p.declared ? `<span class="rowTag">${T.customTag}</span>` : ''}
+        <span class="credentialDot ${p.keyConfigured ? 'credentialDotConfigured' : 'credentialDotMissing'}"
+              role="img" aria-label="${p.keyConfigured ? T.credentialConfigured : T.credentialMissing}"
+              title="${p.keyConfigured ? T.credentialConfigured : T.credentialMissing}"></span>
+      </span>
+      <span class="rowActions">
+        <button class="secondaryButton" data-act="edit" data-p="${p.id}"
+          aria-label="${T.editProvider.replace('{provider}', p.name)}">${T.edit}</button>
+        <button class="dangerButton" data-act="delete" data-p="${p.id}"
+          aria-label="${T.removeProvider.replace('{provider}', p.name)}">${T.remove}</button>
+      </span>
+    </div>
+    ${open ? editorHtml(p) : ''}
+  </li>`;
+}
+
+function customCardHtml() {
+  return `
+  <div class="addCard">
+    <div class="tabs">
+      <div class="tabBar" role="tablist">
+        <button type="button" class="tabButton tabButtonActive" data-act="tab" data-tab="provider" role="tab" aria-selected="true">${T.sectionProvider}</button>
+        <button type="button" class="tabButton" data-act="tab" data-tab="models" role="tab" aria-selected="false">${T.sectionModel}</button>
+      </div>
+      <div class="tabPanel" data-panel="provider">
+        <div class="field">
+          <span class="fieldLabel">${T.customRoute}</span>
+          <input class="input" type="text" placeholder="acme-gateway" aria-label="${T.customRoute}">
+          <p class="advancedHint">${T.customRouteHint}</p>
+        </div>
+        <div class="field">
+          <span class="fieldLabel">${T.customDisplayName}</span>
+          <input class="input" type="text" placeholder="${T.customDisplayName}" aria-label="${T.customDisplayName}">
+        </div>
+        <div class="field">
+          <span class="fieldLabel">${T.baseUrl}</span>
+          <input class="input" type="text" placeholder="${T.customBaseUrlPlaceholder}" aria-label="${T.baseUrl}">
+        </div>
+        <div class="field">
+          <span class="fieldLabel">${T.customApi}</span>
+          <select class="input selectInput" aria-label="${T.customApi}"><option>openai</option></select>
+        </div>
+        <div class="field">
+          <span class="fieldLabel">${T.keyInput}</span>
+          <input class="input" type="password" autocomplete="off" placeholder="${T.keyPlaceholderNative}" aria-label="${T.keyInput}">
+        </div>
+      </div>
+    </div>
+      <div class="tabPanel" data-panel="models" hidden>
+        ${catalogHtml(newProv)}
+      </div>
+    </div>
+    <div class="editorActions">
+      <button class="secondaryButton" data-act="close-add">${T.cancel}</button>
+      <button class="primaryButton" data-act="create">${T.create}</button>
+    </div>
+  </div>`;
+}
+
+function addCardForExistingHtml() {
+  return `
+  <div class="addCard">
+    <div class="field">
+      <span class="fieldLabel">${T.provider}</span>
+      <select class="input selectInput" data-act="pick-addable" aria-label="${T.provider}">
+        ${addable.map(a => `<option value="${a.id}" ${state.addRoute === a.id ? 'selected' : ''}>${a.name}</option>`).join('')}
+      </select>
+    </div>
+    <div class="editor">
+      <div class="tabs">
+        <div class="tabBar" role="tablist">
+          <button type="button" class="tabButton tabButtonActive" data-act="tab" data-tab="provider" role="tab" aria-selected="true">${T.sectionProvider}</button>
+          <button type="button" class="tabButton" data-act="tab" data-tab="models" role="tab" aria-selected="false">${T.sectionModel}</button>
+        </div>
+        <div class="tabPanel" data-panel="provider">
+          <div class="field">
+            <span class="fieldLabel">${T.keyInput}</span>
+            <input class="input" type="password" autocomplete="off" placeholder="${T.keyPlaceholderNative}" aria-label="${T.keyInput}">
+          </div>
+          <div class="field">
+            <span class="fieldLabel">${T.baseUrl}</span>
+            <input class="input" type="text" placeholder="${T.baseUrlDefault}" aria-label="${T.baseUrl}">
+          </div>
+        </div>
+      </div>
+        <div class="tabPanel" data-panel="models" hidden>
+          ${catalogHtml(newProv)}
+        </div>
+      </div>
+      <div class="editorActions">
+        <button class="secondaryButton" data-act="close-add">${T.cancel}</button>
+        <button class="primaryButton" data-act="close-add">${T.apply}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function addBlockHtml() {
+  if (state.addMode === 'custom') return customCardHtml();
+  if (state.addMode === 'add') return addCardForExistingHtml();
+  return `<div class="addActions">
+    <button class="addButton" data-act="add">${PLUS}${T.add}</button>
+    <button class="addButton" data-act="add-custom">${PLUS}${T.customAdd}</button>
+  </div>`;
+}
+
+/* ============ 渲染 ============ */
+function render() {
+  document.getElementById('rows').innerHTML = state.providers.map(rowHtml).join('');
+  document.getElementById('addBlock').innerHTML = addBlockHtml();
+  const notice = document.getElementById('savedNotice');
+  if (state.saved) { notice.textContent = T.savedProvider.replace('{provider}', state.saved); notice.hidden = false; }
+  else { notice.hidden = true; }
+}
+function renderCatalog(p) {
+  // 只重建模型目录，避免整卡重绘丢焦点
+  const sel = p.id === '__new'
+    ? '.addCard .modelCatalog'
+    : `[data-row="${p.id}"] .modelCatalog`;
+  const row = document.querySelector(sel);
+  if (!row) return;
+  const wrap = document.createElement('div');
+  wrap.innerHTML = catalogHtml(p);
+  row.replaceWith(wrap.firstElementChild);
+}
+
+/* ============ 弹窗 ============ */
+function openModal(html) {
+  const mask = document.createElement('div');
+  mask.className = 'modalMask'; mask.id = 'modalMask';
+  mask.innerHTML = html;
+  document.body.appendChild(mask);
+}
+function closeModal() { const m = document.getElementById('modalMask'); if (m) m.remove(); }
+
+function deleteModalHtml(p) {
+  return `<div class="modal deleteDialog" role="dialog" aria-modal="true">
+    <div class="modalTitle">${T.deleteTitle.replace('{provider}', esc(p.name))}</div>
+    <div class="modalDesc">${T.deleteDescriptionWithCredential.replace('{provider}', esc(p.name))}</div>
+    <div class="modalFoot">
+      <button class="secondaryButton" data-act="close-modal">${T.cancel}</button>
+      <button class="secondaryButton deleteConfirm" data-act="confirm-delete">${T.deleteConfirm.replace('{provider}', esc(p.name))}</button>
+    </div>
+  </div>`;
+}
+
+function fetchModalHtml(p) {
+  const known = new Set(p.models.map(m => m.id));
+  const cand = candidatePool.filter(id => !known.has(id));
+  state.fetchPicked = new Set(cand);
+  const list = cand.length === 0
+    ? `<p class="candidateEmpty">${T.fetchNoMatches}</p>`
+    : `<ul class="candidateList">${cand.map(id => `
+        <li class="candidate"><label class="candidateLabel">
+          <input type="checkbox" data-act="pick-candidate" data-id="${id}" checked style="accent-color:var(--dsw-alias-brand-primary)">
+          <span class="candidateId">${id}</span>
+        </label></li>`).join('')}</ul>`;
+  return `<div class="modal fetchDialog" role="dialog" aria-modal="true">
+    <div class="modalTitle">${T.fetchTitle}</div>
+    <div class="modalDesc">${T.fetchDescription}</div>
+    <div class="candidateToolbar">
+      <input class="input candidateSearch" type="search" placeholder="${T.fetchSearch}" aria-label="${T.fetchSearch}" data-act="search">
+      <button class="linkButton" data-act="toggle-all">${T.fetchDeselectAll}</button>
+    </div>
+    <div data-candidates>${list}</div>
+    <div class="modalFoot">
+      <button class="secondaryButton" data-act="close-modal">${T.cancel}</button>
+      <button class="primaryButton" data-act="adopt">${T.fetchAdopt}</button>
+    </div>
+  </div>`;
+}
+
+/* ============ 事件 ============ */
+document.addEventListener('click', (e) => {
+  if (e.target.dataset.act === 'tab') {
+    const tabs = e.target.closest('.tabs');
+    const which = e.target.dataset.tab;
+    tabs.querySelectorAll('[data-act="tab"]').forEach(b => {
+      const on = b.dataset.tab === which;
+      b.classList.toggle('tabButtonActive', on);
+      b.setAttribute('aria-selected', String(on));
+    });
+    tabs.querySelectorAll('[data-panel]').forEach(pn => { pn.hidden = pn.dataset.panel !== which; });
+    return;
+  }
+  if (e.target.dataset.act === 'download-meta') {
+    const btn = e.target;
+    if (btn.dataset.busy === '1') return;
+    btn.dataset.busy = '1';
+    btn.textContent = '正在下载元数据…';
+    window.setTimeout(() => {
+      btn.textContent = '下载/更新元数据';
+      btn.dataset.busy = '0';
+      const note = document.getElementById('savedNotice');
+      note.textContent = 'models.dev 元数据已下载并就绪。';
+      note.hidden = false;
+    }, 1200);
+    return;
+  }
+  const el = e.target.closest('[data-act]');
+  if (!el) { if (e.target.id === 'modalMask') closeModal(); return; }
+  const act = el.dataset.act;
+  const pid = el.dataset.p;
+
+  if (act === 'edit') {
+    state.editing = state.editing === pid ? null : pid;   // 官方：一次一张卡
+    state.addMode = null; state.saved = null; render();
+  }
+  else if (act === 'cancel-edit') { state.editing = null; render(); }
+  else if (act === 'save') {
+    const p = P(pid); state.editing = null; state.saved = p.name; render();
+  }
+  else if (act === 'delete') { state.deleteId = pid; openModal(deleteModalHtml(P(pid))); }
+  else if (act === 'confirm-delete') {
+    state.providers = state.providers.filter(x => x.id !== state.deleteId);
+    if (state.editing === state.deleteId) state.editing = null;
+    state.deleteId = null; closeModal(); render();
+  }
+  else if (act === 'close-modal') { closeModal(); }
+  else if (act === 'add') { state.addMode = 'add'; state.editing = null; render(); }
+  else if (act === 'add-custom') { state.addMode = 'custom'; state.editing = null; render(); }
+  else if (act === 'close-add' || act === 'create') { state.addMode = null; render(); }
+
+  else if (act === 'toggle-adv') {
+    const entry = el.closest('.modelEntry');
+    const ext = entry.querySelector('[data-ext]');   // 容量已并入扩展块，只切这一块
+    const open = el.getAttribute('aria-expanded') !== 'true';
+    el.setAttribute('aria-expanded', String(open));
+    el.firstElementChild.style.transform = open ? 'rotate(90deg)' : '';
+    ext.hidden = !open;
+  }
+  else if (act === 'remove-model') {
+    const p = P(pid); p.models.splice(Number(el.dataset.i), 1); p.overridden = true; renderCatalog(p);
+  }
+  else if (act === 'add-model') {
+    const p = P(pid); p.models.push({ id:'', name:'', context:'', max:'', ext:extDefault() }); p.overridden = true; renderCatalog(p);
+  }
+  else if (act === 'reset-models') {
+    const p = P(pid); p.models = []; p.overridden = false; renderCatalog(p);
+  }
+  else if (act === 'fetch') { state.fetchFor = pid; openModal(fetchModalHtml(P(pid))); }
+  else if (act === 'pick-candidate') {
+    el.checked ? state.fetchPicked.add(el.dataset.id) : state.fetchPicked.delete(el.dataset.id);
+    syncToggleAll();
+  }
+  else if (act === 'toggle-all') {
+    const boxes = [...document.querySelectorAll('[data-act="pick-candidate"]')];
+    const allOn = boxes.every(b => b.checked);
+    boxes.forEach(b => { b.checked = !allOn; b.checked ? state.fetchPicked.add(b.dataset.id) : state.fetchPicked.delete(b.dataset.id); });
+    el.textContent = allOn ? T.fetchSelectAll : T.fetchDeselectAll;
+  }
+  else if (act === 'adopt') {
+    const p = P(state.fetchFor);
+    [...state.fetchPicked].forEach(id => {
+      if (!p.models.some(m => m.id === id)) p.models.push({ id, name:'', context:'', max:'', ext:extDefault() });
+    });
+    p.overridden = true; closeModal(); renderCatalog(p);
+  }
+
+  /* ---- 插件扩展字段交互 ---- */
+  /* ---- 插件扩展字段：语义对齐 ModelExtensionFields.tsx ---- */
+  else if (act === 'ext-devrole') {
+    // 三态：勾选 = 删键回继承态（catalog / 检测说了算）；取消 = 显式写 false
+    modelOfExt(el.closest('[data-ext]')).ext.developerRole = el.checked;
+  }
+  else if (act === 'ext-master') {
+    const ext = el.closest('[data-ext]');
+    modelOfExt(ext).ext.reasoningEffort = el.checked;
+    // 隐藏而非置灰：真实实现为 !supportsReasoningEffort ? null : (…)
+    ext.querySelector('[data-gated]').hidden = !el.checked;
+    updateEffortError(ext);
+  }
+  else if (act === 'ext-level') {
+    const ext = el.closest('[data-ext]');
+    const m = modelOfExt(ext);
+    const key = el.dataset.level;
+    // 勾选即声明，默认线上取值=档位名；off 取值为 null（无取值）
+    if (el.checked) m.ext.levels[key] = key === 'off' ? null : key;
+    else delete m.ext.levels[key];
+    paintWireCell(el.closest('.extTRow'), m);
+    updateEffortError(ext);
+  }
+  else if (act === 'ext-thinking') {
+    modelOfExt(el.closest('[data-ext]')).ext.thinkingFormat = el.value;
+  }
+  else if (act === 'ext-modal') {
+    const m = modelOfExt(el.closest('[data-ext]'));
+    const key = el.dataset.modal;
+    m.ext.input = el.checked
+      ? [...new Set([...m.ext.input, key])]
+      : m.ext.input.filter(entry => entry !== key);
+  }
+});
+
+document.addEventListener('input', (e) => {
+  if (e.target.dataset.act === 'ext-wire') {
+    // 线上取值：空串落库为 null（与 setWireValue 一致），并实时重算校验
+    const ext = e.target.closest('[data-ext]');
+    const m = modelOfExt(ext);
+    const text = e.target.value.trim();
+    m.ext.levels[e.target.dataset.level] = text.length === 0 ? null : text;
+    updateEffortError(ext);
+    return;
+  }
+  if (e.target.dataset.act === 'search') {
+    const q = e.target.value.trim().toLowerCase();
+    document.querySelectorAll('.candidate').forEach(li => {
+      li.style.display = li.querySelector('.candidateId').textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+});
+function syncToggleAll() {
+  const boxes = [...document.querySelectorAll('[data-act="pick-candidate"]')];
+  const btn = document.querySelector('[data-act="toggle-all"]');
+  if (btn) btn.textContent = boxes.every(b => b.checked) ? T.fetchDeselectAll : T.fetchSelectAll;
+}
+
+/* 快速装入：选中预设（change）后整份套用容量与扩展字段，并重绘扩展块 */
+document.addEventListener('change', (e) => {
+  if (e.target.dataset.act !== 'quick-load') return;
+  const preset = QUICK_PRESETS[e.target.value];
+  if (preset === undefined) return;
+  const entry = e.target.closest('.modelEntry');
+  const m = modelOfExt(e.target.closest('[data-ext]'));
+  m.context = preset.context; m.max = preset.max;
+  m.ext = structuredClone(preset.ext);
+  repaintExtBlock(entry);
+});
+
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const dark = document.body.toggleAttribute('data-ds-dark-theme');
+  document.getElementById('themeBtn').textContent = dark ? '切换浅色' : '切换深色';
+});
+
+/* 快速装入下拉候选 */
+document.getElementById('quickPresetOptions').innerHTML =
+  Object.keys(QUICK_PRESETS).map(k => `<option value="${k}"></option>`).join('');
+
+render();
+</script>
+</body>
+</html>

@@ -6,10 +6,11 @@
  *   intro:  var module = { exports: {} }; var exports = module.exports;
  *   footer: return module.exports; } });
  *
- * Official ui-settings-models sources (host tree) are inlined; our two .ext
- * touch-point files replace them via resolveId redirection so every importer —
- * official or ours — gets the ext version. Shared @deepseek-ai/* runtime faces
- * stay external per dsh.client.external + the platform baseline.
+ * v1.0.0: the UI is fully plugin-owned (src/client/models-plus/). Only the
+ * official LOGIC modules (store/operations/schema-operations — zero UI
+ * dependencies) are inlined from the host tree, via a strict allowlist: any
+ * other relative import that does not exist locally FAILS the build, so no
+ * host component can quietly sneak back into the bundle.
  */
 import { resolve, dirname, basename, join, sep } from 'node:path'
 import { existsSync } from 'node:fs'
@@ -18,15 +19,7 @@ import { readFileSync } from 'node:fs'
 import { build } from 'tsdown'
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const OFFICIAL_SRC_DIR = globalThis.OFFICIAL_SRC_DIR
-
 const PLUGIN_ID = 'dsh-model-extension'
-
-/** Touch-point files replaced by our .ext versions (paths relative to official src). */
-const EXT_REDIRECTS = new Map([
-  ['client/ModelListEditor.tsx', resolve(projectRoot, 'src/client/ModelListEditor.ext.tsx')],
-  ['client/ModelsSection.tsx', resolve(projectRoot, 'src/client/ModelsSection.ext.tsx')],
-])
 
 /** Platform module-table baseline (mirrors host packages/client/web/src/platform.ts @ 0.1.2-rc.1). */
 const PLATFORM_EXTERNALS = [
@@ -93,34 +86,6 @@ await build({
     },
   },
   plugins: [
-    {
-      // Bridge relative imports inside our ext/entry files to the official
-      // sources: our files live in src/client, the official ones in the host
-      // tree. Any relative specifier our files request that does not exist
-      // locally resolves against the official client dir (with .ext files
-      // already redirected below).
-      name: 'dsh-official-bridge',
-      resolveId(source, importer) {
-        if (!source.startsWith('.') || typeof importer !== 'string') return null
-        const resolved = resolve(dirname(importer), source)
-        if (!existsSync(resolved) && importer.startsWith(projectRoot + sep + 'src')) {
-          return join(OFFICIAL_SRC_DIR, 'client', basename(source))
-        }
-        return null
-      },
-    },
-    {
-      // Redirect the two official touch-point files to our .ext replacements.
-      name: 'dsh-ext-redirect',
-      resolveId(source, importer) {
-        if (!source.startsWith('.')) return null
-        const resolved = resolve(dirname(importer), source)
-        // Normalize to "client/<file>.tsx" relative to the official src dir.
-        if (!resolved.startsWith(OFFICIAL_SRC_DIR)) return null
-        const rel = resolved.slice(OFFICIAL_SRC_DIR.length + 1).replaceAll('\\', '/')
-        return EXT_REDIRECTS.get(rel) ?? null
-      },
-    },
   ],
   outputOptions: {
     entryFileNames: 'client.js',
@@ -152,7 +117,7 @@ const injection = [
   `if (typeof document !== 'undefined' && document.querySelector('style[data-plugin-css="${PLUGIN_ID}"]') === null) {`,
   `  var __tag = document.createElement('style');`,
   `  __tag.dataset.plugin = ${JSON.stringify(PLUGIN_ID)};`,
-  `  __tag.dataset.pluginCss = ${JSON.stringify(`${PLUGIN_ID}/ModelsSection.ext.module.css`)};`,
+  `  __tag.dataset.pluginCss = ${JSON.stringify(`${PLUGIN_ID}/models-plus.module.css`)};`,
   `  __tag.textContent = __extCss;`,
   `  document.head.appendChild(__tag);`,
   `}`,

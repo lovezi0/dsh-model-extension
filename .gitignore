@@ -10,4 +10,10 @@ build.local.yaml
 # 升级计划
 upgrade plan/
 
+# 会话工作 plan 归档（发布 SOP 阶段 5）
+plans/
+
+# models.dev 元数据样本（0.28MB 数据文件，运行时由 DSH home 提供，不进库）
+models.dev/
+
 dsh-compatibility-check/
