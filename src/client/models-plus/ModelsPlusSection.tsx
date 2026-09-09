@@ -191,7 +191,11 @@ function Loaded({ injected }: { injected: ModelsPlusInjected }): ReactNode {
 
   const anyUsable = state.rows.some(providerUsable)
   const configured = state.rows.filter(row => row.configured)
-  const addable = state.rows.filter(row => !row.configured && row.entry.settingsNs !== '')
+  // Mirrors the host page @ 0.1.5-alpha.2: a row is addable only when its
+  // settings namespace actually resolved — a namespace name the settings
+  // document does not carry would open a card that can never save.
+  const configurable = state.rows.filter(row => state.namespaces.has(row.entry.settingsNs))
+  const addable = configurable.filter(row => !row.configured)
   const addTarget = adding ? editing : undefined
   const addNamespace = addTarget === undefined ? undefined : state.namespaces.get(addTarget.settingsNs)
   const protocols = (() => {
@@ -256,9 +260,15 @@ function Loaded({ injected }: { injected: ModelsPlusInjected }): ReactNode {
           const target = targetOf(row)
           const namespace = state.namespaces.get(target.settingsNs)
           if (namespace === undefined) return null
+          // Adapter-reported configuration diagnostic (@ 0.1.5-alpha.2): shown
+          // above the card so a route that cannot be served still explains why.
+          const error = row.entry.error === undefined
+            ? null
+            : <p role="alert" className={styles['error']}>{row.entry.error}</p>
           if (needsSetup(row, anyUsable) && !dismissedSetup.has(row.entry.provider)) {
             return (
               <li key={row.entry.provider} className={styles['rowCard']}>
+                {error}
                 {renderEditor(target, namespace, (changed) => { closeSetup(changed, target) })}
               </li>
             )
@@ -270,6 +280,7 @@ function Loaded({ injected }: { injected: ModelsPlusInjected }): ReactNode {
             && row.credential?.configured === false
           return (
             <li key={row.entry.provider} className={styles['rowCard']}>
+              {error}
               <div className={styles['rowHead']}>
                 <span className={styles['rowIdentity']}>
                   <span className={styles['rowName']}>{row.entry.displayName}</span>
@@ -391,40 +402,44 @@ function Loaded({ injected }: { injected: ModelsPlusInjected }): ReactNode {
               )
             : (
                 <div className={styles['addActions']}>
-                  <button
-                    type="button"
-                    className={styles['addButton']}
-                    disabled={addable.length === 0 || !state.writable}
-                    onClick={() => {
-                      const first = addable[0]
-                      if (first === undefined) return
-                      setSavedTarget(undefined)
-                      setDeclaring(false)
-                      setAdding(true)
-                      setEditing(targetOf(first))
-                    }}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                      <path d="M8 3.5v9M3.5 8h9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                    </svg>
-                    添加提供方
-                  </button>
-                  <button
-                    type="button"
-                    className={styles['addButton']}
-                    disabled={protocols.length === 0 || !state.writable}
-                    onClick={() => {
-                      setSavedTarget(undefined)
-                      setAdding(false)
-                      setEditing(undefined)
-                      setDeclaring(true)
-                    }}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                      <path d="M8 3.5v9M3.5 8h9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                    </svg>
-                    添加自定义提供方
-                  </button>
+                  {configurable.length > 0 && (
+                    <button
+                      type="button"
+                      className={styles['addButton']}
+                      disabled={addable.length === 0 || !state.writable}
+                      onClick={() => {
+                        const first = addable[0]
+                        if (first === undefined) return
+                        setSavedTarget(undefined)
+                        setDeclaring(false)
+                        setAdding(true)
+                        setEditing(targetOf(first))
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M8 3.5v9M3.5 8h9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                      添加提供方
+                    </button>
+                  )}
+                  {state.namespaces.has('llm-pi-ai') && (
+                    <button
+                      type="button"
+                      className={styles['addButton']}
+                      disabled={protocols.length === 0 || !state.writable}
+                      onClick={() => {
+                        setSavedTarget(undefined)
+                        setAdding(false)
+                        setEditing(undefined)
+                        setDeclaring(true)
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M8 3.5v9M3.5 8h9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                      添加自定义提供方
+                    </button>
+                  )}
                 </div>
               )}
       </div>

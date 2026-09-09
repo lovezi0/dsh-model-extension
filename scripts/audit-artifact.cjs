@@ -9,14 +9,14 @@ console.log('anchor constant:', srv.includes(`"${require('../package.json').dsh.
 
 console.log('== client half ==')
 // 字典 key 抽样：fork 组件实际用到的
-const dictKeys = ['nav:', 'title:', 'intro:', 'adapterVersion:', 'modelContextWindow:', 'modelMaxTokens:', 'fetchModels:', 'customized:', 'baseUrl:', 'apply:', 'fetchAdopt:', 'customRouteHint:']
+const dictKeys = ['nav:', 'title:', 'intro:', 'customBaseUrlInvalid:', 'modelContextWindow:', 'modelMaxTokens:', 'fetchModels:', 'customized:', 'baseUrl:', 'apply:', 'fetchAdopt:', 'customRouteHint:']
 let missing = dictKeys.filter(k => !src.includes(k))
 console.log(missing.length === 0 ? '✓ all sampled dict keys present' : '✗ missing keys: ' + missing.join(', '))
 
-// 组件挂载链
-console.log('ModelsSection registered:', src.includes('"settings.section"') && src.includes('"models-extension"'))
-console.log('ModelExtensionFields mounted with bound index:', src.includes('onChange: (next) => {') && src.includes('patch(index, next)'))
-console.log('locale-aware t in ext fields:', src.includes('documentElement.lang.startsWith'))
+// 组件挂载链（v1.x：自建 Models+ 组件树，扩展字段在 ModelCatalog 的模型行里 patch）
+console.log('Models+ section registered:', src.includes('"settings.section"') && src.includes('"models-extension"'))
+console.log('model row patch wired with bound index:', src.includes('patch(index'))
+console.log('extension-field dictionary keys present:', src.includes('supportsDeveloperRole:') && src.includes('reasoningEfforts:'))
 
 // 残留占位扫描
 const suspects = ['TODO', 'FIXME', 'undefined as never', 'replaced below']

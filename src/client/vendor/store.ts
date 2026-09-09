@@ -1,5 +1,5 @@
 /**
- * VENDORED from @deepseek-ai/dsh-client-ui-settings-models @ 0.1.2-rc.1
+ * VENDORED from @deepseek-ai/dsh-client-ui-settings-models @ 0.1.5-alpha.2
  * (host tree packages/client/ui-settings-models/src/client/store.ts) — copied
  * VERBATIM so the build is self-contained (no host checkout required).
  * Re-diff against the host source on every adapter-anchor bump.
@@ -36,6 +36,8 @@ export interface ProviderDirectoryEntry {
   readonly settingsPath: readonly string[]
   readonly active: boolean
   readonly declared?: boolean
+  /** Configuration diagnostic reported by the owning adapter; absent means none. */
+  readonly error?: string
 }
 
 /**
@@ -57,6 +59,7 @@ export function joinProviderDirectory(
     settingsPath: [...entry.settingsPath],
     active: active.has(entry.provider),
     ...entry.declared === undefined ? {} : { declared: entry.declared },
+    ...entry.error === undefined ? {} : { error: entry.error },
   }))
   for (const provider of registered) {
     if (declared.has(provider.id)) continue

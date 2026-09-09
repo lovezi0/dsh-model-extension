@@ -1,7 +1,7 @@
 # dsh-model-extension
 > 基于 deepseek-harness 的模型扩展插件
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE) [![npm](https://img.shields.io/npm/v/dsh-model-extension.svg?label=npm&labelColor=000000&color=ff4b01)](https://www.npmjs.com/package/dsh-model-extension) [![DeepSeek Harness:0.1.2-rc.1](https://img.shields.io/badge/DeepSeek%20Harness-0.1.2--rc.1-success.svg?labelColor=4D6BFE)](https://github.com/deepseek-ai/deepseek-harness)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE) [![npm](https://img.shields.io/npm/v/dsh-model-extension.svg?label=npm&labelColor=000000&color=ff4b01)](https://www.npmjs.com/package/dsh-model-extension) [![DeepSeek Harness:0.1.5-alpha.2](https://img.shields.io/badge/DeepSeek%20Harness-0.1.5--alpha.2-success.svg?labelColor=4D6BFE)](https://github.com/deepseek-ai/deepseek-harness)
 
 | 供应商 | 模型 |
 | --- | --- |
@@ -48,6 +48,9 @@ npm run build
 
 ## 版本历史
 
+- **1.1.0**
+    - **1.1.0-alpha.1**
+        - 💪适配deepseek harness 0.1.5-alpha.2
 - **1.0.0**
     - 🔥重构[模型+]界面
     - 🔥新增models.json元数据自动预填
