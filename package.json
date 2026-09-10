@@ -1,6 +1,6 @@
 {
   "name": "dsh-model-extension",
-  "version": "1.1.0-alpha.1",
+  "version": "1.1.0",
   "description": "DeepSeek Harness plugin: the Models+ settings page — a fully plugin-owned model/provider UI with per-model extension fields (reasoning efforts, input modalities, compat flags) and models.dev metadata prefill",
   "type": "module",
   "main": "lib/index.js",
@@ -26,7 +26,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dsh": {
-    "adapter": "0.1.5-alpha.2",
+    "adapter": "0.1.5-rc.1",
     "bundle": {
       "patch": "./cordis.patch.yml"
     },

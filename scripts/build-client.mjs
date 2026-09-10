@@ -21,7 +21,7 @@ import { build } from 'tsdown'
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const PLUGIN_ID = 'dsh-model-extension'
 
-/** Platform module-table baseline (mirrors host packages/client/web/src/platform.ts @ 0.1.5-alpha.2). */
+/** Platform module-table baseline (mirrors host packages/client/web/src/platform.ts @ 0.1.5-rc.1). */
 const PLATFORM_EXTERNALS = [
   'react',
   'react/jsx-runtime',

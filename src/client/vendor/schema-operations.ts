@@ -1,5 +1,5 @@
 /**
- * VENDORED from @deepseek-ai/dsh-client-ui-settings-models @ 0.1.5-alpha.2
+ * VENDORED from @deepseek-ai/dsh-client-ui-settings-models @ 0.1.5-rc.1
  * (host tree packages/client/ui-settings-models/src/client/schema-operations.ts) — copied
  * VERBATIM so the build is self-contained (no host checkout required).
  * Re-diff against the host source on every adapter-anchor bump.

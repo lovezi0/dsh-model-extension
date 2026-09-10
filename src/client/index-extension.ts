@@ -4,7 +4,7 @@
  * Registers the Models+ settings section rendering the fully plugin-owned
  * models-plus component tree (no host component code is bundled). The store,
  * schema operations, Host operations, dictionaries, and invalidation wiring
- * keep the upstream ui-settings-models contracts @ 0.1.5-alpha.2 — the logic
+ * keep the upstream ui-settings-models contracts @ 0.1.5-rc.1 — the logic
  * modules (store/operations/schema-operations) are still inlined from the
  * host tree at build time, only the presentation is ours.
  */
@@ -27,7 +27,7 @@ import { en as extensionEn, zh as extensionZh } from './extension-meta.ts'
 /** Cordis service name (distinct from the npm package name). */
 export const name = 'model-extension-client'
 
-/** Required services — mirrors the upstream Models section registration @ 0.1.5-alpha.2. */
+/** Required services — mirrors the upstream Models section registration @ 0.1.5-rc.1. */
 export const inject = [
   'slots', 'locale', 'remote', 'remote.credentials', 'remote.llm', 'remote.settings',
   'settingsScope', 'settingsSchema',

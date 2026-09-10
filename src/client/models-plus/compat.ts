@@ -5,14 +5,14 @@
  *
  * ⚠️ Fork-copy risk: these must be re-checked against the pinned host sources
  * (packages/client/ui-settings-models/src/client/{ProviderEditor,DeepSeekModelsEditor}.tsx
- * @ 0.1.5-alpha.2) on every adapter-anchor bump.
+ * @ 0.1.5-rc.1) on every adapter-anchor bump.
  */
 
 /** One model entry kept structurally open so hidden or future fields survive an edit. */
 export type ModelDraft = Record<string, unknown>
 
 // ---------------------------------------------------------------------------
-// pathOps — copied from ProviderEditor.tsx @ 0.1.5-alpha.2
+// pathOps — copied from ProviderEditor.tsx @ 0.1.5-rc.1
 // ---------------------------------------------------------------------------
 
 import type { JsonValue } from '@deepseek-ai/dsh-util-values'
@@ -48,7 +48,7 @@ export function pathOps(
 }
 
 // ---------------------------------------------------------------------------
-// capacity parsing/formatting — copied from DeepSeekModelsEditor.tsx @ 0.1.5-alpha.2
+// capacity parsing/formatting — copied from DeepSeekModelsEditor.tsx @ 0.1.5-rc.1
 // ---------------------------------------------------------------------------
 
 /** Accepted capacity spellings: a decimal count with an optional K/M suffix. */
@@ -93,7 +93,7 @@ export function formatCapacity(value: number): string {
 }
 
 // ---------------------------------------------------------------------------
-// model-row validation — copied from DeepSeekModelsEditor.tsx @ 0.1.5-alpha.2
+// model-row validation — copied from DeepSeekModelsEditor.tsx @ 0.1.5-rc.1
 // ---------------------------------------------------------------------------
 
 /** A localized validation failure for one user-owned model array. */
