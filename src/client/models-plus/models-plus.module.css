@@ -125,7 +125,9 @@ select.input { max-width: 240px; cursor: pointer; }
 .modalDesc { font-size: 14px; line-height: 22px; color: var(--dsw-alias-label-secondary); margin-bottom: 16px; }
 .modalFoot { display: flex; justify-content: flex-end; gap: 8px; }
 
-/* ---- quick-load dropdown (filtered, max 10 candidates, never a static datalist) ---- */
+/* ---- quick-load dropdown (filtered and capped, plugin-rendered for both the
+   provider and the model list — never a native datalist, whose popup position
+   and styling the page cannot control) ---- */
 .quickWrap { position: relative; display: flex; flex-direction: column; gap: 6px; }
 .quickList { position: absolute; top: 100%; left: 0; right: 0; z-index: 20; margin-top: 2px; padding: 4px; border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 8px; background: var(--dsw-specific-menu); box-shadow: 0 8px 24px rgba(0,0,0,0.12); max-height: 264px; overflow-y: auto; }
 .quickItem { display: block; width: 100%; padding: 6px 8px; border: none; border-radius: 6px; background: transparent; color: var(--dsw-alias-label-primary); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; text-align: left; cursor: pointer; overflow-wrap: anywhere; }

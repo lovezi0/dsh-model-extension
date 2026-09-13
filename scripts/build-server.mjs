@@ -10,6 +10,21 @@ import { build } from 'tsdown'
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const pkg = JSON.parse(readFileSync(join(projectRoot, 'package.json'), 'utf8'))
 
+/**
+ * Whether a module id names one of this project's own source files.
+ *
+ * The predicate must accept BOTH forms rolldown hands the `deps` callbacks:
+ * the raw specifier (`./pi-ai-catalog`) and the resolved absolute path
+ * (`D:\...\src\pi-ai-catalog.ts`). A leading-dot test alone silently
+ * externalizes the resolved form — which is how an earlier revision of this
+ * change shipped a lib/index.js still importing `./pi-ai-catalog.ts` and
+ * therefore unable to load at all.
+ * @param spec - the module id under consideration.
+ * @returns true when the module should be inlined into the bundle.
+ */
+const isOwnSource = (spec) =>
+  spec.startsWith('.') || spec.startsWith('/') || /^[A-Za-z]:[\\/]/.test(spec)
+
 await build({
   entry: { index: resolve(projectRoot, 'src/index.ts') },
   outDir: resolve(projectRoot, 'lib'),
@@ -19,8 +34,15 @@ await build({
   dts: false,
   sourcemap: true,
   clean: false,
-  // Only node builtins stay external; the host provides everything else.
-  external: [/^[^./]/],
+  // Only node builtins stay a specifier; the host provides everything else.
+  // Expressed through `deps` (not the regex `external`, which is deprecated and
+  // tests the resolved path), so a relative import — the pi-ai catalog reader
+  // is the first one this half ever had — is inlined rather than left as a
+  // specifier lib/ cannot satisfy.
+  deps: {
+    neverBundle: (spec) => !isOwnSource(spec),
+    alwaysBundle: (spec) => isOwnSource(spec),
+  },
   define: {
     __DSH_ADAPTER_VERSION__: JSON.stringify(pkg.dsh.adapter),
   },

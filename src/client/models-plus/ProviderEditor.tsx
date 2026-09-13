@@ -270,7 +270,13 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
                   <button type="button" role="tab" aria-selected={tab === 'provider'} className={tab === 'provider' ? `${styles['tabButton']} ${styles['tabButtonActive']}` : styles['tabButton']} onClick={() => { setTab('provider') }}>供应商</button>
                   <button type="button" role="tab" aria-selected={tab === 'models'} className={tab === 'models' ? `${styles['tabButton']} ${styles['tabButtonActive']}` : styles['tabButton']} onClick={() => { setTab('models') }}>模型</button>
                 </div>                <div className={styles['tabPanel']} role="tabpanel" hidden={tab !== 'provider'}>
-                  {layout === 'pi-ai' && props.declared === true
+                  {/* Offered for every pi-ai route, not only hand-declared ones.
+                      The display name is a provider-level field the adapter
+                      defaults to the route key and honours as an override, and
+                      for a catalog route it is the only way to relabel: the key
+                      itself cannot change without breaking the catalog match
+                      and every credential ref derived from it. */}
+                  {layout === 'pi-ai'
                     ? (
                         <div className={styles['field']}>
                           <label className={styles['fieldLabel']}>显示名称</label>

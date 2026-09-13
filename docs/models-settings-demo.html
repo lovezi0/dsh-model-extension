@@ -237,6 +237,10 @@ body { margin: 0; padding: 28px; background: var(--dsw-alias-bg-base); color: va
 .page { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
 .demoNote { border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 12px; padding: 12px 14px; background: var(--dsw-alias-bg-module-platform); font-size: 12px; line-height: 20px; color: var(--dsw-alias-label-secondary); }
 .demoNote b { font-weight: 500; color: var(--dsw-alias-label-primary); }
+/* 说明块默认收起（details/summary 原生交互，零脚本） */
+.demoNote summary { cursor: pointer; font-weight: 500; color: var(--dsw-alias-label-primary); user-select: none; }
+.demoNote summary::marker { color: var(--dsw-alias-label-tertiary); }
+.demoNote[open] summary { margin-bottom: 8px; }
 .extTag { flex: none; padding: 1px 6px; border: 0.5px solid rgba(65,118,230,0.35); border-radius: 4px; background: var(--dsw-static-deepseek-100); color: var(--dsw-static-deepseek-600); font-size: 11px; line-height: 16px; font-weight: 500; }
 .nativeTag { flex: none; padding: 1px 6px; border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 4px; font-size: 11px; line-height: 16px; color: var(--dsw-alias-label-tertiary); }
 .extBlock { border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 10px; padding: 10px; margin: 8px 4px 2px; background: var(--dsw-alias-bg-layer-1); display: flex; flex-direction: column; gap: 10px; }
@@ -265,6 +269,13 @@ body { margin: 0; padding: 28px; background: var(--dsw-alias-bg-base); color: va
 .modalTitle { font-size: 16px; line-height: 24px; font-weight: 500; margin-bottom: 8px; color: var(--dsw-alias-label-primary); }
 .modalDesc { font-size: 14px; line-height: 22px; color: var(--dsw-alias-label-secondary); margin-bottom: 16px; }
 .modalFoot { display: flex; justify-content: flex-end; gap: 8px; }
+/* ---- 快速装入三级选择器的自绘浮层（对齐 models-plus.module.css）——
+   datalist 的弹层位置与样式页面控制不了，提供方与 model id 共用这一种浮层 ---- */
+.quickWrap { position: relative; display: flex; flex-direction: column; gap: 6px; }
+.quickList { position: absolute; top: 100%; left: 0; right: 0; z-index: 20; margin-top: 2px; padding: 4px; border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 8px; background: var(--dsw-specific-menu); box-shadow: 0 8px 24px rgba(0,0,0,0.12); max-height: 264px; overflow-y: auto; }
+.quickItem { display: block; width: 100%; padding: 6px 8px; border: none; border-radius: 6px; background: transparent; color: var(--dsw-alias-label-primary); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; text-align: left; cursor: pointer; overflow-wrap: anywhere; }
+.quickItem:hover { background: var(--dsw-alias-interactive-bg-hover); }
+.quickEmpty { padding: 6px 8px; font-size: 12px; line-height: 18px; color: var(--dsw-alias-label-tertiary); }
 .themeBtn { position: fixed; top: 16px; right: 16px; height: 28px; padding: 0 12px; border-radius: 14px; border: 0.5px solid var(--dsw-alias-border-l3); background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-secondary); font: inherit; font-size: 12px; cursor: pointer; z-index: 50; }
 </style>
 </head>
@@ -273,18 +284,20 @@ body { margin: 0; padding: 28px; background: var(--dsw-alias-bg-base); color: va
 <button class="themeBtn" id="themeBtn" data-page-node-id="GWHDFdkMfi02t5ta6Kaoyk">切换深色</button>
 
 <div class="page" data-page-node-id="v6QajjmZR82vsWc6FlY0DJ">
-  <!-- Demo 说明（不属于界面本体，仅为评审标注归属） -->
-  <div class="demoNote" data-page-node-id="jTYhwSEhvC8XyVfjPC1kWg">
-    <b data-page-node-id="z4pYj64AcqmDgXYmIhpFD1">可交互 Demo</b>　界面为插件自写（样式 token 与类名沿用官方设计）；保存管线 vendor 自官方 <code data-page-node-id="QKGybnQtgsdT6B8jJ1JFxJ">ui-settings-models</code> @0.1.2-rc.1（store / operations / schema-operations）。<br data-page-node-id="35G8y7JADFZDvXvjDSoTvo"/>
-    「供应商」页（Tabs）：API 密钥 · API 地址 · 显示名称 / API 协议（仅自定义路由）。　
-    「模型」页：模型目录，条目展开区为一块扩展面板（容量 / 输入模态 / developer 角色 / 推理挡位 / 思考格式 / 快速装入），无标题。<br data-page-node-id="voZTgt0o7R2yfH9a8LcxJ1"/>
+  <!-- Demo 说明（不属于界面本体，仅为评审标注归属；默认收起，点开再看） -->
+  <details class="demoNote" data-page-node-id="jTYhwSEhvC8XyVfjPC1kWg">
+    <summary>可交互 Demo —— 使用说明（点击展开 / 收起）</summary>
+    界面为插件自写（样式 token 与类名沿用官方设计）；保存管线 vendor 自官方 <code data-page-node-id="QKGybnQtgsdT6B8jJ1JFxJ">ui-settings-models</code>（store / operations / schema-operations）。<br data-page-node-id="35G8y7JADFZDvXvjDSoTvo"/>
+    「供应商」页（Tabs）：显示名称（<b>所有 pi-ai 路由，内置路由也可配</b>——route key 不能改，displayName 是内置路由唯一的改名手段）· API 密钥 · API 地址 · API 协议（仅手声明路由）。　
+    「模型」页：模型目录，条目展开区为一块扩展面板（快速装入 / 容量 / 输入模态 / developer 角色 / 推理开关+挡位 / 其他兼容开关），无标题。<br data-page-node-id="voZTgt0o7R2yfH9a8LcxJ1"/>
     两级展开：点「编辑」展开编辑卡 → 编辑卡内是 <b>Tabs 标签页</b>（供应商 / 模型，默认停在「供应商」，切页不丢状态）→ 在「模型」页再点条目的「容量」箭头展开扩展区。<br/>
-    标题行：「模型+」+ 「下载/更新元数据」按钮（本 Demo 内为模拟；真实实现为点击后从 models.dev 下载并缓存到 DSH home，未就绪时快速装入提示不可用）。官方「模型」页已通过 bundle patch 禁用，本页为唯一模型设置页。<br/>
-    另可试：取消「端点接受推理挡位参数」→ 思考格式与推理挡位<b>整块隐藏</b>（且落盘时一并清除，不留孤儿参数）；
-    「允许以 developer 角色发送系统提示」与「输入模态」不受它控制 → 「获取可用模型」拉候选 → 「删除」走确认弹窗。<br/>
-    新模型行默认值（v1.0.0）：推理挡位开启且七档全声明、思考格式 openai、输入模态全选、developer 角色继承勾选。<br/>
-    「快速装入」：展开区顶部的可搜索下拉——只显示模型 id、忽略大小写模糊匹配、最多 10 条候选；真实数据源为 models.dev（本 Demo 用内置示例数据代替）。
-  </div>
+    标题行：「模型+」+ 「下载/更新元数据」按钮——只服务 <b>models.dev</b> 源（下载并缓存到 DSH home）；<b>llm-pi-ai</b> 源运行时直读宿主已装目录，无需下载。官方「模型」页已通过 bundle patch 禁用，本页为唯一模型设置页。<br/>
+    「快速装入」＝三级收窄选择器 <b>[数据源 ▼][提供方 ▼][model id]</b>：数据源 llm-pi-ai（默认）/ models.dev；同一模型 id 横跨多个提供方（如 glm-5.3-flash 同时在 zai / baseten / together…），先选提供方再搜 id。提供方与 model id 的候选均为<b>插件自绘浮层</b>（datalist 的弹层位置与样式页面控制不了，已弃用）；上限 50 条，超出提示「另有 N 项匹配」。选完提供方自动聚焦 model id 框；选中后输入框保留该 id（同族模型的继续搜索起点）。<br/>
+    预填语义：容量 / 模态 / 挡位 / compat <b>整份替换</b>（切换数据源后重选＝干净重写，不残留另一源的字段）；<b>模型 ID 与显示名称只填空行、绝不覆盖已填值</b>（目录 id 是官方端点的请求 id，走网关时上线字符串常常不同）。pi-ai 源：thinkingLevelMap → reasoningEfforts 按映射转换（<code>null</code> 两侧语义相反：目录里 null=不支持，行里 null=支持但不发送），compat 只写被 offer 的键，其余开关进「其他兼容开关」（清空即移除、回到目录默认）；models.dev 源：清空推理挡位与 compat，只留 supportsReasoningEffort。<br/>
+    推理区显隐：总开关 <b>或</b> 已声明挡位 <b>或</b> 已设思考格式，任一为真即显示——pi-ai 预填常常不写开关（交由适配器按 baseURL 检测），但挡位照样可编辑；此时开关下有灰字提示。取消「端点接受推理挡位参数」→ 挡位与思考格式<b>一并清除</b>且整块隐藏（不留孤儿参数）。「允许以 developer 角色发送系统提示」与「输入模态」不受它控制。<br/>
+    新模型行默认值（v1.0.0）：推理挡位开启且七档全声明、思考格式 openai、输入模态全选、developer 角色继承勾选。「获取可用模型」拉候选 → 「删除」走确认弹窗。<br/>
+    本 Demo 内置示例数据代替真实目录（pi-ai：6 个提供方，含 glm-5.3-flash 的多提供方重名、off:"none" 拼写、无 levelMap、anthropic 协议兜底；models.dev：4 条）。
+  </details>
 
   <!-- ==================== 界面本体 ==================== -->
   <div class="section" id="section" data-page-node-id="UCpijZYf0A8uOjRt8DTCUC">
@@ -294,15 +307,13 @@ body { margin: 0; padding: 28px; background: var(--dsw-alias-bg-base); color: va
         <button class="linkButton" data-act="download-meta" title="下载/更新 models.dev 元数据（供快速装入预填）">下载/更新元数据</button>
       </span>
     </div>
+    <p class="savedNotice" id="metaMessage" hidden style="margin:0"></p>
     <p class="intro" data-page-node-id="65pLmVSBtoZXn30lG4F3C4">填入各提供方的 API 密钥即可使用其模型。</p>
     <p class="savedNotice" id="savedNotice" hidden data-page-node-id="qeTGqCU8GYR3Xu2kzZokHy"></p>
     <ul class="rows" id="rows" data-page-node-id="wakCEJstxtFupCqkfwEYkT"></ul>
     <div class="addBlock" id="addBlock" data-page-node-id="904sm50ZUzRBTyYRPnsd7c"></div>
   </div>
 </div>
-
-<!-- 快速装入的可搜索下拉候选（datalist，选项由脚本按 QUICK_PRESETS 填充） -->
-<datalist id="quickPresetOptions"></datalist>
 
 <script>
 /* ============ 中文文案：抄自官方 locales.ts 的 zh 字典 ============ */
@@ -356,46 +367,178 @@ const FORMATS = ['openai','deepseek','openrouter','together','baseten','zai','qw
   'chat-template','qwen-chat-template','string-thinking','ant-ling'];
 const MODALITIES = [{ key:'text', zh:'文本' }, { key:'image', zh:'图像' }];
 
-/* 模型扩展字段草稿，结构与 ModelExtensionFields.tsx 读写的 draft 一致：
-   - developerRole   = compat.supportsDeveloperRole，三态：未写/true 皆勾选，仅显式 false 不勾
-   - reasoningEffort = compat.supportsReasoningEffort，严格 ===true 才算开（**默认关闭**，门控区隐藏）
-   - levels          = reasoningEfforts，{ [level]: wire|null }，**只含已声明的档位**（off 值为 null）
-   - thinkingFormat  = compat.thinkingFormat，空串 = 未设置
-   - input           = input 模态数组，与推理挡位互不隶属 */
+/* 模型扩展字段草稿，结构与 ModelEntryPanel.tsx 读写的 draft 一致：
+   - compat.supportsDeveloperRole   三态：未写/true 皆勾选，仅显式 false 不勾
+   - compat.supportsReasoningEffort 严格 ===true 才算开；未写 = 交由适配器按 baseURL 检测
+   - levels            = reasoningEfforts，{ [level]: wire|null }，只含已声明的档位（off 值为 null）
+   - compat.thinkingFormat   空缺 = 未设置
+   - input             = input 模态数组，与推理挡位互不隶属 */
 const extDefault = () => ({
-  // v1.0.0 默认值（升级计划 4-7 条）：推理挡位开启且七档全声明、思考格式 openai、
-  // 输入模态全选；developerRole 三态继承（勾选态不写键）。
-  developerRole: true,      // 勾选态 = 继承 catalog/检测
-  reasoningEffort: true,    // 默认开启 → 思考格式 + 推理挡位整块可见
+  // v1.0.0 默认值：推理挡位开启且七档全声明、思考格式 openai、
+  // 输入模态全选；supportsDeveloperRole 三态继承（勾选态不写键）。
+  compat: { supportsReasoningEffort: true, thinkingFormat: 'openai' },
   levels: { off:null, minimal:'minimal', low:'low', medium:'medium', high:'high', xhigh:'xhigh', max:'max' },
-  thinkingFormat: 'openai',
   input: ['text', 'image'],
 });
 
-/* 快速装入预设（demo 示例数据；真实实现可换成适配器目录 / 常用配置快照）。
-   套用语义：容量与扩展字段整份覆盖该模型行。 */
-const QUICK_PRESETS = {
-  'deepseek-chat · DeepSeek': {
-    context:'128K', max:'8K',
-    ext: { developerRole:false, reasoningEffort:false, levels:{}, thinkingFormat:'', input:['text'] },
-  },
-  'deepseek-reasoner · DeepSeek': {
-    context:'128K', max:'64K',
-    ext: { developerRole:true, reasoningEffort:true, thinkingFormat:'deepseek',
-           levels:{ off:null, minimal:'minimal', low:'low', medium:'medium', high:'high', xhigh:'xhigh', max:'max' },
-           input:['text'] },
-  },
-  'gpt-4o · OpenAI': {
-    context:'128K', max:'16K',
-    ext: { developerRole:true, reasoningEffort:false, levels:{}, thinkingFormat:'', input:['text','image'] },
-  },
-  'qwen-max · 阿里云': {
-    context:'32K', max:'8K',
-    ext: { developerRole:false, reasoningEffort:true, thinkingFormat:'qwen',
-           levels:{ off:null, low:'low', medium:'medium', high:'high' },
-           input:['text'] },
+/* ============ 快速装入的示例数据 ============
+   真实实现运行时直读宿主已装的 pi-ai 目录（providers/all 投影）与 models.dev 缓存；
+   这里内置一份小样例，字段与真实投影一致。 */
+const PI_AI = {
+  version: '0.85.1（示例）', generatedAt: '2026-09-05', warnings: [],
+  providers: {
+    zai: {
+      'glm-5.3-flash': { name:'GLM-5.3 Flash', api:'openai-completions', contextWindow:204800, maxTokens:131072,
+        input:['text','image'], reasoning:true,
+        thinkingLevelMap:{ off:null, low:'low', medium:'medium', high:'high' },
+        compat:{ supportsDeveloperRole:false, thinkingFormat:'zai' } },
+      'glm-5.3': { name:'GLM-5.3', api:'openai-completions', contextWindow:204800, maxTokens:131072,
+        input:['text'], reasoning:true,
+        thinkingLevelMap:{ off:null, minimal:'minimal', low:'low', medium:'medium', high:'high' },
+        compat:{ supportsDeveloperRole:false, thinkingFormat:'zai' } },
+    },
+    baseten: {
+      'zai-org/GLM-5.3-Flash': { name:'GLM-5.3 Flash (baseten)', api:'openai-completions', contextWindow:204800, maxTokens:131072,
+        input:['text','image'], reasoning:true,
+        thinkingLevelMap:{ off:'none', low:'low', medium:'medium', high:'high' },
+        compat:{ supportsStore:false, maxTokensField:'max_tokens', thinkingFormat:'baseten',
+                 chatTemplateArgs:{ effort:{ $var:'thinking.effort' } } } },
+    },
+    deepseek: {
+      'deepseek-chat': { name:'DeepSeek Chat', api:'openai-completions', contextWindow:131072, maxTokens:8192,
+        input:['text'], reasoning:false,
+        compat:{ supportsStore:false, maxTokensField:'max_tokens' } },
+      'deepseek-reasoner': { name:'DeepSeek Reasoner', api:'openai-completions', contextWindow:131072, maxTokens:65536,
+        input:['text'], reasoning:true,
+        thinkingLevelMap:{ minimal:null, low:'low', medium:null, high:'high', max:'max' },
+        compat:{ supportsStore:false, supportsDeveloperRole:false, maxTokensField:'max_tokens',
+                 requiresReasoningContentOnAssistantMessages:true, thinkingFormat:'deepseek' } },
+    },
+    xiaomi: {
+      'mimo-v2.5-pro': { name:'MiMo v2.5 Pro', api:'openai-completions', contextWindow:1048576, maxTokens:131072,
+        input:['text','image'], reasoning:true,
+        compat:{ requiresReasoningContentOnAssistantMessages:true, thinkingFormat:'deepseek' } },
+    },
+    together: {
+      'glm-5.3-flash': { name:'GLM-5.3 Flash (together)', api:'openai-completions', contextWindow:204800, maxTokens:131072,
+        input:['text','image'], reasoning:true,
+        thinkingLevelMap:{ off:'none', low:'low', medium:'medium', high:'high' },
+        compat:{ supportsDeveloperRole:false, thinkingFormat:'openrouter' } },
+    },
+    anthropic: {
+      'claude-sonnet-4': { name:'Claude Sonnet 4', api:'anthropic-messages', contextWindow:204800, maxTokens:64000,
+        input:['text','image'], reasoning:true,
+        thinkingLevelMap:{ low:'low', medium:'medium', high:'high' },
+        compat:{ forceAdaptiveThinking:true, supportsTemperature:false } },
+    },
   },
 };
+const MODELS_DEV = {
+  'zhipuai/glm-5.3-flash': { context:204800, output:131072, input:['text','image'], reasoning:true },
+  'xiaomi/mimo-v2.5-pro':  { context:1048576, output:131072, input:['text','image','audio','video'], reasoning:true },
+  'deepseek/deepseek-chat':{ context:131072, output:8192, input:['text'], reasoning:false },
+  'openai/gpt-4o':         { context:128000, output:16384, input:['text','image'], reasoning:false },
+};
+
+/* 被适配器 offer 的 compat 键（抄自 extension-meta.ts；示例只列两个协议，
+   真实实现覆盖 6 个）。宿主对协议不认的字段是「拒绝」而非忽略，预填必须过滤。 */
+const OFFERED_COMPAT = {
+  'openai-completions': [ 'supportsStore','supportsDeveloperRole','supportsReasoningEffort','supportsUsageInStreaming',
+    'supportsFinishReason','maxTokensField','requiresToolResultName','requiresAssistantAfterToolResult',
+    'requiresThinkingAsText','requiresReasoningContentOnAssistantMessages','thinkingFormat','chatTemplateKwargs',
+    'chatTemplateArgs','supportsThinkingTokenBudget','thinkingTokenBudgetField','vllmPriority','supportsStrictMode',
+    'cacheControlFormat','supportsLongCacheRetention' ],
+  'anthropic-messages': [ 'supportsEagerToolInputStreaming','supportsLongCacheRetention','supportsCacheControlOnTools',
+    'supportsTemperature','forceAdaptiveThinking','allowEmptySignature','supportsStrictTools' ],
+};
+
+const LEVEL_KEYS = ['off','minimal','low','medium','high','xhigh','max'];
+
+/* thinkingLevelMap → reasoningEfforts：null 两侧语义相反，必须映射而非照抄。
+   anthropic/bedrock 的 minimal 兑底是 low，mistral 一律 high，其余为档位名。 */
+function defaultWireSpelling(api, level) {
+  if (api === 'anthropic-messages' || api === 'bedrock-converse-stream') return level === 'minimal' ? 'low' : level;
+  if (api === 'mistral-conversations') return 'high';
+  return level;
+}
+function reasoningEffortsFrom(map, api, reasoning) {
+  if (!reasoning) return false;
+  const src = map || {}; const efforts = {};
+  for (const level of LEVEL_KEYS) {
+    if (!(level in src)) {
+      if (level === 'off') { efforts[level] = null; continue; }          // 缺席 off = 支持但不发送
+      if (level === 'xhigh' || level === 'max') continue;                // 缺席 = 不支持
+      efforts[level] = defaultWireSpelling(api, level);
+      continue;
+    }
+    if (src[level] === null) continue;                                   // 显式 null = 不支持
+    efforts[level] = src[level];
+  }
+  return Object.keys(efforts).some(k => k !== 'off') ? efforts : false;  // 只剩 off 的 dict 会被适配器拒绝
+}
+function compatFrom(entry) {
+  const offered = OFFERED_COMPAT[entry.api] || [];
+  const compat = entry.compat || {};
+  return Object.fromEntries(offered.filter(k => k in compat).map(k => [k, compat[k]]));
+}
+function fmtCap(n) {
+  if (n % 1048576 === 0) return (n / 1048576) + 'M';
+  if (n % 1024 === 0) return (n / 1024) + 'K';
+  return String(n);
+}
+function providersOf(source) {
+  if (source === 'pi-ai') return Object.keys(PI_AI.providers);
+  return [...new Set(Object.keys(MODELS_DEV).map(id => id.split('/')[0]))];
+}
+function searchPrefill(source, provider, text) {
+  const entries = source === 'pi-ai' ? PI_ENTRIES : MD_ENTRIES;
+  const needle = text.trim().toLowerCase();
+  const hits = entries.filter(en =>
+    (provider.length === 0 || en.provider === provider) &&
+    (needle.length === 0 || en.id.toLowerCase().includes(needle)));
+  return { hits: hits.slice(0, QUICK_LIMIT), total: hits.length };
+}
+function sourceSummary(source) {
+  if (source === 'pi-ai') {
+    return `pi-ai 目录 v${PI_AI.version}，${PI_ENTRIES.length} 个模型 · ${PI_AI.generatedAt}；选择提供方或输入 model id`;
+  }
+  return `models.dev，${MD_ENTRIES.length} 条；选择提供方或输入 model id`;
+}
+const PI_ENTRIES = Object.entries(PI_AI.providers).flatMap(([provider, models]) =>
+  Object.entries(models).map(([id, raw]) => ({
+    source:'pi-ai', provider, id,
+    name: raw.name, api: raw.api,
+    context: raw.contextWindow, output: raw.maxTokens,
+    input: raw.input || [], reasoning: raw.reasoning === true,
+    thinkingLevelMap: raw.thinkingLevelMap, compat: raw.compat,
+  })));
+const MD_ENTRIES = Object.entries(MODELS_DEV).map(([id, raw]) => ({
+  source:'models.dev', provider: id.split('/')[0], id,
+  context: raw.context, output: raw.output, input: raw.input || [], reasoning: raw.reasoning === true,
+}));
+// 候选项用位置索引用于点选回查：key 里的 \u0000 分隔符经 innerHTML 往返可能被
+// HTML 解析器替换成 U+FFFD，字符串匹配会静默失配。
+PI_ENTRIES.forEach((en, i) => { en.idx = i; });
+MD_ENTRIES.forEach((en, i) => { en.idx = i; });
+
+/* 预填语义（对齐 applyMetadata）：容量/模态/挡位/compat 整份替换；
+   id 与显示名称只填空行——目录 id 是官方端点的请求 id，走网关时常常不同。 */
+function applyPrefill(m, entry) {
+  m.context = entry.context === undefined ? '' : fmtCap(entry.context);
+  m.max = entry.output === undefined ? '' : fmtCap(entry.output);
+  const mods = entry.input.filter(x => x === 'text' || x === 'image');
+  m.ext.input = mods.length > 0 ? mods.slice() : [];
+  if (entry.source === 'pi-ai') {
+    if (String(m.id || '').trim().length === 0) m.id = entry.id;
+    if (String(m.name || '').trim().length === 0 && entry.name) m.name = entry.name;
+    const efforts = reasoningEffortsFrom(entry.thinkingLevelMap, entry.api, entry.reasoning);
+    m.ext.levels = efforts === false ? {} : efforts;
+    m.ext.compat = compatFrom(entry);
+  } else {
+    m.ext.levels = {};
+    m.ext.compat = entry.reasoning ? { supportsReasoningEffort: true } : {};
+  }
+}
 
 /** 按最新草稿重绘某条目的扩展块（保留展开状态）。 */
 function repaintExtBlock(entry) {
@@ -440,11 +583,13 @@ function paintWireCell(rowEl, m) {
 }
 const state = {
   providers: [
-    { id:'deepseek', name:'DeepSeek', route:'deepseek', declared:false, keyConfigured:true,
+    { id:'deepseek', name:'DeepSeek', route:'deepseek', ns:'deepseek', declared:false, keyConfigured:true,
       baseURL:'https://api.deepseek.com', overridden:false,
       models:[ { id:'deepseek-chat', name:'DeepSeek Chat', context:'', max:'', ext:extDefault() },
                { id:'deepseek-reasoner', name:'DeepSeek Reasoner', context:'', max:'', ext:extDefault() } ] },
-    { id:'acme-gateway', name:'Acme Gateway', route:'acme-gateway', declared:true, keyConfigured:true,
+    { id:'xiaomi', name:'Xiaomi', route:'xiaomi', ns:'pi-ai', declared:false, keyConfigured:false,
+      baseURL:'', overridden:false, models:[] },
+    { id:'acme-gateway', name:'Acme Gateway', route:'acme-gateway', ns:'pi-ai', declared:true, keyConfigured:true,
       baseURL:'https://gateway.example/v1', overridden:true,
       models:[ { id:'gpt-4o', name:'GPT-4o', context:'128K', max:'16K', ext:extDefault() } ] },
   ],
@@ -466,7 +611,7 @@ const candidatePool = ['deepseek-chat','deepseek-reasoner','deepseek-coder','dee
 /* 新建卡片（添加提供方 / 添加自定义提供方）的模型草稿。它不在 providers 列表里，
    但必须能被 P() 找到：否则在这两张卡上点「添加模型」，P('__new') 返回 undefined，
    undefined.models 抛 TypeError，整段脚本从此失效——后续所有交互（含容量展开）全废。 */
-const newProv = { id:'__new', name:'', route:'', declared:true, keyConfigured:false,
+const newProv = { id:'__new', name:'', route:'', ns:'pi-ai', declared:true, keyConfigured:false,
   baseURL:'', overridden:false, models:[] };
 const P = (id) => state.providers.find(p => p.id === id) || (id === '__new' ? newProv : undefined);
 const esc = (s) => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -474,54 +619,87 @@ const esc = (s) => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>
 /* ============ 片段模板 ============ */
 function extBlockHtml(m) {
   const e = m.ext;
+  const compat = e.compat || {};
+  const gateOn = compat.supportsReasoningEffort === true;
+  const fmt = typeof compat.thinkingFormat === 'string' ? compat.thinkingFormat : '';
+  const levelsDeclared = Object.keys(e.levels || {}).length > 0;
+  // 显隐条件对齐 reasoningAreaShown：开关 或 已声明挡位 或 已设思考格式，任一为真即显示。
+  // pi-ai 预填常常不写开关（交由适配器按 baseURL 检测），但挡位照样要可见可编辑。
+  const shown = gateOn || levelsDeclared || fmt !== '';
   // 七档常显：真实实现渲染 THINKING_LEVELS 全部行，未声明的行取值列显示「—」。
   const rows = LEVELS.map(l => {
-    const declared = l.key in e.levels;
-    const value = String(e.levels[l.key] ?? '');
+    const declared = l.key in (e.levels || {});
+    const value = String((e.levels || {})[l.key] ?? '');
     const cell = declared && l.key !== 'off'
-      ? `<input type="text" data-act="ext-wire" data-level="${l.key}" value="${esc(value)}" placeholder="${l.key}" aria-label="${l.zh} (${l.key}) 线上取值">`
+      ? `<input type="text" data-act="ext-wire" data-level="${l.key}" value="${esc(value)}" placeholder="${l.key}" aria-label="${l.key} 线上取值">`
       : '<span style="font-size:12px;color:var(--dsw-alias-label-tertiary)">—</span>';
     return `
     <div class="extTRow" data-level-row="${l.key}">
       <div style="display:flex;justify-content:center">
         <input type="checkbox" data-act="ext-level" data-level="${l.key}" ${declared ? 'checked' : ''}
-               aria-label="声明 ${l.zh} (${l.key})" style="accent-color:var(--dsw-alias-brand-primary);width:15px;height:15px">
+               aria-label="声明 ${l.key}" style="accent-color:var(--dsw-alias-brand-primary);width:15px;height:15px">
       </div>
-      <div style="opacity:${declared ? 1 : 0.5}">${l.zh} (${l.key})</div>
+      <div style="opacity:${declared ? 1 : 0.5}">${l.key}</div>
       <div style="opacity:${declared ? 1 : 0.4}">${cell}</div>
     </div>`;
   }).join('');
+  // 其他兼容开关：compat 里除三个基础键外的全部键（字母序）——
+  // pi-ai 目录记录的 compat 面远大于本面板显式建模的三个，看不见的值等于修不了的值。
+  const extra = Object.keys(compat)
+    .filter(k => !['supportsDeveloperRole', 'supportsReasoningEffort', 'thinkingFormat'].includes(k))
+    .sort()
+    .map(k => {
+      const v = compat[k];
+      const text = typeof v === 'string' ? v : JSON.stringify(v);
+      return `
+      <label style="display:flex;flex-direction:column;gap:2px">
+        <span class="extHint">${esc(k)}</span>
+        <input class="input" type="text" data-act="ext-compat" data-key="${esc(k)}" value="${esc(text)}" aria-label="${esc(k)}">
+      </label>`;
+    }).join('');
   return `
   <div class="extBlock" hidden data-ext>
-    <!-- ⓪ 快速装入：可搜索下拉，选中后整份套用预设（容量 + 扩展字段） -->
+    <!-- ⓪ 快速装入：[数据源][提供方][model id] 三级收窄；两个候选列表均为自绘浮层（非 datalist） -->
     <div class="extGroup" style="border-top:none;padding-top:0">
-      <span class="extLabel" style="margin-bottom:6px">快速装入</span>
-      <input class="input" list="quickPresetOptions" data-act="quick-load"
-             placeholder="搜索预设（示例数据）…" aria-label="快速装入">
+      <div class="quickWrap" data-q-source="pi-ai" data-q-provider="" data-q-text="" data-q-panel="">
+        <span class="extLabel">快速装入</span>
+        <div style="display:flex;gap:6px;align-items:center">
+          <select class="input selectInput" data-act="quick-source" style="flex:0 0 108px;min-width:0" aria-label="数据源">
+            <option value="pi-ai">llm-pi-ai</option>
+            <option value="models.dev">models.dev</option>
+          </select>
+          <input class="input" style="flex:0 0 132px;min-width:0" type="text" data-act="quick-provider"
+                 placeholder="提供方：全部" aria-label="提供方" autocomplete="off">
+          <input class="input" style="flex:1 1 auto;min-width:0" type="text" data-act="quick-text"
+                 placeholder="model id（如 glm）…" aria-label="model id" autocomplete="off">
+        </div>
+      </div>
     </div>
     <!-- ① 容量字段并入块顶：上下文窗口 / 最大输出 token -->
-    <div class="modelAdvanced" style="padding:0">
-      <label class="modelField"><span class="modelFieldLabel">${T.modelContextWindow}</span>
-        <input class="input" type="text" value="${esc(m.context || '')}" placeholder="${T.contextWindowPlaceholder}" aria-label="${T.modelContextWindow}"></label>
-      <label class="modelField"><span class="modelFieldLabel">${T.modelMaxTokens}</span>
-        <input class="input" type="text" value="${esc(m.max || '')}" placeholder="${T.maxTokensPlaceholder}" aria-label="${T.modelMaxTokens}"></label>
+    <div class="extGroup">
+      <div class="modelField" style="padding:0 4px">
+        <label class="modelField"><span class="modelFieldLabel">${T.modelContextWindow}</span>
+          <input class="input" type="text" value="${esc(m.context || '')}" placeholder="${T.contextWindowPlaceholder}" aria-label="${T.modelContextWindow}"></label>
+        <label class="modelField"><span class="modelFieldLabel">${T.modelMaxTokens}</span>
+          <input class="input" type="text" value="${esc(m.max || '')}" placeholder="${T.maxTokensPlaceholder}" aria-label="${T.modelMaxTokens}"></label>
+      </div>
     </div>
 
-    <!-- ① 输入模态：与推理挡位互不隶属，不受总开关控制 -->
+    <!-- 输入模态：与推理挡位互不隶属，不受总开关控制 -->
     <div class="extGroup">
       <span class="extLabel" style="margin-bottom:6px">输入模态</span>
       <div style="display:flex;gap:18px">
         ${MODALITIES.map(md => `
           <label class="switchRow">
-            <input type="checkbox" data-act="ext-modal" data-modal="${md.key}" ${e.input.includes(md.key) ? 'checked' : ''}>${md.zh}
+            <input type="checkbox" data-act="ext-modal" data-modal="${md.key}" ${(e.input || []).includes(md.key) ? 'checked' : ''}>${md.zh}
           </label>`).join('')}
       </div>
     </div>
 
-    <!-- ② developer 角色：三态，不受「端点接受推理挡位参数」控制 -->
+    <!-- developer 角色：三态（compat.supportsDeveloperRole 未写/true 皆勾选），不受总开关控制 -->
     <div class="extGroup">
       <label class="extCheck">
-        <input type="checkbox" data-act="ext-devrole" ${e.developerRole ? 'checked' : ''}
+        <input type="checkbox" data-act="ext-devrole" ${compat.supportsDeveloperRole !== false ? 'checked' : ''}
                style="accent-color:var(--dsw-alias-brand-primary);width:15px;height:15px;flex:none;margin-top:3px"
                aria-label="允许以 developer 角色发送系统提示">
         <span style="display:flex;flex-direction:column;gap:2px">
@@ -531,21 +709,22 @@ function extBlockHtml(m) {
       </label>
     </div>
 
-    <!-- ③ 总开关：仅在 compat.supportsReasoningEffort === true 时为真（默认关闭） -->
+    <!-- 总开关：仅 compat.supportsReasoningEffort === true 才算开；未写 = 交由适配器按 baseURL 检测 -->
     <div class="extGroup">
       <label class="switchRow">
-        <input type="checkbox" data-act="ext-master" ${e.reasoningEffort ? 'checked' : ''}>
+        <input type="checkbox" data-act="ext-master" ${gateOn ? 'checked' : ''}>
         端点接受推理挡位参数（reasoning_effort）
       </label>
+      ${!gateOn && shown ? '<p class="extHint" style="margin-top:6px">此项未设置：由 llm-pi-ai 按其 baseURL 检测结果决定是否发送 reasoning_effort；下面的挡位不受影响，仍通过各协议自己的 thinking 参数生效。</p>' : ''}
     </div>
 
-    <!-- ④ 受总开关门控：真实实现是 !supportsReasoningEffort ? null : (…) —— 整块隐藏，不是置灰；门控内先思考格式、后推理挡位 -->
-    <div class="extGated" data-gated ${e.reasoningEffort ? '' : 'hidden'}>
+    <!-- 门控区：开关、挡位、思考格式任一存在即显示（整块隐藏，不是置灰）；门控内先思考格式、后推理挡位 -->
+    <div class="extGated" data-gated ${shown ? '' : 'hidden'}>
       <div class="extField">
         <span class="extLabel">思考格式</span>
         <select class="input selectInput" data-act="ext-thinking" aria-label="思考格式">
-          <option value="" ${e.thinkingFormat === '' ? 'selected' : ''}>—</option>
-          ${FORMATS.map(f => `<option value="${f}" ${e.thinkingFormat === f ? 'selected' : ''}>${f}</option>`).join('')}
+          <option value="" ${fmt === '' ? 'selected' : ''}>—</option>
+          ${FORMATS.map(f => `<option value="${f}" ${fmt === f ? 'selected' : ''}>${f}</option>`).join('')}
         </select>
       </div>
       <div class="extField">
@@ -557,6 +736,14 @@ function extBlockHtml(m) {
         <p class="error" data-effort-error hidden style="margin-top:6px"></p>
       </div>
     </div>
+
+    ${extra ? `
+    <!-- 其他兼容开关：pi-ai 目录预填、本面板没有专用控件的键；清空即移除、回到目录默认 -->
+    <div class="extGroup">
+      <span class="extLabel" style="margin-bottom:6px">其他兼容开关</span>
+      <div style="display:flex;flex-direction:column;gap:6px">${extra}</div>
+      <p class="extHint" style="margin-top:6px">这些开关由 pi-ai 目录预填；清空输入框即移除该开关，回到目录默认。</p>
+    </div>` : ''}
   </div>`;
 }
 
@@ -596,7 +783,7 @@ function catalogHtml(p) {
 
 function editorHtml(p) {
   const keyPlaceholder = p.keyConfigured ? T.keyStored
-    : (p.declared ? T.keyPlaceholderNative : T.keyPlaceholder);
+    : (p.ns === 'pi-ai' && p.declared ? T.keyPlaceholderNative : T.keyPlaceholder);
   return `
   <div class="editor">
     <!-- 分区一：供应商——端点身份与凭据（默认收起） -->
@@ -606,7 +793,7 @@ function editorHtml(p) {
         <button type="button" class="tabButton" data-act="tab" data-tab="models" role="tab" aria-selected="false">${T.sectionModel}</button>
       </div>
       <div class="tabPanel" data-panel="provider">
-        ${p.declared ? `
+        ${p.ns === 'pi-ai' ? `
         <div class="field">
           <span class="fieldLabel">${T.customDisplayName}</span>
           <input class="input" type="text" value="${esc(p.name)}" placeholder="${esc(p.route)}" aria-label="${T.customDisplayName}">
@@ -617,9 +804,9 @@ function editorHtml(p) {
         </div>
         <div class="field">
           <span class="fieldLabel">${T.baseUrl}</span>
-          <input class="input" type="text" value="${esc(p.baseURL)}" placeholder="${T.baseUrlDefault}" aria-label="${T.baseUrl}">
+          <input class="input" type="text" value="${esc(p.baseURL)}" placeholder="${p.ns === 'deepseek' ? 'https://api.deepseek.com' : T.baseUrlDefault}" aria-label="${T.baseUrl}">
         </div>
-        ${p.declared ? `
+        ${p.ns === 'pi-ai' && p.declared ? `
         <div class="field">
           <span class="fieldLabel">${T.customApi}</span>
           <select class="input selectInput" aria-label="${T.customApi}"><option>openai</option></select>
@@ -664,17 +851,18 @@ function rowHtml(p) {
 function customCardHtml() {
   return `
   <div class="addCard">
+    <!-- Provider ID 在 Tabs 之外：它决定 route 与凭据引用名，先于两页字段 -->
+    <div class="field">
+      <span class="fieldLabel">${T.customRoute}</span>
+      <input class="input" type="text" placeholder="acme-gateway" aria-label="${T.customRoute}">
+      <p class="advancedHint">${T.customRouteHint}</p>
+    </div>
     <div class="tabs">
       <div class="tabBar" role="tablist">
         <button type="button" class="tabButton tabButtonActive" data-act="tab" data-tab="provider" role="tab" aria-selected="true">${T.sectionProvider}</button>
         <button type="button" class="tabButton" data-act="tab" data-tab="models" role="tab" aria-selected="false">${T.sectionModel}</button>
       </div>
       <div class="tabPanel" data-panel="provider">
-        <div class="field">
-          <span class="fieldLabel">${T.customRoute}</span>
-          <input class="input" type="text" placeholder="acme-gateway" aria-label="${T.customRoute}">
-          <p class="advancedHint">${T.customRouteHint}</p>
-        </div>
         <div class="field">
           <span class="fieldLabel">${T.customDisplayName}</span>
           <input class="input" type="text" placeholder="${T.customDisplayName}" aria-label="${T.customDisplayName}">
@@ -692,7 +880,6 @@ function customCardHtml() {
           <input class="input" type="password" autocomplete="off" placeholder="${T.keyPlaceholderNative}" aria-label="${T.keyInput}">
         </div>
       </div>
-    </div>
       <div class="tabPanel" data-panel="models" hidden>
         ${catalogHtml(newProv)}
       </div>
@@ -729,7 +916,6 @@ function addCardForExistingHtml() {
             <input class="input" type="text" placeholder="${T.baseUrlDefault}" aria-label="${T.baseUrl}">
           </div>
         </div>
-      </div>
         <div class="tabPanel" data-panel="models" hidden>
           ${catalogHtml(newProv)}
         </div>
@@ -838,8 +1024,8 @@ document.addEventListener('click', (e) => {
     window.setTimeout(() => {
       btn.textContent = '下载/更新元数据';
       btn.dataset.busy = '0';
-      const note = document.getElementById('savedNotice');
-      note.textContent = 'models.dev 元数据已下载并就绪。';
+      const note = document.getElementById('metaMessage');
+      note.textContent = 'models.dev 元数据已下载并就绪（llm-pi-ai 源无需下载，运行时直读宿主已装目录）。';
       note.hidden = false;
     }, 1200);
     return;
@@ -904,18 +1090,23 @@ document.addEventListener('click', (e) => {
     p.overridden = true; closeModal(); renderCatalog(p);
   }
 
-  /* ---- 插件扩展字段交互 ---- */
-  /* ---- 插件扩展字段：语义对齐 ModelExtensionFields.tsx ---- */
+  /* ---- 插件扩展字段：语义对齐 ModelEntryPanel.tsx ---- */
   else if (act === 'ext-devrole') {
-    // 三态：勾选 = 删键回继承态（catalog / 检测说了算）；取消 = 显式写 false
-    modelOfExt(el.closest('[data-ext]')).ext.developerRole = el.checked;
+    // 三态：勾选 = 删键回继承态（catalog / baseURL 检测说了算）；取消 = 显式写 false
+    const compat = modelOfExt(el.closest('[data-ext]')).ext.compat;
+    if (el.checked) delete compat.supportsDeveloperRole;
+    else compat.supportsDeveloperRole = false;
   }
   else if (act === 'ext-master') {
-    const ext = el.closest('[data-ext]');
-    modelOfExt(ext).ext.reasoningEffort = el.checked;
-    // 隐藏而非置灰：真实实现为 !supportsReasoningEffort ? null : (…)
-    ext.querySelector('[data-gated]').hidden = !el.checked;
-    updateEffortError(ext);
+    // 一个动作清掉开关与全部被门控的值——不留孤儿参数（对齐 toggleGate）
+    const m = modelOfExt(el.closest('[data-ext]'));
+    if (el.checked) m.ext.compat.supportsReasoningEffort = true;
+    else {
+      delete m.ext.compat.supportsReasoningEffort;
+      delete m.ext.compat.thinkingFormat;
+      m.ext.levels = {};
+    }
+    repaintExtBlock(el.closest('.modelEntry'));
   }
   else if (act === 'ext-level') {
     const ext = el.closest('[data-ext]');
@@ -928,7 +1119,11 @@ document.addEventListener('click', (e) => {
     updateEffortError(ext);
   }
   else if (act === 'ext-thinking') {
-    modelOfExt(el.closest('[data-ext]')).ext.thinkingFormat = el.value;
+    const m = modelOfExt(el.closest('[data-ext]'));
+    if (el.value === '') delete m.ext.compat.thinkingFormat;
+    else m.ext.compat.thinkingFormat = el.value;
+    // 清空后若开关也未设且无挡位，整块应随之隐藏 → 重绘
+    repaintExtBlock(el.closest('.modelEntry'));
   }
   else if (act === 'ext-modal') {
     const m = modelOfExt(el.closest('[data-ext]'));
@@ -954,6 +1149,14 @@ document.addEventListener('input', (e) => {
     document.querySelectorAll('.candidate').forEach(li => {
       li.style.display = li.querySelector('.candidateId').textContent.toLowerCase().includes(q) ? '' : 'none';
     });
+    return;
+  }
+  if (e.target.dataset.act === 'quick-provider' || e.target.dataset.act === 'quick-text') {
+    // 输入只过滤候选列表；恰好输全某个提供方的名字才算选中（chosenProvider 语义）
+    const wrap = quickWrapOf(e.target);
+    wrap.dataset[e.target.dataset.act === 'quick-provider' ? 'qProvider' : 'qText'] = e.target.value;
+    wrap.dataset.qPanel = e.target.dataset.act === 'quick-provider' ? 'provider' : 'model';
+    renderQuickPanel(wrap);
   }
 });
 function syncToggleAll() {
@@ -962,26 +1165,119 @@ function syncToggleAll() {
   if (btn) btn.textContent = boxes.every(b => b.checked) ? T.fetchDeselectAll : T.fetchSelectAll;
 }
 
-/* 快速装入：选中预设（change）后整份套用容量与扩展字段，并重绘扩展块 */
+/* ---- 快速装入：三级收窄选择器（语义对齐 QuickLoad.tsx） ---- */
+const QUICK_LIMIT = 50;
+function quickWrapOf(el) { return el.closest('.quickWrap'); }
+function renderQuickPanel(wrap) {
+  const old = wrap.querySelector('.quickList');
+  if (old) old.remove();
+  const panel = wrap.dataset.qPanel;
+  if (!panel) return;
+  const div = document.createElement('div');
+  div.className = 'quickList';
+  div.innerHTML = panel === 'provider' ? quickProviderBody(wrap) : quickModelBody(wrap);
+  wrap.appendChild(div);
+}
+function quickProviderBody(wrap) {
+  const providers = providersOf(wrap.dataset.qSource);
+  if (providers.length === 0) return '<span class="quickEmpty">该数据源没有提供方信息</span>';
+  const needle = (wrap.dataset.qProvider || '').trim().toLowerCase();
+  const matches = needle.length === 0 ? providers : providers.filter(n => n.toLowerCase().includes(needle));
+  return '<button type="button" class="quickItem" data-act="quick-pick-provider" data-name="">全部（不限提供方）</button>'
+    + matches.map(n => `<button type="button" class="quickItem" data-act="quick-pick-provider" data-name="${esc(n)}">${esc(n)}</button>`).join('')
+    + (matches.length === 0 ? '<span class="quickEmpty">没有匹配的提供方</span>' : '');
+}
+function quickModelBody(wrap) {
+  const source = wrap.dataset.qSource;
+  const providers = providersOf(source);
+  // 半截输入只过滤候选列表；恰好是某个提供方的全名才算选中（chosenProvider 语义）
+  const providerRaw = wrap.dataset.qProvider || '';
+  const chosen = providers.includes(providerRaw) ? providerRaw : '';
+  const text = wrap.dataset.qText || '';
+  if (chosen.length === 0 && text.trim().length === 0) {
+    const warn = source === 'pi-ai' && PI_AI.warnings.length > 0
+      ? `<span class="error" style="padding:0 8px">${esc(PI_AI.warnings.join('；'))}</span>` : '';
+    return `<span class="quickEmpty">${esc(sourceSummary(source))}</span>${warn}`;
+  }
+  const { hits, total } = searchPrefill(source, chosen, text);
+  if (hits.length === 0) return '<span class="quickEmpty">没有匹配的模型</span>';
+  return hits.map(en => `<button type="button" class="quickItem" data-act="quick-pick-model" data-idx="${en.idx}">${esc(en.id)}</button>`).join('')
+    + (total > hits.length ? `<span class="quickEmpty">另有 ${total - hits.length} 项匹配——继续输入或选定提供方以缩小范围</span>` : '');
+}
+function pickPrefill(itemEl, idx) {
+  const wrap = quickWrapOf(itemEl);
+  const list = wrap.dataset.qSource === 'pi-ai' ? PI_ENTRIES : MD_ENTRIES;
+  const entry = list[Number(idx)];
+  if (entry === undefined) return;
+  const modelEl = itemEl.closest('.modelEntry');
+  applyPrefill(modelOfExt(itemEl.closest('[data-ext]')), entry);
+  // 保留刚选中的 id：选完变空白看不出装了什么，且它是同族模型的搜索起点
+  wrap.dataset.qPanel = '';
+  wrap.dataset.qText = entry.id;
+  repaintExtBlock(modelEl);
+  const fresh = modelEl.querySelector('.quickWrap');
+  fresh.querySelector('[data-act="quick-text"]').value = entry.id;
+}
+document.addEventListener('mousedown', (e) => {
+  const el = e.target.closest('[data-act="quick-pick-provider"], [data-act="quick-pick-model"]');
+  if (!el) return;
+  // mousedown 先于 blur：preventDefault 保住输入框焦点，点选才不会先收起浮层
+  e.preventDefault();
+  const wrap = quickWrapOf(el);
+  if (el.dataset.act === 'quick-pick-provider') {
+    wrap.dataset.qProvider = el.dataset.name;
+    wrap.dataset.qText = '';
+    wrap.querySelector('[data-act="quick-text"]').focus();  // 选完提供方直接进入 id 输入
+  } else {
+    pickPrefill(el, el.dataset.idx);
+  }
+});
+document.addEventListener('focusin', (e) => {
+  const act = e.target.dataset ? e.target.dataset.act : undefined;
+  if (act !== 'quick-provider' && act !== 'quick-text') return;
+  const wrap = quickWrapOf(e.target);
+  wrap.dataset.qPanel = act === 'quick-provider' ? 'provider' : 'model';
+  renderQuickPanel(wrap);
+});
+document.addEventListener('focusout', (e) => {
+  const wrap = e.target.closest ? e.target.closest('.quickWrap') : null;
+  if (!wrap) return;
+  window.requestAnimationFrame(() => {
+    if (!wrap.contains(document.activeElement)) { wrap.dataset.qPanel = ''; renderQuickPanel(wrap); }
+  });
+});
 document.addEventListener('change', (e) => {
-  if (e.target.dataset.act !== 'quick-load') return;
-  const preset = QUICK_PRESETS[e.target.value];
-  if (preset === undefined) return;
-  const entry = e.target.closest('.modelEntry');
-  const m = modelOfExt(e.target.closest('[data-ext]'));
-  m.context = preset.context; m.max = preset.max;
-  m.ext = structuredClone(preset.ext);
-  repaintExtBlock(entry);
+  const act = e.target.dataset.act;
+  if (act === 'quick-source') {
+    // 提供方列表属于数据源：切源清掉旧选择，否则结果被筛空还以为源是空的
+    const wrap = quickWrapOf(e.target);
+    wrap.dataset.qProvider = ''; wrap.dataset.qText = ''; wrap.dataset.qPanel = '';
+    wrap.querySelector('[data-act="quick-provider"]').value = '';
+    wrap.querySelector('[data-act="quick-text"]').value = '';
+    renderQuickPanel(wrap);
+    return;
+  }
+  if (act === 'ext-compat') {
+    // blur 提交：清空 = 移除该开关、回到目录默认；其余按原值类型回读
+    const compat = modelOfExt(e.target.closest('[data-ext]')).ext.compat;
+    const key = e.target.dataset.key;
+    const raw = e.target.value.trim();
+    if (raw.length === 0) delete compat[key];
+    else {
+      const prev = compat[key];
+      if (typeof prev === 'boolean') compat[key] = raw === 'true';
+      else if (typeof prev === 'number') { const n = Number(raw); compat[key] = Number.isNaN(n) ? prev : n; }
+      else if (typeof prev === 'string') compat[key] = raw;
+      else { try { compat[key] = JSON.parse(raw); } catch { /* 读不回就保持原值 */ } }
+    }
+    repaintExtBlock(e.target.closest('.modelEntry'));
+  }
 });
 
 document.getElementById('themeBtn').addEventListener('click', () => {
   const dark = document.body.toggleAttribute('data-ds-dark-theme');
   document.getElementById('themeBtn').textContent = dark ? '切换浅色' : '切换深色';
 });
-
-/* 快速装入下拉候选 */
-document.getElementById('quickPresetOptions').innerHTML =
-  Object.keys(QUICK_PRESETS).map(k => `<option value="${k}"></option>`).join('');
 
 render();
 </script>

@@ -12,12 +12,23 @@
 
 import { useState } from 'react'
 import type { ReactNode } from 'react'
-import { THINKING_FORMATS, THINKING_LEVELS } from '../extension-meta.ts'
+import { COMPAT_BASE_FIELDS, THINKING_FORMATS, THINKING_LEVELS } from '../extension-meta.ts'
 import type { ModelDraft } from './compat.ts'
 import { formatCapacity, parseCapacity } from './compat.ts'
+import { compatFrom, reasoningEffortsFrom } from './prefill.ts'
 import { QuickLoad } from './QuickLoad.tsx'
-import type { MetadataEntry } from './models-index.ts'
+import type { PrefillEntry } from './models-index.ts'
 import styles from './models-plus.module.css'
+
+/**
+ * Whether a draft field is absent or whitespace-only.
+ * @param value - the field's current value.
+ * @returns true when the field carries nothing worth keeping.
+ */
+function isBlank(value: unknown): boolean {
+  if (value === undefined || value === null) return true
+  return typeof value === 'string' && value.trim().length === 0
+}
 
 /** The row's compat sub-object as a plain record (absent → empty). */
 function compatOf(model: ModelDraft): Record<string, unknown> {
@@ -88,24 +99,73 @@ export function ModelEntryPanel(props: ModelEntryPanelProps): ReactNode {
   }
 
   // --- quick load ----------------------------------------------------------
-  const applyMetadata = (entry: MetadataEntry): void => {
-    // Only the four metadata fields are overwritten; everything else keeps
-    // its draft value (a fresh row already carries the v1.0.0 defaults).
+  /**
+   * Apply one prefill candidate.
+   *
+   * Every value is *restated* from the picked source rather than merged into
+   * whatever was already there: capacities, modalities, reasoning levels and
+   * compat are replaced wholesale. A prefill answers "what does this catalog
+   * say about the model", so an absent field clears — leaving another source's
+   * value behind would describe a model neither catalog claims, and switching
+   * sources then re-picking is meant to be a clean rewrite.
+   *
+   * Two things do not follow that rule. `id` and `name` are filled only into a
+   * blank row, because a catalog id is the request id for the vendor's *own*
+   * endpoint while behind a gateway the string on the wire is often different.
+   * And pi-ai's level map is *mapped* rather than copied, because `null` means
+   * the opposite on each side.
+   * @param entry - the picked candidate.
+   */
+  const applyMetadata = (entry: PrefillEntry): void => {
     const next = { ...model }
     if (entry.context === undefined) Reflect.deleteProperty(next, 'contextWindow')
     else next['contextWindow'] = entry.context
     if (entry.output === undefined) Reflect.deleteProperty(next, 'maxTokens')
     else next['maxTokens'] = entry.output
-    const compat = { ...compatOf(model) }
-    compat['supportsReasoningEffort'] = entry.reasoning
-    if (!entry.reasoning) {
-      // A non-reasoning model: keep the draft free of orphan gated values.
-      Reflect.deleteProperty(compat, 'thinkingFormat')
+    // A prefill states what *this* source knows, so an absent value clears
+    // rather than merges — leaving the other catalog's modality list behind
+    // would describe a model neither source claims.
+    const modality = entry.input.filter(m => m === 'text' || m === 'image')
+    if (modality.length > 0) next['input'] = modality
+    else Reflect.deleteProperty(next, 'input')
+
+    if (entry.source === 'pi-ai') {
+      // The id and name are filled into an *empty* row and never written over a
+      // typed one. A catalog id is the request id for the vendor's own
+      // endpoint; behind a gateway the string that actually reaches the wire is
+      // often different (`v2.5-pro` vs `mimo-v2.5-pro`), so overwriting a typed
+      // id would silently repoint the row at a model the endpoint does not
+      // serve — the failure would surface later, as a 404 from the provider.
+      if (isBlank(next['id'])) next['id'] = entry.id
+      if (isBlank(next['name']) && entry.name !== undefined) next['name'] = entry.name
+
+      next['reasoningEfforts'] = reasoningEffortsFrom(entry.thinkingLevelMap, entry.api, entry.reasoning)
+
+      // Catalog values only. `supportsReasoningEffort` is deliberately NOT
+      // inferred from `reasoning`: the two answer different questions (does
+      // the endpoint accept the field, vs. does the model think), and an
+      // absent key is pi-ai's way of saying "auto-detect from the endpoint".
+      // Writing our guess there would replace a detection with a claim we
+      // cannot check, and a wrong `true` makes the adapter send a parameter
+      // the endpoint may refuse.
+      const compat = compatFrom(entry.compat, entry.api)
+      if (Object.keys(compat).length === 0) Reflect.deleteProperty(next, 'compat')
+      else next['compat'] = compat
+    } else {
+      // models.dev: its ids are directory paths (`zhipuai/glm-5.3-flash`) and
+      // the file carries no reasoning or compat surface at all — so the whole
+      // block is REPLACED by the one fact this source can support.
+      //
+      // Merging here (as an earlier revision did) leaves a previous pi-ai
+      // prefill's switches in place, and the row goes on claiming a thinking
+      // format — or a reasoning-content requirement — that the source you just
+      // switched to says nothing about. Switching sources is asking for the
+      // other catalog's answer, not for a blend of the two.
       Reflect.deleteProperty(next, 'reasoningEfforts')
+      if (entry.reasoning) next['compat'] = { supportsReasoningEffort: true }
+      else Reflect.deleteProperty(next, 'compat')
     }
-    setKey('compat', Object.keys(compat).length === 0 ? undefined : compat)
-    const supported = entry.input.filter(m => m === 'text' || m === 'image')
-    if (supported.length > 0) next['input'] = supported
+
     onChange(next)
     setCapacityText(new Map())
   }
@@ -151,9 +211,54 @@ export function ModelEntryPanel(props: ModelEntryPanelProps): ReactNode {
   const compat = compatOf(model)
   const developerRole = compat['supportsDeveloperRole'] !== false
 
+  // --- compat switches with no dedicated control ---------------------------
+  /**
+   * Switches a prefill wrote that the block above has no control for. Listing
+   * them keeps a prefilled value from becoming invisible state: the pi-ai
+   * catalog records far more of the compat surface than this panel models
+   * explicitly, and that API refuses an unknown switch rather than ignoring
+   * it — so a value the user cannot see is a value the user cannot fix.
+   */
+  const extraCompat = Object.entries(compat)
+    .filter(([key]) => !COMPAT_BASE_FIELDS.includes(key))
+    .sort(([a], [b]) => a.localeCompare(b))
+
+  /**
+   * Read an edited switch back as the type it already had.
+   * @param previous - the value the switch carried when rendered.
+   * @param raw - the field text.
+   * @returns the coerced value, or the previous one when the text is unreadable.
+   */
+  const readCompatValue = (previous: unknown, raw: string): unknown => {
+    if (typeof previous === 'boolean') return raw === 'true'
+    if (typeof previous === 'number') {
+      const parsed = Number(raw)
+      return Number.isNaN(parsed) ? previous : parsed
+    }
+    if (typeof previous === 'string') return raw
+    try {
+      return JSON.parse(raw) as unknown
+    } catch {
+      return previous
+    }
+  }
+
   // --- effort gate ----------------------------------------------------------
-  const supportsReasoningEffort = compat['supportsReasoningEffort'] === true
+  /** The switch as a wire field: whether the endpoint takes `reasoning_effort`. */
+  const gateOn = compat['supportsReasoningEffort'] === true
   const efforts = effortsOf(model)
+  /**
+   * Whether the reasoning area is worth showing.
+   *
+   * The switch and the area answer different questions: the switch tells the
+   * adapter the endpoint accepts `reasoning_effort`, while the area edits what
+   * *this model* offers. A pi-ai prefill can leave the switch unset on purpose
+   * — an absent key lets the adapter auto-detect from the endpoint — while
+   * still carrying levels worth editing, and those levels reach the provider
+   * through the protocol's own thinking parameter either way. So the area keys
+   * off either signal, not the switch alone.
+   */
+  const reasoningAreaShown = gateOn || efforts !== undefined || compat['thinkingFormat'] !== undefined
 
   const toggleGate = (checked: boolean): void => {
     if (checked) {
@@ -258,16 +363,24 @@ export function ModelEntryPanel(props: ModelEntryPanelProps): ReactNode {
           <input
             type="checkbox"
             className={styles['extCheckbox']}
-            checked={supportsReasoningEffort}
+            checked={gateOn}
             disabled={disabled}
             onChange={(event) => { toggleGate(event.target.checked) }}
           />
           端点接受推理挡位参数（reasoning_effort）
         </label>
+        {!gateOn && reasoningAreaShown
+          ? (
+              <p className={styles['extHint']} style={{ marginTop: 6 }}>
+                此项未设置：由 llm-pi-ai 按其 baseURL 检测结果决定是否发送 reasoning_effort；
+                下面的挡位不受影响，仍通过各协议自己的 thinking 参数生效。
+              </p>
+            )
+          : null}
       </div>
 
       {/* Gated area: HIDDEN (not dimmed) while the gate is off. */}
-      <div className={styles['extGated']} hidden={!supportsReasoningEffort}>
+      <div className={styles['extGated']} hidden={!reasoningAreaShown}>
         <div className={styles['extField']}>
           <span className={styles['extLabel']}>思考格式</span>
           <select
@@ -331,6 +444,37 @@ export function ModelEntryPanel(props: ModelEntryPanelProps): ReactNode {
             : null}
         </div>
       </div>
+
+      {extraCompat.length > 0
+        ? (
+            <div className={styles['extGroup']}>
+              <span className={styles['extLabel']} style={{ marginBottom: 6 }}>其他兼容开关</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {extraCompat.map(([key, value]) => (
+                  <label key={key} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <span className={styles['extHint']}>{key}</span>
+                    <input
+                      className={styles['input']}
+                      type="text"
+                      defaultValue={typeof value === 'string' ? value : JSON.stringify(value) ?? ''}
+                      aria-label={key}
+                      disabled={disabled}
+                      onBlur={(event) => {
+                        const raw = event.target.value.trim()
+                        // An emptied field drops the switch, handing the
+                        // decision back to the installed catalog.
+                        setCompatKey(key, raw.length === 0 ? undefined : readCompatValue(value, raw))
+                      }}
+                    />
+                  </label>
+                ))}
+              </div>
+              <p className={styles['extHint']} style={{ marginTop: 6 }}>
+                这些开关由 pi-ai 目录预填；清空输入框即移除该开关，回到目录默认。
+              </p>
+            </div>
+          )
+        : null}
     </div>
   )
 }

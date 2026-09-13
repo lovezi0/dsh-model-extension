@@ -216,8 +216,13 @@ export function ModelCatalog(props: ModelCatalogProps): ReactNode {
         : (
             <div className={styles['modelList']}>
               {models.map((model, index) => (
+                // Keyed by position alone. A key derived from the row's content
+                // — the id especially — changes on every keystroke, so React
+                // unmounts and remounts the row and the field being typed into
+                // loses focus after each character. Nothing in this subtree
+                // needs resetting when the id changes, so position is correct.
                 <div
-                  key={`${String(index)}:${textOf(model, 'id')}`}
+                  key={String(index)}
                   className={styles['modelEntry']}
                 >
                   <div className={styles['modelRow']}>

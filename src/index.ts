@@ -8,17 +8,20 @@
  *    a mismatched wire write from corrupting anything (worst case: a refused
  *    write with a diagnostic), so a hard gate would only make compatible
  *    upgrades silently drop the plugin.
- * 2. The metadata service: two same-origin routes backing the Models+ page's
+ * 2. The metadata service: three same-origin routes backing the Models+ page's
  *    quick-load. models.dev is fetched ONLY on an explicit user click (the
  *    title-row button); the raw file caches next to settings.yaml under DSH
  *    home. Only the flat models.dev shape (top-level keys = full model ids)
- *    is accepted; anything else is a refusal, per plan.
+ *    is accepted; anything else is a refusal, per plan. The pi-ai catalog is
+ *    the other, richer source: it is read from the installed package the host
+ *    adapter itself loads, with no network call at all (./pi-ai-catalog.ts).
  */
 import { createRequire } from 'node:module'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { IncomingMessage, ServerResponse } from 'node:http'
+import { piAiCatalog, piAiCopies, piAiUnavailableReason } from './pi-ai-catalog'
 
 /** Adapter anchor, injected at build time from package.json `dsh.adapter`. */
 declare const __DSH_ADAPTER_VERSION__: string
@@ -276,11 +279,49 @@ export function apply(ctx: PluginContext): void {
       },
     })
 
+    // GET: the installed pi-ai catalog. Served straight from the package the
+    // host adapter loads — no network, no cache file. A refusal (404) is the
+    // client's signal to fall back to the models.dev index alone.
+    const disposeCatalog = webServer.register({
+      kind: 'exact',
+      path: '/plugins/dsh-model-extension/pi-ai-catalog',
+      handler: (req, res) => {
+        if (req.method !== 'GET' && req.method !== 'HEAD') {
+          res.writeHead(405)
+          res.end()
+          return
+        }
+        void (async () => {
+          try {
+            const catalog = await piAiCatalog()
+            if (catalog === undefined) {
+              // The refusal carries the reason AND the copies that are visible:
+              // "the host ships no pi-ai" and "it ships one this reader cannot
+              // call" are otherwise indistinguishable, and only the second is
+              // worth acting on.
+              json(res, 404, {
+                ok: false,
+                message: `pi-ai 内置目录不可用：${piAiUnavailableReason() ?? '原因未知'}`,
+                copies: piAiCopies(),
+              })
+              return
+            }
+            json(res, 200, { ok: true, ...catalog })
+          } catch (error) {
+            const message = error instanceof Error ? error.message : String(error)
+            json(res, 500, { ok: false, message })
+          }
+        })()
+      },
+    })
+
     return () => {
       const a = disposeIndex
       if (typeof a === 'function') a()
       const b = disposeDownload
       if (typeof b === 'function') b()
+      const c = disposeCatalog
+      if (typeof c === 'function') c()
     }
   }, 'dsh-model-extension: metadata routes')
 }

@@ -33,6 +33,88 @@ export const THINKING_FORMATS = [
 ] as const
 export type ThinkingFormat = (typeof THINKING_FORMATS)[number]
 
+/**
+ * The compatibility switches llm-pi-ai *offers*, by wire protocol (the `offer`
+ * set of its COMPAT_GATES @ 0.1.5-rc.2). Only these may reach a model row: the
+ * adapter refuses a switch no protocol offers rather than ignoring it, so
+ * copying pi-ai's catalog `compat` across verbatim would fail resolution on
+ * the withheld fields it also records (routing preferences, session affinity,
+ * deferred tools, grammar tools). Re-check against the host's COMPAT_GATES on
+ * every adapter-anchor bump — the same drift gate the host keeps for itself.
+ */
+export const COMPAT_FIELDS: Readonly<Record<string, readonly string[]>> = {
+  'openai-completions': [
+    'supportsStore',
+    'supportsDeveloperRole',
+    'supportsReasoningEffort',
+    'supportsUsageInStreaming',
+    'supportsFinishReason',
+    'maxTokensField',
+    'requiresToolResultName',
+    'requiresAssistantAfterToolResult',
+    'requiresThinkingAsText',
+    'requiresReasoningContentOnAssistantMessages',
+    'thinkingFormat',
+    'chatTemplateKwargs',
+    'chatTemplateArgs',
+    'supportsThinkingTokenBudget',
+    'thinkingTokenBudgetField',
+    'vllmPriority',
+    'supportsStrictMode',
+    'cacheControlFormat',
+    'supportsLongCacheRetention',
+  ],
+  'openai-responses': [
+    'supportsDeveloperRole',
+    'supportsMaxOutputTokens',
+    'supportsStrictMode',
+    'supportsLongCacheRetention',
+  ],
+  'azure-openai-responses': [
+    'supportsDeveloperRole',
+    'supportsMaxOutputTokens',
+    'supportsStrictMode',
+    'supportsLongCacheRetention',
+  ],
+  'openai-codex-responses': [
+    'supportsDeveloperRole',
+    'supportsMaxOutputTokens',
+    'supportsStrictMode',
+    'supportsLongCacheRetention',
+  ],
+  'anthropic-messages': [
+    'supportsEagerToolInputStreaming',
+    'supportsLongCacheRetention',
+    'supportsCacheControlOnTools',
+    'supportsTemperature',
+    'forceAdaptiveThinking',
+    'allowEmptySignature',
+    'supportsStrictTools',
+  ],
+  'bedrock-converse-stream': ['supportsStrictMode'],
+}
+
+/**
+ * Switches the base panel already renders a dedicated control for; the
+ * "other compatibility switches" block lists everything else.
+ */
+export const COMPAT_BASE_FIELDS: readonly string[] = [
+  'supportsDeveloperRole',
+  'supportsReasoningEffort',
+  'thinkingFormat',
+]
+
+/**
+ * The offered compat field names for one wire protocol.
+ * @param api - the model's protocol, when known.
+ * @returns the field names; empty for an unknown or absent protocol.
+ */
+export function offeredCompatFields(api: string | undefined): readonly string[] {
+  if (api === undefined) return []
+  const fields = COMPAT_FIELDS[api]
+  return fields === undefined ? [] : fields
+}
+
 /** Extra copy for the extension, keyed like the official dictionaries (en is authoritative). */
 export const en = {
   // --- official Models-page keys the forked components still render -------
