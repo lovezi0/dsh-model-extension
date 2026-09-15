@@ -1,6 +1,6 @@
 {
   "name": "dsh-model-extension",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "DeepSeek Harness plugin: the Models+ settings page — a fully plugin-owned model/provider UI with per-model extension fields (reasoning efforts, input modalities, compat flags) and models.dev metadata prefill",
   "type": "module",
   "main": "lib/index.js",
@@ -16,7 +16,8 @@
   ],
   "scripts": {
     "build": "node scripts/build.mjs",
-    "audit:pi-ai": "node --experimental-strip-types scripts/audit-pi-ai-contract.mjs"
+    "audit:pi-ai": "node --experimental-strip-types scripts/audit-pi-ai-contract.mjs",
+    "audit:compat": "node --experimental-strip-types scripts/audit-compat-protocol.mts"
   },
   "license": "MIT",
   "repository": {

@@ -13,7 +13,7 @@ import type { JsonValue } from '@deepseek-ai/dsh-util-values'
 import { deriveKeyRef } from '../vendor/store.ts'
 import type { ModelsOperations } from '../vendor/operations.ts'
 import type { ModelDraft } from './compat.ts'
-import { normalizeModelRow, validateModelRows } from './compat.ts'
+import { compatFailureMessage, normalizeModelRow, validateModelRows } from './compat.ts'
 import { ModelCatalog } from './ModelCatalog.tsx'
 import styles from './models-plus.module.css'
 
@@ -65,7 +65,9 @@ export function CreateProviderCard(props: CreateProviderCardProps): ReactNode {
 
   const routeInvalid = route.length > 0 && !ROUTE_PATTERN.test(route)
   const routeTaken = taken.includes(route)
-  const modelFailure = validateModelRows(models)
+  // The card states the protocol itself, so every row it drafts is judged by it
+  // — the same protocol the adapter will resolve the route to.
+  const modelFailure = validateModelRows(models, protocol)
   const keyFailure = ((): 'keyBlank' | 'keyIllegalCharacters' | undefined => {
     if (keyDraft.length === 0) return undefined
     const value = keyDraft.trim()
@@ -87,7 +89,9 @@ export function CreateProviderCard(props: CreateProviderCardProps): ReactNode {
     : baseURL.length === 0
       ? '自定义提供方需要填写 API 地址。'
       : modelFailure !== undefined
-        ? `模型 ${String(modelFailure.index + 1)}：${modelFailure.key}`
+        ? modelFailure.key === 'modelCompatNotOffered'
+          ? compatFailureMessage(modelFailure)
+          : `模型 ${String(modelFailure.index + 1)}：${modelFailure.key}`
         : '自定义提供方至少需要一个模型。'
 
   /** Perform the create, returning a failure message or undefined. */
@@ -218,6 +222,7 @@ export function CreateProviderCard(props: CreateProviderCardProps): ReactNode {
           <ModelCatalog
             models={models}
             overridden={true}
+            routeApi={protocol}
             defaultContextWindow={undefined}
             defaultMaxTokens={undefined}
             probe={{

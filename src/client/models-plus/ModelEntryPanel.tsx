@@ -8,11 +8,18 @@
  * rides the card's existing path-ops save with no extra wire calls. Clearing
  * the effort gate drops `reasoningEfforts` AND `compat.thinkingFormat` in ONE
  * commit so partial updates never overwrite each other (no orphan settings).
+ *
+ * Which compat switches this panel may write at all is decided by `api` (see
+ * {@link ModelEntryPanelProps.api}): the adapter refuses a switch the model's
+ * protocol does not declare instead of ignoring it, so a control offered on the
+ * wrong protocol is a save that cannot succeed. An UNKNOWN protocol hides
+ * nothing — nothing can be judged — and the host's own diagnostic still covers
+ * that case.
  */
 
 import { useState } from 'react'
 import type { ReactNode } from 'react'
-import { COMPAT_BASE_FIELDS, THINKING_FORMATS, THINKING_LEVELS } from '../extension-meta.ts'
+import { COMPAT_BASE_FIELDS, THINKING_FORMATS, THINKING_LEVELS, offeredCompatFields } from '../extension-meta.ts'
 import type { ModelDraft } from './compat.ts'
 import { formatCapacity, parseCapacity } from './compat.ts'
 import { compatFrom, reasoningEffortsFrom } from './prefill.ts'
@@ -59,6 +66,16 @@ export interface ModelEntryPanelProps {
   onChange: (next: ModelDraft) => void
   /** Disable every control (read-only deployment or a pending write). */
   disabled: boolean
+  /**
+   * The wire protocol this row resolves to, when the route settles one — the
+   * route's own `api` for a hand-declared route, the installed catalog's shared
+   * api for a catalog route, `undefined` when neither settles it.
+   *
+   * This is the protocol the ADAPTER will judge the row by (`route.api` wins
+   * over the catalog entry), which is why it — and not the catalog entry's own
+   * api — decides which compat switches may be written here.
+   */
+  api?: string
 }
 
 /**
@@ -67,7 +84,19 @@ export interface ModelEntryPanelProps {
  * @returns the expanded panel.
  */
 export function ModelEntryPanel(props: ModelEntryPanelProps): ReactNode {
-  const { model, onChange, disabled } = props
+  const { model, onChange, disabled, api } = props
+
+  /**
+   * Whether this panel may OFFER a control for one compat switch.
+   *
+   * Not the same question as `protocolOffers`, and deliberately so: an
+   * unresolvable protocol answers `true` throughout, because with no protocol to
+   * read nothing can be judged — hiding a control on a guess would remove a
+   * switch the route may well take, while the host still names anything it
+   * refuses. A resolved protocol that offers nothing (one pi-ai gives no compat
+   * type) answers `false` throughout, which is exactly what the adapter says.
+   */
+  const mayOffer = (field: string): boolean => api === undefined || offeredCompatFields(api).includes(field)
 
   // Capacities are text-edited, so keystrokes live in this buffer rather than
   // being re-derived from the parsed count (which would rewrite `1000` to
@@ -118,6 +147,12 @@ export function ModelEntryPanel(props: ModelEntryPanelProps): ReactNode {
    */
   const applyMetadata = (entry: PrefillEntry): void => {
     const next = { ...model }
+    // The protocol the row will be judged by, which is the route's when the
+    // route states one. A catalog entry taken from another protocol's provider
+    // (`deepseek-v4-pro` picked while the route speaks Anthropic) carries that
+    // other protocol's compat block, and filtering it with the ENTRY's api is
+    // what wrote `supportsStore` onto an `anthropic-messages` route.
+    const judgedBy = props.api ?? entry.api
     if (entry.context === undefined) Reflect.deleteProperty(next, 'contextWindow')
     else next['contextWindow'] = entry.context
     if (entry.output === undefined) Reflect.deleteProperty(next, 'maxTokens')
@@ -139,7 +174,7 @@ export function ModelEntryPanel(props: ModelEntryPanelProps): ReactNode {
       if (isBlank(next['id'])) next['id'] = entry.id
       if (isBlank(next['name']) && entry.name !== undefined) next['name'] = entry.name
 
-      next['reasoningEfforts'] = reasoningEffortsFrom(entry.thinkingLevelMap, entry.api, entry.reasoning)
+      next['reasoningEfforts'] = reasoningEffortsFrom(entry.thinkingLevelMap, judgedBy, entry.reasoning)
 
       // Catalog values only. `supportsReasoningEffort` is deliberately NOT
       // inferred from `reasoning`: the two answer different questions (does
@@ -148,7 +183,7 @@ export function ModelEntryPanel(props: ModelEntryPanelProps): ReactNode {
       // Writing our guess there would replace a detection with a claim we
       // cannot check, and a wrong `true` makes the adapter send a parameter
       // the endpoint may refuse.
-      const compat = compatFrom(entry.compat, entry.api)
+      const compat = compatFrom(entry.compat, judgedBy)
       if (Object.keys(compat).length === 0) Reflect.deleteProperty(next, 'compat')
       else next['compat'] = compat
     } else {
@@ -162,7 +197,10 @@ export function ModelEntryPanel(props: ModelEntryPanelProps): ReactNode {
       // switched to says nothing about. Switching sources is asking for the
       // other catalog's answer, not for a blend of the two.
       Reflect.deleteProperty(next, 'reasoningEfforts')
-      if (entry.reasoning) next['compat'] = { supportsReasoningEffort: true }
+      // This one fact is itself protocol-bound: `supportsReasoningEffort`
+      // exists on `openai-completions` alone, so claiming it for a models.dev
+      // candidate on any other route is a save the adapter refuses.
+      if (entry.reasoning && mayOffer('supportsReasoningEffort')) next['compat'] = { supportsReasoningEffort: true }
       else Reflect.deleteProperty(next, 'compat')
     }
 
@@ -213,14 +251,21 @@ export function ModelEntryPanel(props: ModelEntryPanelProps): ReactNode {
 
   // --- compat switches with no dedicated control ---------------------------
   /**
-   * Switches a prefill wrote that the block above has no control for. Listing
-   * them keeps a prefilled value from becoming invisible state: the pi-ai
-   * catalog records far more of the compat surface than this panel models
-   * explicitly, and that API refuses an unknown switch rather than ignoring
-   * it — so a value the user cannot see is a value the user cannot fix.
+   * Switches a prefill wrote that no control above stands for. Listing them
+   * keeps a prefilled value from becoming invisible state: the pi-ai catalog
+   * records far more of the compat surface than this panel models explicitly,
+   * and that API refuses an unknown switch rather than ignoring it — so a value
+   * the user cannot see is a value the user cannot fix.
+   *
+   * The set is the panel's base list narrowed to what this protocol takes. A
+   * switch the protocol refuses keeps NO control — writing it would fail the
+   * save — so it lands here instead, where it is named as refused and can be
+   * cleared. That is the only way out of a row written before a protocol change
+   * on the route, which no amount of hiding would repair.
    */
+  const dedicated = COMPAT_BASE_FIELDS.filter(field => mayOffer(field))
   const extraCompat = Object.entries(compat)
-    .filter(([key]) => !COMPAT_BASE_FIELDS.includes(key))
+    .filter(([key]) => !dedicated.includes(key))
     .sort(([a], [b]) => a.localeCompare(b))
 
   /**
@@ -244,8 +289,14 @@ export function ModelEntryPanel(props: ModelEntryPanelProps): ReactNode {
   }
 
   // --- effort gate ----------------------------------------------------------
-  /** The switch as a wire field: whether the endpoint takes `reasoning_effort`. */
-  const gateOn = compat['supportsReasoningEffort'] === true
+  /**
+   * The switch as a wire field: whether the endpoint takes `reasoning_effort`.
+   *
+   * Gated on the protocol as well as on the stored value: on a protocol that
+   * does not take the switch a leftover `true` describes nothing this route can
+   * act on, and the field's real home is the refused-switch list below.
+   */
+  const gateOn = mayOffer('supportsReasoningEffort') && compat['supportsReasoningEffort'] === true
   const efforts = effortsOf(model)
   /**
    * Whether the reasoning area is worth showing.
@@ -258,7 +309,8 @@ export function ModelEntryPanel(props: ModelEntryPanelProps): ReactNode {
    * through the protocol's own thinking parameter either way. So the area keys
    * off either signal, not the switch alone.
    */
-  const reasoningAreaShown = gateOn || efforts !== undefined || compat['thinkingFormat'] !== undefined
+  const reasoningAreaShown = gateOn || efforts !== undefined
+    || (mayOffer('thinkingFormat') && compat['thinkingFormat'] !== undefined)
 
   const toggleGate = (checked: boolean): void => {
     if (checked) {
@@ -335,41 +387,54 @@ export function ModelEntryPanel(props: ModelEntryPanelProps): ReactNode {
         </div>
       </div>
 
-      <div className={styles['extGroup']}>
-        <label className={styles['extCheck']}>
-          <input
-            type="checkbox"
-            className={styles['extCheckbox']}
-            style={{ marginTop: 3 }}
-            checked={developerRole}
-            disabled={disabled}
-            onChange={(event) => {
-              // Checked is the natural default, so a check REMOVES the key;
-              // only an explicit uncheck writes `false`.
-              setCompatKey('supportsDeveloperRole', event.target.checked ? undefined : false)
-            }}
-          />
-          <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <span className={styles['extCheckLabel']}>允许以 developer 角色发送系统提示</span>
-            <span className={styles['extHint']}>
-              推理模型的系统提示将以 developer 角色发出；网关拒绝该角色时取消勾选，改用 system。
-            </span>
-          </span>
-        </label>
-      </div>
+      {mayOffer('supportsDeveloperRole')
+        ? (
+            <div className={styles['extGroup']}>
+              <label className={styles['extCheck']}>
+                <input
+                  type="checkbox"
+                  className={styles['extCheckbox']}
+                  style={{ marginTop: 3 }}
+                  checked={developerRole}
+                  disabled={disabled}
+                  onChange={(event) => {
+                    // Checked is the natural default, so a check REMOVES the key;
+                    // only an explicit uncheck writes `false`.
+                    setCompatKey('supportsDeveloperRole', event.target.checked ? undefined : false)
+                  }}
+                />
+                <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <span className={styles['extCheckLabel']}>允许以 developer 角色发送系统提示</span>
+                  <span className={styles['extHint']}>
+                    推理模型的系统提示将以 developer 角色发出；网关拒绝该角色时取消勾选，改用 system。
+                  </span>
+                </span>
+              </label>
+            </div>
+          )
+        : null}
 
       <div className={styles['extGroup']}>
-        <label className={styles['switchRow']}>
-          <input
-            type="checkbox"
-            className={styles['extCheckbox']}
-            checked={gateOn}
-            disabled={disabled}
-            onChange={(event) => { toggleGate(event.target.checked) }}
-          />
-          端点接受推理挡位参数（reasoning_effort）
-        </label>
-        {!gateOn && reasoningAreaShown
+        {mayOffer('supportsReasoningEffort')
+          ? (
+              <label className={styles['switchRow']}>
+                <input
+                  type="checkbox"
+                  className={styles['extCheckbox']}
+                  checked={gateOn}
+                  disabled={disabled}
+                  onChange={(event) => { toggleGate(event.target.checked) }}
+                />
+                端点接受推理挡位参数（reasoning_effort）
+              </label>
+            )
+          : (
+              <p className={styles['extHint']}>
+                当前协议（{String(api)}）不接受 reasoning_effort 开关，故此处不提供；下面的挡位仍通过该协议自身的
+                thinking 参数生效。
+              </p>
+            )}
+        {mayOffer('supportsReasoningEffort') && !gateOn && reasoningAreaShown
           ? (
               <p className={styles['extHint']} style={{ marginTop: 6 }}>
                 此项未设置：由 llm-pi-ai 按其 baseURL 检测结果决定是否发送 reasoning_effort；
@@ -381,18 +446,22 @@ export function ModelEntryPanel(props: ModelEntryPanelProps): ReactNode {
 
       {/* Gated area: HIDDEN (not dimmed) while the gate is off. */}
       <div className={styles['extGated']} hidden={!reasoningAreaShown}>
-        <div className={styles['extField']}>
-          <span className={styles['extLabel']}>思考格式</span>
-          <select
-            className={`${styles['input']} ${styles['selectInput']}`}
-            value={typeof compat['thinkingFormat'] === 'string' ? compat['thinkingFormat'] : ''}
-            disabled={disabled}
-            onChange={(event) => { setCompatKey('thinkingFormat', event.target.value === '' ? undefined : event.target.value) }}
-          >
-            <option value="">—</option>
-            {THINKING_FORMATS.map(format => <option key={format} value={format}>{format}</option>)}
-          </select>
-        </div>
+        {mayOffer('thinkingFormat')
+          ? (
+              <div className={styles['extField']}>
+                <span className={styles['extLabel']}>思考格式</span>
+                <select
+                  className={`${styles['input']} ${styles['selectInput']}`}
+                  value={typeof compat['thinkingFormat'] === 'string' ? compat['thinkingFormat'] : ''}
+                  disabled={disabled}
+                  onChange={(event) => { setCompatKey('thinkingFormat', event.target.value === '' ? undefined : event.target.value) }}
+                >
+                  <option value="">—</option>
+                  {THINKING_FORMATS.map(format => <option key={format} value={format}>{format}</option>)}
+                </select>
+              </div>
+            )
+          : null}
 
         <div className={styles['extField']}>
           <span className={styles['extLabel']}>推理挡位</span>
@@ -450,24 +519,34 @@ export function ModelEntryPanel(props: ModelEntryPanelProps): ReactNode {
             <div className={styles['extGroup']}>
               <span className={styles['extLabel']} style={{ marginBottom: 6 }}>其他兼容开关</span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {extraCompat.map(([key, value]) => (
-                  <label key={key} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <span className={styles['extHint']}>{key}</span>
-                    <input
-                      className={styles['input']}
-                      type="text"
-                      defaultValue={typeof value === 'string' ? value : JSON.stringify(value) ?? ''}
-                      aria-label={key}
-                      disabled={disabled}
-                      onBlur={(event) => {
-                        const raw = event.target.value.trim()
-                        // An emptied field drops the switch, handing the
-                        // decision back to the installed catalog.
-                        setCompatKey(key, raw.length === 0 ? undefined : readCompatValue(value, raw))
-                      }}
-                    />
-                  </label>
-                ))}
+                {extraCompat.map(([key, value]) => {
+                  // A switch this protocol refuses is the one state the panel
+                  // cannot leave implicit: the save fails until the key is
+                  // gone, and this field is the only place it can go.
+                  const refused = !mayOffer(key)
+                  return (
+                    <label key={key} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <span className={refused ? styles['error'] : styles['extHint']}>
+                        {refused
+                          ? `${key} —— 当前协议（${String(api)}）不接受此开关，请清空输入框以移除`
+                          : key}
+                      </span>
+                      <input
+                        className={styles['input']}
+                        type="text"
+                        defaultValue={typeof value === 'string' ? value : JSON.stringify(value) ?? ''}
+                        aria-label={key}
+                        disabled={disabled}
+                        onBlur={(event) => {
+                          const raw = event.target.value.trim()
+                          // An emptied field drops the switch, handing the
+                          // decision back to the installed catalog.
+                          setCompatKey(key, raw.length === 0 ? undefined : readCompatValue(value, raw))
+                        }}
+                      />
+                    </label>
+                  )
+                })}
               </div>
               <p className={styles['extHint']} style={{ marginTop: 6 }}>
                 这些开关由 pi-ai 目录预填；清空输入框即移除该开关，回到目录默认。

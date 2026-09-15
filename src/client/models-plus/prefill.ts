@@ -93,12 +93,16 @@ export function reasoningEffortsFrom(
  * Project a catalog `compat` block onto the switches the host offers for one
  * protocol.
  *
- * The filter is load-bearing: pi-ai's catalog also records withheld switches
- * (routing preferences, session affinity, deferred tools, grammar tools), and
- * the adapter *refuses* a switch no protocol offers instead of ignoring it — a
- * verbatim copy would make the route fail to resolve.
+ * The filter is load-bearing twice over. It drops pi-ai's withheld switches
+ * (routing preferences, session affinity, deferred tools, grammar tools), which
+ * the adapter *refuses* rather than ignores — a verbatim copy would make the
+ * route fail to resolve. And it filters by the protocol the row will be JUDGED
+ * by, which is not always the catalog entry's own: a hand-declared route states
+ * its `api`, that value overrides the catalog for every model on the route, and
+ * a block taken from another protocol's entry (`supportsStore` on a gateway
+ * that speaks `anthropic-messages`) is refused at save time.
  * @param compat - the catalog's compat record, when it carries one.
- * @param api - the model's wire protocol.
+ * @param api - the protocol the row resolves to, as the adapter resolves it.
  * @returns the writable subset; empty when nothing survives.
  */
 export function compatFrom(

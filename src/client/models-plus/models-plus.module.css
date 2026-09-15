@@ -130,7 +130,9 @@ select.input { max-width: 240px; cursor: pointer; }
    and styling the page cannot control) ---- */
 .quickWrap { position: relative; display: flex; flex-direction: column; gap: 6px; }
 .quickList { position: absolute; top: 100%; left: 0; right: 0; z-index: 20; margin-top: 2px; padding: 4px; border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 8px; background: var(--dsw-specific-menu); box-shadow: 0 8px 24px rgba(0,0,0,0.12); max-height: 264px; overflow-y: auto; }
-.quickItem { display: block; width: 100%; padding: 6px 8px; border: none; border-radius: 6px; background: transparent; color: var(--dsw-alias-label-primary); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; text-align: left; cursor: pointer; overflow-wrap: anywhere; }
+.quickItem { display: flex; flex-direction: column; gap: 1px; width: 100%; padding: 6px 8px; border: none; border-radius: 6px; background: transparent; color: var(--dsw-alias-label-primary); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; text-align: left; cursor: pointer; }
+.quickItemId { overflow-wrap: anywhere; }
+.quickItemApi { font-size: 11px; line-height: 14px; color: var(--dsw-alias-label-tertiary); letter-spacing: 0.2px; }
 .quickItem:hover { background: var(--dsw-alias-interactive-bg-hover); }
 .quickEmpty { padding: 6px 8px; font-size: 12px; line-height: 18px; color: var(--dsw-alias-label-tertiary); }
 

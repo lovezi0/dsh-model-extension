@@ -35,6 +35,13 @@ export interface ModelCatalogProps {
   defaultMaxTokens: number | undefined
   /** Endpoint facts for the fetch action. */
   probe: ProbeTarget
+  /**
+   * The wire protocol every row of this route resolves to, when the route
+   * settles one (a hand-declared route's own `api`, or the api its installed
+   * catalog entries agree on). Rows seed and validate their compat against it;
+   * see {@link ModelEntryPanelProps.api}.
+   */
+  routeApi?: string
   /** Why the fetch action is unavailable, or undefined when it is. */
   probeBlocked?: string
   /** The Host operations whose interrogation answers the fetch action. */
@@ -54,8 +61,8 @@ function textOf(model: ModelDraft, key: string): string {
 }
 
 /** Adopt one candidate, v1.0.0 defaults + the endpoint's disclosed capacities. */
-function adopt(candidate: LlmDiscoveredModel): ModelDraft {
-  const row = newModelDraft()
+function adopt(candidate: LlmDiscoveredModel, routeApi: string | undefined): ModelDraft {
+  const row = newModelDraft(routeApi)
   row['id'] = candidate.id
   row['name'] = candidate.name ?? candidate.id
   if (candidate.contextWindow !== undefined) row['contextWindow'] = candidate.contextWindow
@@ -151,7 +158,7 @@ export function ModelCatalog(props: ModelCatalogProps): ReactNode {
     for (const candidate of candidates) {
       if (!picked.has(candidate.id)) continue
       // A row the user already tuned wins over the provider's own numbers.
-      byId.set(candidate.id, byId.get(candidate.id) ?? adopt(candidate))
+      byId.set(candidate.id, byId.get(candidate.id) ?? adopt(candidate, props.routeApi))
     }
     onChange([...byId.values()])
     closePicker()
@@ -273,6 +280,7 @@ export function ModelCatalog(props: ModelCatalogProps): ReactNode {
                     ? (
                         <ModelEntryPanel
                           model={model}
+                          api={props.routeApi}
                           disabled={disabled}
                           onChange={(next) => {
                             onChange(models.map((row, at) => (at === index ? next : row)))
@@ -289,7 +297,7 @@ export function ModelCatalog(props: ModelCatalogProps): ReactNode {
         type="button"
         className={styles['addModelButton']}
         disabled={disabled}
-        onClick={() => { onChange([...models, newModelDraft()]) }}
+        onClick={() => { onChange([...models, newModelDraft(props.routeApi)]) }}
       >
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
           <path d="M8 3.5v9M3.5 8h9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />

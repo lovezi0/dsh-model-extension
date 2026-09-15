@@ -192,7 +192,17 @@ export function QuickLoad(props: QuickLoadProps): ReactNode {
               pick(entry)
             }}
           >
-            {entry.id}
+            <span className={styles['quickItemId']}>{entry.id}</span>
+            {/* The protocol of each candidate, because the SAME id ships under
+                several of them (`claude-fable-5` exists in anthropic,
+                github-copilot and openrouter — one speaks anthropic-messages,
+                two speak openai-completions). Which one a row gets decides its
+                whole compat surface, so it belongs beside the id and not in a
+                later surprise. models.dev candidates carry no protocol, which
+                is why the line is conditional rather than a placeholder. */}
+            {entry.api === undefined
+              ? null
+              : <span className={styles['quickItemApi']}>{entry.api}</span>}
           </button>
         ))}
         {total > hits.length

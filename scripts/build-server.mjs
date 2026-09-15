@@ -15,7 +15,7 @@ const pkg = JSON.parse(readFileSync(join(projectRoot, 'package.json'), 'utf8'))
  *
  * The predicate must accept BOTH forms rolldown hands the `deps` callbacks:
  * the raw specifier (`./pi-ai-catalog`) and the resolved absolute path
- * (`D:\...\src\pi-ai-catalog.ts`). A leading-dot test alone silently
+ * (`<repo>/src/pi-ai-catalog.ts`). A leading-dot test alone silently
  * externalizes the resolved form — which is how an earlier revision of this
  * change shipped a lib/index.js still importing `./pi-ai-catalog.ts` and
  * therefore unable to load at all.

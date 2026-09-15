@@ -270,6 +270,30 @@ export async function getPrefillIndex(): Promise<PrefillIndex> {
   return cachedIndex
 }
 
+/**
+ * The one wire protocol one catalog provider's entries agree on.
+ *
+ * This mirrors the host's own `sharedCatalogApi`: a route whose installed
+ * entries all speak the same protocol needs no `api` in configuration, because
+ * the host resolves every model — including ones the catalog does not describe
+ * — to that shared protocol. Reading it here is what lets the panel judge a
+ * row's compat switches the way the adapter will. A provider whose entries
+ * disagree (an OpenAI-style catalog spanning Responses and Chat Completions)
+ * has no such answer, and neither does an index that has not loaded yet.
+ * @param index - the fetched index, or undefined while the page still loads.
+ * @param provider - the route key to inspect.
+ * @returns the shared protocol, or undefined when none settles it.
+ */
+export function sharedCatalogApi(index: PrefillIndex | undefined, provider: string | undefined): string | undefined {
+  if (index === undefined || provider === undefined || provider.length === 0) return undefined
+  const apis = new Set<string>()
+  for (const entry of index.piAi) {
+    if (entry.provider !== provider || entry.api === undefined) continue
+    apis.add(entry.api)
+  }
+  return apis.size === 1 ? [...apis][0] : undefined
+}
+
 /** The outcome of an explicit user-triggered download. */
 export type MetadataDownload = { readonly ok: true } | { readonly ok: false; readonly message: string }
 

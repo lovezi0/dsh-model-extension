@@ -17,6 +17,7 @@ export type ModelDraft = Record<string, unknown>
 
 import type { JsonValue } from '@deepseek-ai/dsh-util-values'
 import type { SettingsPathOpView } from '@deepseek-ai/dsh-api-remotes/client'
+import { offeredCompatFields, protocolOffers } from '../extension-meta.ts'
 
 /**
  * The minimal path ops carrying `after` over `before`, both as the card sees
@@ -102,7 +103,13 @@ export interface ModelRowsValidationFailure {
   index: number
   /** Message key owned by the Models+ dictionary. */
   key: 'modelIdRequired' | 'modelIdDuplicate' | 'modelNameInvalid' | 'modelContextInvalid'
-  | 'modelMaxTokensInvalid'
+  | 'modelMaxTokensInvalid' | 'modelCompatNotOffered'
+  /** For `modelCompatNotOffered`: the switch the protocol refuses. */
+  field?: string
+  /** For `modelCompatNotOffered`: the protocol the row resolves to. */
+  api?: string
+  /** For `modelCompatNotOffered`: the switches that protocol does take. */
+  offered?: readonly string[]
 }
 
 /** Convert a schema-validated catalog value into records without dropping hidden fields. */
@@ -158,11 +165,40 @@ export function normalizeModelRow(row: ModelDraft): ModelDraft {
 }
 
 /**
+ * The message for a refused compat switch, shared by both provider cards so the
+ * same failure reads the same way wherever it is hit.
+ * @param failure - a `modelCompatNotOffered` failure from {@link validateModelRows}.
+ * @returns the localised sentence.
+ */
+export function compatFailureMessage(failure: ModelRowsValidationFailure): string {
+  const offered = failure.offered ?? []
+  const available = offered.length === 0
+    ? '，该协议不接受任何可配置开关'
+    : `，该协议可用：${offered.join('、')}`
+  return `模型 ${String(failure.index + 1)}：compat 开关 ${String(failure.field)} 不适用于当前协议`
+    + `（${String(failure.api)}）${available}。请在展开的「其他兼容开关」中清空该项以移除，`
+    + '或回到供应商页把协议改成端点真正使用的协议。'
+}
+
+/**
  * Validate adapter constraints that the serialized schema cannot express.
+ *
+ * The compat half of the check exists because the adapter *refuses* a switch a
+ * model's protocol does not declare rather than ignoring it — and the protocol
+ * a row resolves to is `route.api` first, the installed catalog entry second.
+ * A row can therefore hold switches that were legal when it was written (a
+ * protocol change on the route, or a prefill taken from another protocol's
+ * catalog entry) and only fail at save time, in English, from the host. This
+ * turns that into a positioned, named, localised refusal.
+ *
+ * An unknown protocol is skipped on purpose: the route's protocol could not be
+ * resolved, so the row's real one is unknowable here, and a guess would refuse
+ * a configuration the host accepts. The host's own diagnostic still covers it.
  * @param value - user-owned `models` value, or undefined while inherited.
+ * @param api - the protocol every row resolves to, when the route settles one.
  * @returns the first invalid row, or undefined when the adapter will accept it.
  */
-export function validateModelRows(value: unknown): ModelRowsValidationFailure | undefined {
+export function validateModelRows(value: unknown, api?: string): ModelRowsValidationFailure | undefined {
   if (value === undefined) return undefined
   const models = modelDrafts(value)
   const seen = new Set<string>()
@@ -188,6 +224,13 @@ export function validateModelRows(value: unknown): ModelRowsValidationFailure | 
     if (maxTokens !== undefined
       && (typeof maxTokens !== 'number' || !Number.isInteger(maxTokens) || maxTokens <= 0)) {
       return { index, key: 'modelMaxTokensInvalid' }
+    }
+    const compat = model['compat']
+    if (api !== undefined && typeof compat === 'object' && compat !== null && !Array.isArray(compat)) {
+      for (const field of Object.keys(compat)) {
+        if (protocolOffers(api, field)) continue
+        return { index, key: 'modelCompatNotOffered', field, api, offered: offeredCompatFields(api) }
+      }
     }
   }
   return undefined

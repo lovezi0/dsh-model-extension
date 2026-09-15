@@ -48,6 +48,9 @@ npm run build
 
 ## 版本历史
 
+- **1.2.1**
+    - 🐛修复非 openai-completions API 协议网关保存报错
+    - 💪快速装入 model id 显示对应的API协议
 - **1.2.0**
     - 🔥支持 dsh 内置 llm-pi-ai model 元数据快速装入
     - 💪快速装入选项拆分，筛选模型更方便&准确

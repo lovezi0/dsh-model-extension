@@ -115,6 +115,21 @@ export function offeredCompatFields(api: string | undefined): readonly string[] 
   return fields === undefined ? [] : fields
 }
 
+/**
+ * Whether one protocol takes one compat switch.
+ *
+ * The adapter *refuses* a switch its protocol does not declare rather than
+ * ignoring it, so this is the difference between a control that can be offered
+ * and one that would fail the save. An unknown protocol takes nothing: its
+ * field set cannot be read, and the adapter resolves it to the same refusal.
+ * @param api - the model's wire protocol, when known.
+ * @param field - the compat field name.
+ * @returns true when the protocol offers the field.
+ */
+export function protocolOffers(api: string | undefined, field: string): boolean {
+  return offeredCompatFields(api).includes(field)
+}
+
 /** Extra copy for the extension, keyed like the official dictionaries (en is authoritative). */
 export const en = {
   // --- official Models-page keys the forked components still render -------

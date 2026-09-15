@@ -16,7 +16,9 @@ import { deriveKeyRef, protocolChoices } from '../vendor/store.ts'
 import type { ModelsOperations } from '../vendor/operations.ts'
 import type { SettingsSchemaOperations } from '../vendor/schema-operations.ts'
 import type { ModelDraft } from './compat.ts'
-import { modelDrafts, normalizeModelRow, pathOps, validateModelRows } from './compat.ts'
+import { compatFailureMessage, modelDrafts, normalizeModelRow, pathOps, validateModelRows } from './compat.ts'
+import { getPrefillIndex, sharedCatalogApi } from './models-index.ts'
+import type { PrefillIndex } from './models-index.ts'
 import { ModelCatalog } from './ModelCatalog.tsx'
 import styles from './models-plus.module.css'
 
@@ -107,6 +109,20 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
     () => layout === 'pi-ai' ? protocolChoices(namespace, schema) : [],
     [layout, namespace, schema],
   )
+  /**
+   * The pi-ai catalog, loaded only on the family that needs it: it answers the
+   * protocol of a route that states none (a catalog route), which is what the
+   * model panel judges compat switches by.
+   */
+  const [prefillIndex, setPrefillIndex] = useState<PrefillIndex | undefined>(undefined)
+  useEffect(() => {
+    if (layout !== 'pi-ai') return
+    let stale = false
+    void getPrefillIndex().then((loaded) => {
+      if (!stale) setPrefillIndex(loaded)
+    })
+    return () => { stale = true }
+  }, [layout])
 
   useEffect(() => {
     let stale = false
@@ -129,7 +145,22 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
       : schema.setPath(current, [key], value))
   }
 
-  const modelFailure = validateModelRows(schema.getPath(draft, ['models']))
+  /**
+   * The protocol every row of this route resolves to, resolved the way the
+   * adapter resolves it: a hand-declared route's own `api` first — it overrides
+   * the catalog for every model on the route — then the protocol the installed
+   * catalog's entries for this route agree on, then nothing.
+   *
+   * The model panel needs it because the adapter judges each row's compat
+   * switches by THIS protocol, not by the catalog entry the row was prefilled
+   * from; without it a row can carry switches the route will refuse.
+   */
+  const routeApi = layout === 'pi-ai'
+    ? (props.declared === true ? stringAt(draft, 'api') ?? stringAt(fallback, 'api') : undefined)
+      ?? sharedCatalogApi(prefillIndex, props.provider)
+    : undefined
+
+  const modelFailure = validateModelRows(schema.getPath(draft, ['models']), routeApi)
   const keyFailure = ((): 'keyBlank' | 'keyIllegalCharacters' | undefined => {
     if (keyDraft.length === 0) return undefined
     const value = keyDraft.trim()
@@ -167,15 +198,17 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
       && stringAt(fallback, 'apiKeyEnv') === undefined && keyValue.length > 0
       ? schema.setPath(draft, ['apiKeyEnv'], keyRef)
       : draft
-    const rowFailure = validateModelRows(schema.getPath(next, ['models']))
+    const rowFailure = validateModelRows(schema.getPath(next, ['models']), routeApi)
     if (rowFailure !== undefined) {
-      return `模型 ${String(rowFailure.index + 1)}：${{
-        modelIdRequired: '模型 ID 不能为空。',
-        modelIdDuplicate: '模型 ID 不能重复。',
-        modelNameInvalid: '显示名称不能为空。',
-        modelContextInvalid: '上下文窗口须为正数，如 131072、256K、1M。',
-        modelMaxTokensInvalid: '最大输出 token 数须为正数，如 8192、64K、1M。',
-      }[rowFailure.key]}`
+      return rowFailure.key === 'modelCompatNotOffered'
+        ? compatFailureMessage(rowFailure)
+        : `模型 ${String(rowFailure.index + 1)}：${{
+          modelIdRequired: '模型 ID 不能为空。',
+          modelIdDuplicate: '模型 ID 不能重复。',
+          modelNameInvalid: '显示名称不能为空。',
+          modelContextInvalid: '上下文窗口须为正数，如 131072、256K、1M。',
+          modelMaxTokensInvalid: '最大输出 token 数须为正数，如 8192、64K、1M。',
+        }[rowFailure.key]}`
     }
     if (node !== undefined && settingsPath.length === 0) {
       const sectionError = schema.validate(node, next)
@@ -347,6 +380,7 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
                   <ModelCatalog
                     models={models}
                     overridden={modelsOverridden}
+                    routeApi={routeApi}
                     defaultContextWindow={typeof defaultContextWindow === 'number' ? defaultContextWindow : undefined}
                     defaultMaxTokens={typeof defaultMaxTokens === 'number' ? defaultMaxTokens : undefined}
                     probe={probe}
@@ -368,7 +402,9 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
         ? null
         : (
             <p className={styles['advancedHint']}>
-              {`模型 ${String(modelFailure.index + 1)}：${modelFailure.key}`}
+              {modelFailure.key === 'modelCompatNotOffered'
+                ? compatFailureMessage(modelFailure)
+                : `模型 ${String(modelFailure.index + 1)}：${modelFailure.key}`}
             </p>
           )}
 
