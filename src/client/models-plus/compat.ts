@@ -5,7 +5,7 @@
  *
  * ⚠️ Fork-copy risk: these must be re-checked against the pinned host sources
  * (packages/client/ui-settings-models/src/client/{ProviderEditor,DeepSeekModelsEditor}.tsx
- * @ 0.1.5-rc.1) on every adapter-anchor bump.
+ * @ 0.1.6-alpha.2) on every adapter-anchor bump.
  */
 
 /** One model entry kept structurally open so hidden or future fields survive an edit. */

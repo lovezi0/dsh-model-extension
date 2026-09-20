@@ -44,6 +44,14 @@ export interface ModelCatalogProps {
   routeApi?: string
   /** Why the fetch action is unavailable, or undefined when it is. */
   probeBlocked?: string
+  /**
+   * Hide the fetch action entirely. The host registers model discovery only
+   * for `llm-pi-ai` (the sole `registerModelDiscovery` caller across the host
+   * tree), so a deepseek-family card would otherwise offer an action that can
+   * only ever fail with `NO_DISCOVERY` — mirroring the official page, whose
+   * DeepSeekModelsEditor has no fetch button at all.
+   */
+  hideFetch?: boolean
   /** The Host operations whose interrogation answers the fetch action. */
   operations: ModelsOperations
   /** Disable every control (read-only deployment or a pending write). */
@@ -204,17 +212,21 @@ export function ModelCatalog(props: ModelCatalogProps): ReactNode {
                 </button>
               )
             : null}
-          <button
-            type="button"
-            className={styles['linkButton']}
-            disabled={disabled || busy || !askable || props.probeBlocked !== undefined}
-            title={props.probeBlocked !== undefined
-              ? props.probeBlocked
-              : askable ? undefined : '请先填写 API 地址，再获取。'}
-            onClick={() => { void fetchModels() }}
-          >
-            {busy ? '正在询问提供方…' : '获取可用模型'}
-          </button>
+          {props.hideFetch === true
+            ? null
+            : (
+                <button
+                  type="button"
+                  className={styles['linkButton']}
+                  disabled={disabled || busy || !askable || props.probeBlocked !== undefined}
+                  title={props.probeBlocked !== undefined
+                    ? props.probeBlocked
+                    : askable ? undefined : '请先填写 API 地址，再获取。'}
+                  onClick={() => { void fetchModels() }}
+                >
+                  {busy ? '正在询问提供方…' : '获取可用模型'}
+                </button>
+              )}
         </div>
       </div>
 

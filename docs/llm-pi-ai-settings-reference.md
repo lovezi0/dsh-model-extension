@@ -1,9 +1,9 @@
-# `settings.llm-pi-ai` 参数速查（@ dsh 0.1.5-rc.2）
+# `settings.llm-pi-ai` 参数速查（@ dsh 0.1.6-alpha.2）
 
 > 事实源：`packages/llm/llm-pi-ai/src/config.ts`、`catalog.ts`、`provider.ts`；`packages/llm/llm/src/retry-policy.ts`
 > 命名空间常量：`const NS = 'llm-pi-ai'`（`index.ts:93`），schema 为 `Config`（`config.ts:340`）
 > 目录数据源：`@earendil-works/pi-ai`（经其公开子路径 `providers/all`），见第七节
-> 版本基准：**0.1.5-rc.2**（第四节的可写 compat 集合与第七节按此版本对拍，`npm run audit:pi-ai`）。第一至六节的其余内容成文于 0.1.2-rc.1，本次核对覆盖到的字段两版一致
+> 版本基准：**0.1.6-alpha.2**（第四节的可写 compat 集合与第七节按此版本对拍，`npm run audit:pi-ai`）。第一至六节的其余内容成文于 0.1.2-rc.1；0.1.5-rc.2 与 0.1.6-alpha.2 两次核对覆盖到的字段均与本文一致
 
 ## 结构总览
 

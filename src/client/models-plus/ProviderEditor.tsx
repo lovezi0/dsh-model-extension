@@ -22,8 +22,11 @@ import type { PrefillIndex } from './models-index.ts'
 import { ModelCatalog } from './ModelCatalog.tsx'
 import styles from './models-plus.module.css'
 
-/** The public DeepSeek endpoint shown as the deepseek base-URL placeholder. */
-const DEEPSEEK_PUBLIC_BASE_URL = 'https://api.deepseek.com'
+/** The official DeepSeek roots, chosen by the profile's resolved protocol.
+ * Mirrors the host's locales keys deepSeekChatBaseUrl / deepSeekMessagesBaseUrl
+ * (@ 0.1.6-alpha.2), where the Messages protocol became the default. */
+const DEEPSEEK_CHAT_BASE_URL = 'https://api.deepseek.com'
+const DEEPSEEK_MESSAGES_BASE_URL = 'https://api.deepseek.com/anthropic'
 
 /** Per-adapter-family curated field sets (unknown namespaces get the hint alone). */
 export type EditorLayout = 'deepseek' | 'pi-ai' | 'unknown'
@@ -349,12 +352,15 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
                       type="text"
                       value={stringAt(draft, 'baseURL') ?? ''}
                       placeholder={layout === 'deepseek'
-                        ? DEEPSEEK_PUBLIC_BASE_URL
+                        ? (stringAt(fallback, 'protocol') === 'messages' ? DEEPSEEK_MESSAGES_BASE_URL : DEEPSEEK_CHAT_BASE_URL)
                         : stringAt(fallback, 'baseURL') ?? '提供方默认'}
                       aria-label="API 地址"
                       disabled={disabled}
                       onChange={(event) => { setField('baseURL', event.target.value === '' ? undefined : event.target.value) }}
                     />
+                    {layout === 'deepseek'
+                      ? <span className={styles['advancedHint']}>请填写与当前连接配置兼容的 API 地址。</span>
+                      : null}
                   </div>
                   {layout === 'pi-ai' && props.declared === true
                     ? (
@@ -385,6 +391,7 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
                     defaultMaxTokens={typeof defaultMaxTokens === 'number' ? defaultMaxTokens : undefined}
                     probe={probe}
                     probeBlocked={keyFailure}
+                    hideFetch={layout === 'deepseek'}
                     operations={operations}
                     disabled={disabled}
                     onChange={(rows: ModelDraft[]) => {
