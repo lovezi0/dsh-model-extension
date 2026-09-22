@@ -23,8 +23,11 @@ import { ModelCatalog } from './ModelCatalog.tsx'
 import styles from './models-plus.module.css'
 
 /** The official DeepSeek roots, chosen by the profile's resolved protocol.
- * Mirrors the host's locales keys deepSeekChatBaseUrl / deepSeekMessagesBaseUrl
- * (@ 0.1.6-alpha.2), where the Messages protocol became the default. */
+ * Host @ 0.1.6-alpha.2 kept both keys (deepSeekChatBaseUrl / deepSeekMessagesBaseUrl)
+ * with Messages as the default; @ 0.1.7-alpha.1 it collapsed to a single
+ * deepSeekBaseUrl (https://api.deepseek.com/anthropic) with an Anthropic-only
+ * hint. We keep the protocol-aware pair so a chat-protocol route still prefills
+ * the bare root — prefill only, the saved draft is whatever the user set. */
 const DEEPSEEK_CHAT_BASE_URL = 'https://api.deepseek.com'
 const DEEPSEEK_MESSAGES_BASE_URL = 'https://api.deepseek.com/anthropic'
 

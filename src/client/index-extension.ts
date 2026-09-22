@@ -27,10 +27,10 @@ import { en as extensionEn, zh as extensionZh } from './extension-meta.ts'
 /** Cordis service name (distinct from the npm package name). */
 export const name = 'model-extension-client'
 
-/** Required services — mirrors the upstream Models section registration @ 0.1.5-rc.1. */
+/** Required services — mirrors the upstream Models section registration @ 0.1.7-alpha.1. */
 export const inject = [
   'slots', 'locale', 'remote', 'remote.credentials', 'remote.llm', 'remote.settings',
-  'settingsScope', 'settingsSchema',
+  'configForms', 'settingsSchema',
 ]
 
 /** Refetch the page snapshot only after its first load (upstream helper, inlined). */
@@ -52,7 +52,7 @@ export function apply(ctx: ClientContext): void {
 
   const schema = createSettingsSchemaOperations(ctx.settingsSchema)
   const operations = createModelsOperations(ctx)
-  const controller = new ModelsSettingsStore(ctx, schema, ctx.settingsScope.describe())
+  const controller = new ModelsSettingsStore(ctx, schema, ctx.configForms.describe())
   const t = ctx.locale.bind(NS) as ModelsPlusInjected['t']
   const injected = (): ModelsPlusInjected => ({
     controller,
