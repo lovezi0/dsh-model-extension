@@ -1,7 +1,7 @@
 # dsh-model-extension
 > 基于 deepseek-harness 的模型扩展插件
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE) [![npm](https://img.shields.io/npm/v/dsh-model-extension.svg?label=npm&labelColor=000000&color=ff4b01)](https://www.npmjs.com/package/dsh-model-extension) [![DeepSeek Harness:0.1.7-alpha.1](https://img.shields.io/badge/DeepSeek%20Harness-0.1.7--alpha.1-success.svg?labelColor=4D6BFE)](https://github.com/deepseek-ai/deepseek-harness)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE) [![npm](https://img.shields.io/npm/v/dsh-model-extension.svg?label=npm&labelColor=000000&color=ff4b01)](https://www.npmjs.com/package/dsh-model-extension) [![DeepSeek Harness:0.1.7-rc.1](https://img.shields.io/badge/DeepSeek%20Harness-0.1.7--rc.1-success.svg?labelColor=4D6BFE)](https://github.com/deepseek-ai/deepseek-harness)
 
 | 供应商 | 模型 |
 | --- | --- |
@@ -44,11 +44,13 @@ npm install
 npm run build
 ```
 
-运行时 `dsh.adapter` 锚点仅作软校验：宿主版本与锚点不一致时记录告警并照常注册——宿主自身的 settings schema 校验与 revision fence 保证不兼容的写入会被拒绝而非损坏数据。
+插件不自行做版本门：能否装载由宿主按 `package.json` 的 `peerDependencies`（`@deepseek-ai/dsh*`）判定，跟随宿主版本时只改这一处。宿主自身的 settings schema 校验与 revision fence 保证不兼容的写入会被拒绝而非损坏数据。
 
 ## 版本历史
 
 - **1.2.3**
+    - 🐛移除已作废的 dsh.adapter 逻辑
+    - npm publish
     - **1.2.3-alpha.2**
         - 💪适配deepseek harness 0.1.7-alpha.1
     - **1.2.3-alpha.1**

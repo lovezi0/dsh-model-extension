@@ -72,7 +72,6 @@ await build({
     alwaysBundle: (spec) => !isExternal(spec),
   },
   define: {
-    __DSH_ADAPTER_VERSION__: JSON.stringify(pkg.dsh.adapter),
     'process.env.NODE_ENV': JSON.stringify('production'),
   },
   // @tsdown/css pipeline: CSS Modules with the host's hashed pattern. The

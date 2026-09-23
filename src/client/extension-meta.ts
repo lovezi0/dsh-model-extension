@@ -1,13 +1,8 @@
 /**
- * Shared extension metadata: enums pinned to the adapter anchor version, and
- * the extra locale keys the extension adds on top of the official Models page
- * dictionaries. The anchor constant itself is injected at build time.
+ * Shared extension metadata: enums pinned to the host release this extension
+ * was last verified against, and the extra locale keys the extension adds on
+ * top of the official Models page dictionaries.
  */
-
-/** Adapter anchor (build-time define from package.json dsh.adapter). */
-declare const __DSH_ADAPTER_VERSION__: string
-export const ADAPTER_VERSION: string =
-  typeof __DSH_ADAPTER_VERSION__ === 'string' ? __DSH_ADAPTER_VERSION__ : '0.0.0-unknown'
 
 /** Thinking levels offered by llm-pi-ai (THINKING_LEVEL_GATE @ 0.1.2-alpha.4). Only `off` may carry an empty wire value. */
 export const THINKING_LEVELS = ['off', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'] as const
@@ -40,7 +35,7 @@ export type ThinkingFormat = (typeof THINKING_FORMATS)[number]
  * copying pi-ai's catalog `compat` across verbatim would fail resolution on
  * the withheld fields it also records (routing preferences, session affinity,
  * deferred tools, grammar tools). Re-check against the host's COMPAT_GATES on
- * every adapter-anchor bump — the same drift gate the host keeps for itself.
+ * every host upgrade — the same drift gate the host keeps for itself.
  */
 export const COMPAT_FIELDS: Readonly<Record<string, readonly string[]>> = {
   'openai-completions': [

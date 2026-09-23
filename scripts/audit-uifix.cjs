@@ -1,14 +1,14 @@
 /**
- * v1.0.0 artifact audit (dynamically reads package.json, no hardcoded versions).
+ * v1.0.0 artifact audit (reads the built bundles; no hardcoded versions).
  *
  * Asserts the rewritten Models+ bundle:
  *  - NO host UI component sneaked in (the bridge allowlist must hold)
  *  - the plugin-owned models-plus components ARE present
  *  - the extension enums / defaults / search constraints survived bundling
- *  - the server half carries the metadata routes and the fixed models.dev URL
+ *  - the server half carries the metadata routes, the fixed models.dev URL,
+ *    and no host-version gate (admission is the host's peerDependency call)
  */
 const fs = require('fs')
-const pkg = require('../package.json')
 
 let failures = 0
 const check = (name, ok) => {
@@ -43,7 +43,7 @@ check('quick-load limit 10', /limit = 10|slice\(0, 10\)|\b10\b/.test(client))
 check('[hidden] override rule in css', client.replace(/\s/g, '').includes('display:none!important'))
 
 // --- server half -------------------------------------------------------------
-check('version gate anchored to dsh.adapter', server.includes(JSON.stringify(pkg.dsh.adapter)))
+check('no host-version gate in the server half', !server.includes('validated anchor') && !server.includes('readHostVersion'))
 check('metadata index route', server.includes('/plugins/dsh-model-extension/models-index'))
 check('metadata download route', server.includes('/plugins/dsh-model-extension/models-download'))
 check('fixed models.dev URL', server.includes('https://models.dev/models.json'))

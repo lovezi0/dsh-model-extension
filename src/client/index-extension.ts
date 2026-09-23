@@ -27,7 +27,7 @@ import { en as extensionEn, zh as extensionZh } from './extension-meta.ts'
 /** Cordis service name (distinct from the npm package name). */
 export const name = 'model-extension-client'
 
-/** Required services — mirrors the upstream Models section registration @ 0.1.7-alpha.1. */
+/** Required services — mirrors the upstream Models section registration @ 0.1.7-rc.1. */
 export const inject = [
   'slots', 'locale', 'remote', 'remote.credentials', 'remote.llm', 'remote.settings',
   'configForms', 'settingsSchema',

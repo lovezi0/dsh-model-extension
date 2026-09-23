@@ -3,9 +3,11 @@ const src = require('fs').readFileSync('lib/client.js', 'utf8')
 const srv = require('fs').readFileSync('lib/index.js', 'utf8')
 
 console.log('== server half ==')
-console.log('DSH_HOME candidate path logic:', srv.includes('profiles/web/node_modules'))
-console.log('dsh-base fallback:', srv.includes('dsh-base/package.json'))
-console.log('anchor constant:', srv.includes(`"${require('../package.json').dsh.adapter}"`))
+// The runtime version gate is gone by design — the host admits or denies this
+// package from its own `@deepseek-ai/dsh*` peerDependencies — so guard against
+// it (and its build-time anchor constant) sneaking back in.
+console.log('no host-version gate:', !srv.includes('readHostVersion') && !srv.includes('validated anchor'))
+console.log('DSH_HOME still honored (metadata dir):', srv.includes('DSH_HOME'))
 
 console.log('== client half ==')
 // 字典 key 抽样：fork 组件实际用到的

@@ -2,7 +2,8 @@
  * VENDORED from @deepseek-ai/dsh-client-ui-settings-models @ 0.1.5-rc.1
  * (host tree packages/client/ui-settings-models/src/client/store.ts) — copied
  * VERBATIM so the build is self-contained (no host checkout required).
- * Re-diff against the host source on every adapter-anchor bump.
+ * Re-diff against the host source on every host upgrade (last verified
+ * byte-identical @ 0.1.7-rc.1).
  */
 /**
  * Models settings page store: one snapshot joining the configurable-provider

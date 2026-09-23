@@ -1,33 +1,26 @@
 /**
  * dsh-model-extension — host-side entry (v1.0.0).
  *
- * Two halves:
- * 1. The adapter anchor: ADVISORY at runtime — on a host-version mismatch the
- *    plugin logs a warning and registers anyway. The UI is fully plugin-owned,
- *    and the host's own settings schema validation plus revision fencing keep
- *    a mismatched wire write from corrupting anything (worst case: a refused
- *    write with a diagnostic), so a hard gate would only make compatible
- *    upgrades silently drop the plugin.
- * 2. The metadata service: three same-origin routes backing the Models+ page's
- *    quick-load. models.dev is fetched ONLY on an explicit user click (the
- *    title-row button); the raw file caches next to settings.yaml under DSH
- *    home. Only the flat models.dev shape (top-level keys = full model ids)
- *    is accepted; anything else is a refusal, per plan. The pi-ai catalog is
- *    the other, richer source: it is read from the installed package the host
- *    adapter itself loads, with no network call at all (./pi-ai-catalog.ts).
+ * The host half is the metadata service: same-origin routes backing the
+ * Models+ page's quick-load. models.dev is fetched ONLY on an explicit user
+ * click (the title-row button); the raw file caches next to settings.yaml
+ * under DSH home. Only the flat models.dev shape (top-level keys = full model
+ * ids) is accepted; anything else is a refusal, per plan. The pi-ai catalog is
+ * the other, richer source: it is read from the installed package the host
+ * adapter itself loads, with no network call at all (./pi-ai-catalog.ts).
+ *
+ * No version gate lives here. The `dsh.adapter` anchor is gone: the host (as
+ * of 0.1.7-rc.1) admits or denies this package from its own
+ * `@deepseek-ai/dsh*` peerDependencies, so a second, softer copy of that
+ * decision inside the plugin body would only emit a warning nobody can act
+ * on. The UI is fully plugin-owned, and the host's settings schema validation
+ * plus revision fencing reject — never corrupt — anything a mismatched wire
+ * contract might produce.
  */
-import { createRequire } from 'node:module'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { piAiCatalog, piAiCopies, piAiUnavailableReason } from './pi-ai-catalog'
-
-/** Adapter anchor, injected at build time from package.json `dsh.adapter`. */
-declare const __DSH_ADAPTER_VERSION__: string
-const ADAPTER_VERSION: string = typeof __DSH_ADAPTER_VERSION__ === 'string'
-  ? __DSH_ADAPTER_VERSION__
-  : '0.0.0-unknown'
 
 /** Cordis service name (distinct from the npm package name). */
 export const name = 'model-extension'
@@ -67,41 +60,6 @@ interface MetadataEntry {
   output?: number
   input: string[]
   reasoning: boolean
-}
-
-/**
- * Read the running host's version by resolving the installed CLI package's
- * manifest.
- *
- * Node resolves symlinks by default, so the plugin module's real path is the
- * project checkout — walking up from there never reaches the global tree.
- * The resolution therefore starts at the *link* path under the profile
- * node_modules (symlink not resolved), then falls back to this module's own
- * real path.
- * @returns the version string, or undefined when unresolvable.
- */
-function readHostVersion(): string | undefined {
-  const candidates: string[] = []
-  const dshHome = process.env.DSH_HOME
-  if (dshHome !== undefined && dshHome.length > 0) {
-    candidates.push(`${dshHome}/profiles/web/node_modules/dsh-model-extension/lib/index.js`)
-    candidates.push(`${dshHome}/profiles/node/node_modules/dsh-model-extension/lib/index.js`)
-  }
-  try {
-    candidates.push(fileURLToPath(import.meta.url))
-  } catch { /* ignore */ }
-
-  for (const specifier of ['@deepseek-ai/dsh/package.json', '@deepseek-ai/dsh-base/package.json']) {
-    for (const base of candidates) {
-      try {
-        const require = createRequire(base)
-        const manifestPath = require.resolve(specifier)
-        const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as { version?: unknown }
-        if (typeof manifest.version === 'string') return manifest.version
-      } catch { /* next candidate */ }
-    }
-  }
-  return undefined
 }
 
 /**
@@ -203,22 +161,11 @@ function json(res: ServerResponse, status: number, body: unknown): void {
 }
 
 /**
- * Host plugin body: gate on the exact host version, then mount the two
- * metadata routes (an explicit webServer register, mirroring the hmr plugin's
- * usage of the same registry).
+ * Host plugin body: mount the metadata routes (an explicit webServer register,
+ * mirroring the hmr plugin's usage of the same registry).
  * @param ctx - cordis context.
  */
 export function apply(ctx: PluginContext): void {
-  const hostVersion = readHostVersion()
-  if (hostVersion === undefined || hostVersion !== ADAPTER_VERSION) {
-    // Advisory only: the plugin-owned UI does not fork host components, and
-    // the host's settings schema validation + revision fence reject (never
-    // corrupt) anything a mismatched wire contract might produce.
-    ctx.logger?.warn(
-      `[dsh-model-extension] host version ${hostVersion ?? '<unreadable>'} differs from the validated anchor ${ADAPTER_VERSION}; registering anyway — if settings reads or writes misbehave, please report the host version`,
-    )
-  }
-
   const webServer = ctx.webServer
   if (webServer === undefined) {
     ctx.logger?.warn('[dsh-model-extension] webServer service absent; metadata routes not mounted')

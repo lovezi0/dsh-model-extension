@@ -3,19 +3,16 @@
  *
  * v1.0.0: self-contained — the official logic modules are vendored under
  * src/client/vendor/ (verbatim copies, see their headers), so no host
- * checkout is needed to build. The adapter anchor is still injected from
- * package.json `dsh.adapter` and enforced at runtime by src/index.ts.
+ * checkout is needed to build. No host version is injected here and none is
+ * gated on at runtime: the host admits or denies this package from its own
+ * `@deepseek-ai/dsh*` peerDependencies in package.json, which is the single
+ * source of truth for the compatible host range.
  */
-import { readFileSync, mkdirSync, rmSync } from 'node:fs'
+import { mkdirSync, rmSync } from 'node:fs'
 import { resolve, dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const pkg = JSON.parse(readFileSync(join(projectRoot, 'package.json'), 'utf8'))
-if (typeof pkg.dsh?.adapter !== 'string' || pkg.dsh.adapter.length === 0) {
-  console.error('[build] package.json is missing dsh.adapter (the pinned DSH version)')
-  process.exit(1)
-}
 
 // ---------------------------------------------------------------------------
 // Output hygiene
