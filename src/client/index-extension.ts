@@ -4,7 +4,7 @@
  * Registers the Models+ settings section rendering the fully plugin-owned
  * models-plus component tree (no host component code is bundled). The store,
  * schema operations, Host operations, dictionaries, and invalidation wiring
- * keep the upstream ui-settings-models contracts @ 0.1.5-rc.1 — the logic
+ * keep the upstream ui-settings-models contracts @ 0.1.7-rc.2 — the logic
  * modules (store/operations/schema-operations) are still inlined from the
  * host tree at build time, only the presentation is ours.
  */
@@ -27,9 +27,9 @@ import { en as extensionEn, zh as extensionZh } from './extension-meta.ts'
 /** Cordis service name (distinct from the npm package name). */
 export const name = 'model-extension-client'
 
-/** Required services — mirrors the upstream Models section registration @ 0.1.7-rc.1. */
+/** Required services — mirrors the upstream Models section registration @ 0.1.7-rc.2. */
 export const inject = [
-  'slots', 'locale', 'remote', 'remote.credentials', 'remote.llm', 'remote.settings',
+  'slots', 'locale', 'remote', 'remote.credentials', 'remote.llm', 'remote.settings', 'remote.session',
   'configForms', 'settingsSchema',
 ]
 
@@ -67,6 +67,9 @@ export function apply(ctx: ClientContext): void {
     const refreshModels = (): void => { refreshIfLoaded(controller) }
     return () => [
       ctx.remote.$on('settings/document-updated', () => { refreshModels() }),
+      // The account route's availability follows its credential record, which
+      // the reference-updated event does not cover (host @ 0.1.7-rc.2).
+      ctx.remote.$on('credentials/record-updated', refreshModels),
       ctx.remote.$on('credentials/reference-updated', refreshModels),
       ctx.remote.$on('llm/adapters-updated', refreshModels),
       ctx.on('connection/reset', refreshModels),

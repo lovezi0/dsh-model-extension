@@ -1,7 +1,7 @@
 # dsh-model-extension
 > 基于 deepseek-harness 的模型扩展插件
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE) [![npm](https://img.shields.io/npm/v/dsh-model-extension.svg?label=npm&labelColor=000000&color=ff4b01)](https://www.npmjs.com/package/dsh-model-extension) [![DeepSeek Harness:0.1.7-rc.1](https://img.shields.io/badge/DeepSeek%20Harness-0.1.7--rc.1-success.svg?labelColor=4D6BFE)](https://github.com/deepseek-ai/deepseek-harness)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE) [![npm](https://img.shields.io/npm/v/dsh-model-extension.svg?label=npm&labelColor=000000&color=ff4b01)](https://www.npmjs.com/package/dsh-model-extension) [![DeepSeek Harness:0.1.7-rc.2](https://img.shields.io/badge/DeepSeek%20Harness-0.1.7--rc.2-success.svg?labelColor=4D6BFE)](https://github.com/deepseek-ai/deepseek-harness) [![Desktop: supported](https://img.shields.io/badge/Desktop-supported-success.svg?labelColor=4D6BFE)](#安装)
 
 | 供应商 | 模型 |
 | --- | --- |
@@ -19,21 +19,28 @@
   - **兼容性**（`compat`）：`supportsReasoningEffort` 开关与 `thinkingFormat` 线制格式。
 - 支持通过 `models.json` 元数据自动预填。可通过插件下载或自行下载并放到 `$DSH_HOME/models.json` 供插件使用。
     - **仅支持`https://models.dev/models.json`数据格式**。
+- 支持 **DeepSeek 账号**路由（`deepseek-account`）：置顶显示，无可用模型时整行隐藏；编辑卡片只含模型目录（账号不使用 API 密钥与地址）。
 - 所有保存走 DSH 原生 `settings.mutate`，落盘 `$DSH_HOME/settings.yaml`。
 
 ## 安装
+> Desktop 与 CLI 共享同一 `$DSH_HOME` 下的会话、设置、凭证与工作区，但**插件激活与 lockfile 彼此独立**——同一插件需要在两侧分别安装。
+
+### Web / CLI（`web` profile）
 
 ```bash
+# github
 dsh plugin --profile web add github:lovezi0/dsh-model-extension
-```
 
-仓库自带构建产物 `lib/`，安装即用、无需本地构建。
-
-也可从 npm 安装（已发布至 npmjs）：
-
-```bash
+# npm
 dsh plugin --profile web add dsh-model-extension
 ```
+
+### Desktop（Electron 应用）
+只能在 Desktop 应用内的**插件页**安装，安装源填以下任意一种：
+
+- `github:lovezi0/dsh-model-extension`（git 源）
+- `dsh-model-extension`（npm 源）
+- 本机某一**绝对路径**（开发自测）
 
 ## 从源码构建
 
@@ -44,10 +51,12 @@ npm install
 npm run build
 ```
 
-插件不自行做版本门：能否装载由宿主按 `package.json` 的 `peerDependencies`（`@deepseek-ai/dsh*`）判定，跟随宿主版本时只改这一处。宿主自身的 settings schema 校验与 revision fence 保证不兼容的写入会被拒绝而非损坏数据。
-
 ## 版本历史
 
+- **1.3.0**
+    - 💪适配 deepseek harness 0.1.7-rc.2
+    - 💪适配 deepseek harness 官方 Desktop
+    - 🐛修复 deepseek harness desktop 快速装入下拉框透明的问题
 - **1.2.3**
     - 🐛移除已作废的 dsh.adapter 逻辑
     - npm publish

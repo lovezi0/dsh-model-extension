@@ -129,6 +129,7 @@ export function protocolOffers(api: string | undefined, field: string): boolean 
 export const en = {
   // --- official Models-page keys the forked components still render -------
   nav: 'Models+',
+  deepSeekAccount: 'DeepSeek Account',
   title: 'Models+',
   intro: 'Enter your API keys to use models from the following providers.',
   edit: 'Edit',
@@ -247,6 +248,7 @@ export type ExtensionKey = keyof typeof en
 export const zh: { [K in ExtensionKey]: string } = {
   // --- official Models-page keys (upstream zh values) ----------------------
   nav: '模型+',
+  deepSeekAccount: 'DeepSeek 账号',
   title: '模型+',
   intro: '填入各提供方的 API 密钥即可使用其模型。',
   edit: '编辑',

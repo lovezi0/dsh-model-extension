@@ -42,7 +42,7 @@ export interface ModelsPlusInjected {
 
 /** One fact decides the first-run posture: whether any provider is usable. */
 function needsSetup(row: ProviderRow, anyUsable: boolean): boolean {
-  if (anyUsable) return false
+  if (anyUsable || row.entry.provider === 'deepseek-account') return false
   if (row.entry.settingsPath.length > 0) return false
   return row.credential?.configured !== true
 }
@@ -128,7 +128,12 @@ function Loaded({ injected }: { injected: ModelsPlusInjected }): ReactNode {
   const { controller, operations, schema, t } = injected
   const useSnapshot = injected.useSnapshot
 
-  const state = useSnapshot(snapshot => snapshot)
+  const snapshot = useSnapshot(value => value)
+  // The account route takes the extension dictionary's name instead of the
+  // adapter's own; the store already sinks it to the top of the list and drops
+  // it entirely while it has no usable model (host @ 0.1.7-rc.2).
+  const state = { ...snapshot, rows: snapshot.rows.map(row => row.entry.provider === 'deepseek-account'
+    ? { ...row, entry: { ...row.entry, displayName: t('deepSeekAccount') } } : row) }
   const [editing, setEditing] = useState<EditorTarget | undefined>(undefined)
   const [adding, setAdding] = useState(false)
   const [declaring, setDeclaring] = useState(false)
@@ -191,7 +196,7 @@ function Loaded({ injected }: { injected: ModelsPlusInjected }): ReactNode {
 
   const anyUsable = state.rows.some(providerUsable)
   const configured = state.rows.filter(row => row.configured)
-  // Mirrors the host page @ 0.1.5-rc.1: a row is addable only when its
+  // Mirrors the host page @ 0.1.7-rc.2: a row is addable only when its
   // settings namespace actually resolved — a namespace name the settings
   // document does not carry would open a card that can never save.
   const configurable = state.rows.filter(row => state.namespaces.has(row.entry.settingsNs))
@@ -260,7 +265,7 @@ function Loaded({ injected }: { injected: ModelsPlusInjected }): ReactNode {
           const target = targetOf(row)
           const namespace = state.namespaces.get(target.settingsNs)
           if (namespace === undefined) return null
-          // Adapter-reported configuration diagnostic (@ 0.1.5-rc.1): shown
+          // Adapter-reported configuration diagnostic (@ 0.1.7-rc.2): shown
           // above the card so a route that cannot be served still explains why.
           const error = row.entry.error === undefined
             ? null

@@ -22,17 +22,25 @@ import type { PrefillIndex } from './models-index.ts'
 import { ModelCatalog } from './ModelCatalog.tsx'
 import styles from './models-plus.module.css'
 
-/** The official DeepSeek roots, chosen by the profile's resolved protocol.
- * Host @ 0.1.6-alpha.2 kept both keys (deepSeekChatBaseUrl / deepSeekMessagesBaseUrl)
- * with Messages as the default; @ 0.1.7-alpha.1 it collapsed to a single
- * deepSeekBaseUrl (https://api.deepseek.com/anthropic) with an Anthropic-only
- * hint. We keep the protocol-aware pair so a chat-protocol route still prefills
- * the bare root — prefill only, the saved draft is whatever the user set. */
-const DEEPSEEK_CHAT_BASE_URL = 'https://api.deepseek.com'
-const DEEPSEEK_MESSAGES_BASE_URL = 'https://api.deepseek.com/anthropic'
+/**
+ * The official DeepSeek endpoint root, and the only one left to prefill: the
+ * route is Messages-only. The host dropped the `protocol` field in
+ * 0.1.7-alpha.1 and its resolver now refuses a configuration that still carries
+ * one, so a chat-completions variant is neither offered nor reachable — reading
+ * that old field only ever produced the bare root, which the adapter refuses
+ * (host @ 0.1.7-rc.2, `PUBLIC_BASE_URL`).
+ */
+const DEEPSEEK_BASE_URL = 'https://api.deepseek.com/anthropic'
 
 /** Per-adapter-family curated field sets (unknown namespaces get the hint alone). */
 export type EditorLayout = 'deepseek' | 'pi-ai' | 'unknown'
+
+/**
+ * The official signed-in account route. It carries no API key and no base URL
+ * of its own — the host renders the model catalog alone for it, under the
+ * DeepSeek family's curated field set (host @ 0.1.7-rc.2).
+ */
+export const ACCOUNT_PROVIDER = 'deepseek-account'
 
 /** The editor layout the owning namespace selects. */
 export function layoutOf(ns: string): EditorLayout {
@@ -109,7 +117,10 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
   const node = useMemo(() => schema.nodeAtPath(root, settingsPath), [root, schema, settingsPath])
   const fallback = schema.getPath(namespace.value, settingsPath)
   const disabled = props.readOnly || busy
-  const layout = layoutOf(namespace.ns)
+  const accountProvider = props.provider === ACCOUNT_PROVIDER
+  // The account route is modelled on the DeepSeek family although its namespace
+  // is the adapter's own, so the curated field set applies to it (host @ 0.1.7-rc.2).
+  const layout = accountProvider ? 'deepseek' : layoutOf(namespace.ns)
   const keyRef = refFor(schema, namespace, settingsPath, props.provider)
   const protocols = useMemo(
     () => layout === 'pi-ai' ? protocolChoices(namespace, schema) : [],
@@ -131,6 +142,8 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
   }, [layout])
 
   useEffect(() => {
+    // The account route has no page-managed credential to describe.
+    if (accountProvider) return
     let stale = false
     setKeyState(undefined)
     void operations.describeCredential(keyRef).then((described) => {
@@ -138,7 +151,7 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
       setKeyState(described)
     })
     return () => { stale = true }
-  }, [operations, keyRef])
+  }, [operations, keyRef, accountProvider])
 
   const stringAt = (source: unknown, key: string): string | undefined => {
     const value = schema.getPath(source, [key])
@@ -302,7 +315,28 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
     <div className={styles['editor']}>
       {layout === 'unknown'
         ? <p className={styles['advancedHint']}>其余字段存于 settings.yaml；请直接编辑对应段。（{namespace.ns}）</p>
-        : (
+        : accountProvider
+          ? (
+              /* No API key and no base URL: the platform's own model catalog is
+                 the whole card, and its list is never fetched (host @ 0.1.7-rc.2). */
+              <ModelCatalog
+                models={models}
+                overridden={modelsOverridden}
+                routeApi={routeApi}
+                defaultContextWindow={typeof defaultContextWindow === 'number' ? defaultContextWindow : undefined}
+                defaultMaxTokens={typeof defaultMaxTokens === 'number' ? defaultMaxTokens : undefined}
+                probe={probe}
+                probeBlocked={keyFailure}
+                hideFetch
+                operations={operations}
+                disabled={disabled}
+                onChange={(rows: ModelDraft[]) => {
+                  setDraft(current => schema.setPath(current, ['models'], rows))
+                }}
+                onReset={() => { setDraft(current => schema.deletePath(current, ['models'])) }}
+              />
+            )
+          : (
             <>
               <div className={styles['tabs']}>
                 <div className={styles['tabBar']} role="tablist">
@@ -355,14 +389,14 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
                       type="text"
                       value={stringAt(draft, 'baseURL') ?? ''}
                       placeholder={layout === 'deepseek'
-                        ? (stringAt(fallback, 'protocol') === 'messages' ? DEEPSEEK_MESSAGES_BASE_URL : DEEPSEEK_CHAT_BASE_URL)
+                        ? DEEPSEEK_BASE_URL
                         : stringAt(fallback, 'baseURL') ?? '提供方默认'}
                       aria-label="API 地址"
                       disabled={disabled}
                       onChange={(event) => { setField('baseURL', event.target.value === '' ? undefined : event.target.value) }}
                     />
                     {layout === 'deepseek'
-                      ? <span className={styles['advancedHint']}>请填写与当前连接配置兼容的 API 地址。</span>
+                      ? <span className={styles['advancedHint']}>该路由固定使用 Messages 协议，地址须指向兼容该协议的端点。</span>
                       : null}
                   </div>
                   {layout === 'pi-ai' && props.declared === true
