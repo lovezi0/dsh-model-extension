@@ -1,7 +1,7 @@
 # dsh-model-extension
 > 基于 deepseek-harness 的模型扩展插件
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE) [![npm](https://img.shields.io/npm/v/dsh-model-extension.svg?label=npm&labelColor=000000&color=ff4b01)](https://www.npmjs.com/package/dsh-model-extension) [![DeepSeek Harness:0.1.7-rc.2](https://img.shields.io/badge/DeepSeek%20Harness-0.1.7--rc.2-success.svg?labelColor=4D6BFE)](https://github.com/deepseek-ai/deepseek-harness) [![Desktop: supported](https://img.shields.io/badge/Desktop-supported-success.svg?labelColor=4D6BFE)](#安装)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE) [![npm](https://img.shields.io/npm/v/dsh-model-extension.svg?label=npm&labelColor=000000&color=ff4b01)](https://www.npmjs.com/package/dsh-model-extension) [![DeepSeek Harness:0.2.0-rc.1](https://img.shields.io/badge/DeepSeek%20Harness-0.2.0--rc.1-success.svg?labelColor=4D6BFE)](https://github.com/deepseek-ai/deepseek-harness) [![Desktop: supported](https://img.shields.io/badge/Desktop-supported-success.svg?labelColor=4D6BFE)](#安装)
 
 | 供应商 | 模型 |
 | --- | --- |
@@ -53,6 +53,8 @@ npm run build
 
 ## 版本历史
 
+- **1.3.1**
+    - dsh peer [0.1.7 ... 0.2.0]
 - **1.3.0**
     - 💪适配 deepseek harness 0.1.7-rc.2
     - 💪适配 deepseek harness 官方 Desktop
