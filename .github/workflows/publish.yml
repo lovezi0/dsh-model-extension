@@ -20,6 +20,18 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org
 
+          # A clean runner has no node_modules, and the build imports tsdown
+          # (a devDependency). `cache: npm` also needs a lockfile to key on.
+          cache: npm
+
+      # `--legacy-peer-deps` is not optional here: the host packages this plugin
+      # runs against are PEER dependencies, deliberately absent from the lock's
+      # installed set, so a strict `npm ci` cannot satisfy them and fails with
+      # ERESOLVE before the build ever starts. The peers are provided by the
+      # profile that installs the plugin, not by this package's own tree.
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
       - name: Verify tag matches package version
         run: |
           tag="${GITHUB_REF_NAME#v}"
