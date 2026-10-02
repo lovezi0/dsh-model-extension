@@ -16,6 +16,7 @@
   ],
   "scripts": {
     "build": "node scripts/build.mjs",
+    "selftest": "node scripts/selftest.mjs",
     "audit:pi-ai": "node --experimental-strip-types scripts/audit-pi-ai-contract.mjs",
     "audit:compat": "node --experimental-strip-types scripts/audit-compat-protocol.mts"
   },
