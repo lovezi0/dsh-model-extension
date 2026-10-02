@@ -5,8 +5,8 @@
  * plugin's ModelEntryPanel — capacities and extension fields in one block.
  */
 
-import { useState } from 'react'
-import type { ReactNode } from 'react'
+import { useRef, useState } from 'react'
+import type { DragEvent, KeyboardEvent, ReactNode } from 'react'
 import type { LlmDiscoveredModel } from '@deepseek-ai/dsh-api-remotes/client'
 import { Modal } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { ModelDraft } from './compat.ts'
@@ -126,6 +126,130 @@ export function ModelCatalog(props: ModelCatalogProps): ReactNode {
     })
   }
 
+  // --- reordering -----------------------------------------------------------
+  // A drag is a POSITION move, and three things here are keyed by position, so
+  // one move has to carry all of them or they disagree: the draft array itself,
+  // the expanded-row set, and the DOM (rows are keyed by index, so a keystroke
+  // never remounts the field being typed into). The epoch serves the third: a
+  // reorder bumps it, remounting the rows once — cheap, because a reorder is one
+  // deliberate action — and dropping the per-row scratch state (the panel's
+  // in-progress capacity text, which is keyed by FIELD name and would otherwise
+  // follow the position and re-apply itself to whichever model moved in).
+  const [dragging, setDragging] = useState<number | undefined>(undefined)
+  const [dropAt, setDropAt] = useState<{ row: number, after: boolean } | undefined>(undefined)
+  const [epoch, setEpoch] = useState(0)
+  // Refs, not state: the drag handlers fire many times per move and must never
+  // read the index the pointer has already left behind.
+  const draggingRef = useRef<number | undefined>(undefined)
+  const dropAtRef = useRef<{ row: number, after: boolean } | undefined>(undefined)
+
+  /**
+   * Where a drop lands once the dragged row is out of the way.
+   *
+   * The indicator names a GAP, not a row: `after` picks the gap above or below
+   * the row under the pointer (its own midpoint, so the indicator says what a
+   * release would do before the release), and the gap is counted in pre-move
+   * positions. Removing the dragged row first shifts everything after it up by
+   * one, so a gap beyond the drag's own slot has to come back by one to stay
+   * the same slot.
+   * @param from - the dragged row's position.
+   * @param row - the row under the pointer.
+   * @param after - whether the pointer sits past that row's midpoint.
+   * @returns the insertion index for the post-removal array.
+   */
+  const dropIndex = (from: number, row: number, after: boolean): number => {
+    const gap = after ? row + 1 : row
+    return from < gap ? gap - 1 : gap
+  }
+
+  /**
+   * Carry the expanded-row set through a move: the dragged row keeps its own
+   * panel, and every row it passed shifts one slot.
+   * @param current - the expanded positions before the move.
+   * @param from - the dragged row's position.
+   * @param to - its position after the move.
+   * @returns the same panels, addressed by their new positions.
+   */
+  const moveExpanded = (current: ReadonlySet<number>, from: number, to: number): Set<number> => {
+    const next = new Set<number>()
+    for (const at of current) {
+      if (at === from) next.add(to)
+      else if (from < to ? at > from && at <= to : at >= to && at < from) next.add(at + (from < to ? -1 : 1))
+      else next.add(at)
+    }
+    return next
+  }
+
+  /**
+   * Put one row at another position in the draft.
+   * @param from - the row's current position.
+   * @param to - the position it should end up at.
+   */
+  const moveRow = (from: number, to: number): void => {
+    if (from === to || from < 0 || to < 0 || from >= models.length || to >= models.length) return
+    const next = [...models]
+    const [moved] = next.splice(from, 1)
+    if (moved === undefined) return
+    next.splice(to, 0, moved)
+    onChange(next)
+    setExpanded((current) => moveExpanded(current, from, to))
+    setEpoch((value) => value + 1)
+  }
+
+  /** @param index - the row the pointer took hold of. */
+  const beginDrag = (index: number): void => {
+    draggingRef.current = index
+    dropAtRef.current = undefined
+    setDragging(index)
+    setDropAt(undefined)
+  }
+
+  /**
+   * Follow the pointer: keep the drop gap live so a release is predictable.
+   * @param event - the dragover on a row.
+   * @param index - that row's position.
+   */
+  const trackDrag = (event: DragEvent<HTMLDivElement>, index: number): void => {
+    if (draggingRef.current === undefined) return
+    // Without preventDefault the drop is refused outright: the browser will not
+    // fire `drop` on a target that never opted in.
+    event.preventDefault()
+    if (event.dataTransfer !== null) event.dataTransfer.dropEffect = 'move'
+    const box = event.currentTarget.getBoundingClientRect()
+    const at = { row: index, after: event.clientY > box.top + box.height / 2 }
+    const current = dropAtRef.current
+    if (current !== undefined && current.row === at.row && current.after === at.after) return
+    dropAtRef.current = at
+    setDropAt(at)
+  }
+
+  /** Commit the drop, or abandon it when the drag never named a gap. */
+  const endDrag = (): void => {
+    const from = draggingRef.current
+    const at = dropAtRef.current
+    draggingRef.current = undefined
+    dropAtRef.current = undefined
+    setDragging(undefined)
+    setDropAt(undefined)
+    if (from === undefined || at === undefined) return
+    moveRow(from, dropIndex(from, at.row, at.after))
+  }
+
+  /**
+   * Reorder from the keyboard.
+   *
+   * The handle is a button, so the move has to be reachable without a pointer.
+   * Alt + Arrow is the conventional "move this thing" chord, and it leaves the
+   * bare arrow keys to their normal page duty.
+   * @param event - the key event on the handle.
+   * @param index - this row's position.
+   */
+  const handleHandleKey = (event: KeyboardEvent<HTMLButtonElement>, index: number): void => {
+    if (!event.altKey || (event.key !== 'ArrowUp' && event.key !== 'ArrowDown')) return
+    event.preventDefault()
+    moveRow(index, index + (event.key === 'ArrowUp' ? -1 : 1))
+  }
+
   const fetchModels = async (): Promise<void> => {
     setBusy(true)
     setFailure(undefined)
@@ -235,16 +359,31 @@ export function ModelCatalog(props: ModelCatalogProps): ReactNode {
         : (
             <div className={styles['modelList']}>
               {models.map((model, index) => (
-                // Keyed by position alone. A key derived from the row's content
-                // — the id especially — changes on every keystroke, so React
-                // unmounts and remounts the row and the field being typed into
-                // loses focus after each character. Nothing in this subtree
-                // needs resetting when the id changes, so position is correct.
+                // Keyed by position, plus an epoch that only a reorder bumps.
+                // A key derived from the row's content — the id especially —
+                // changes on every keystroke, so React unmounts and remounts the
+                // row and the field being typed into loses focus after each
+                // character; a position key is right for editing. Reordering is
+                // the one case where keeping the nodes would be wrong, because
+                // the scratch state inside them is addressed by field name and
+                // would follow the slot instead of the model — so the epoch
+                // remounts them exactly once per move.
                 <div
-                  key={String(index)}
-                  className={styles['modelEntry']}
+                  key={epoch + ':' + String(index)}
+                  className={dragging === index
+                    ? `${styles['modelEntry']} ${styles['modelEntryDragging']}`
+                    : styles['modelEntry']}
                 >
-                  <div className={styles['modelRow']}>
+                  <div
+                    className={styles['modelRow']}
+                    // The whole card is a drop target, so a drop anywhere on
+                    // the row — not only on the handle — lands the move.
+                    onDragOver={(event) => { trackDrag(event, index) }}
+                    onDrop={(event) => {
+                      event.preventDefault()
+                      endDrag()
+                    }}
+                  >
                     <input
                       className={styles['input']}
                       type="text"
@@ -287,6 +426,43 @@ export function ModelCatalog(props: ModelCatalogProps): ReactNode {
                         <path d="M2.5 4h11M6.5 4V2.5h3V4M4 4l.7 9a1 1 0 001 .9h4.6a1 1 0 001-.9L12 4M6.5 6.8v4.4M9.5 6.8v4.4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </button>
+                    <button
+                      type="button"
+                      className={styles['dragHandle']}
+                      aria-label={`拖动以调整模型顺序 ${String(index + 1)}`}
+                      // The list is the reading order of the model selector, so
+                      // where the row SITS is announced, and the handle is a
+                      // button that moves it.
+                      title="拖动以调整顺序（也可用 Alt + ↑/↓）"
+                      disabled={disabled || models.length < 2}
+                      draggable={disabled !== true}
+                      onDragStart={(event) => {
+                        // The row itself is not draggable, so nothing here has
+                        // to stop a drag the inputs may have started.
+                        event.dataTransfer.effectAllowed = 'move'
+                        // Firefox refuses to start a drag with no payload.
+                        event.dataTransfer.setData('text/plain', textOf(model, 'id'))
+                        beginDrag(index)
+                      }}
+                      onDragEnd={endDrag}
+                      onKeyDown={(event) => { handleHandleKey(event, index) }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M5.5 4h.01M5.5 8h.01M5.5 12h.01M10.5 4h.01M10.5 8h.01M10.5 12h.01" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                      </svg>
+                    </button>
+                    {/* The gap a release would fill, drawn inside the row it
+                        points at (the rule is absolutely positioned, so it needs
+                        no extra markup at the list's top and bottom edges). */}
+                    {dropAt !== undefined && dropAt.row === index
+                      ? (
+                          <div
+                            className={styles['modelDropLine']}
+                            data-edge={dropAt.after ? 'after' : 'before'}
+                            aria-hidden="true"
+                          />
+                        )
+                      : null}
                   </div>
                   {expanded.has(index)
                     ? (

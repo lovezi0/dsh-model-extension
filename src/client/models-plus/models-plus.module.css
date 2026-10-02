@@ -30,7 +30,7 @@
 .dangerButton:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover-danger); }
 .rowActions .secondaryButton, .rowActions .dangerButton { height: 28px; padding: 0 10px; border-radius: 14px; font-size: 12px; line-height: 18px; }
 .primaryButton:disabled, .secondaryButton:disabled, .dangerButton:disabled, .addButton:disabled, .linkButton:disabled, .addModelButton:disabled { opacity: 0.4; cursor: default; }
-.primaryButton:focus-visible, .secondaryButton:focus-visible, .dangerButton:focus-visible, .addButton:focus-visible, .linkButton:focus-visible, .addModelButton:focus-visible, .iconButton:focus-visible, .customizedSummary:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--dsw-alias-border-l3); }
+.primaryButton:focus-visible, .secondaryButton:focus-visible, .dangerButton:focus-visible, .addButton:focus-visible, .linkButton:focus-visible, .addModelButton:focus-visible, .iconButton:focus-visible, .dragHandle:focus-visible, .customizedSummary:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--dsw-alias-border-l3); }
 
 .editor { border-radius: 12px; background: var(--dsw-alias-bg-module-platform); padding: 14px 16px; display: flex; flex-direction: column; gap: 14px; }
 .field { display: flex; flex-direction: column; gap: 6px; }
@@ -62,7 +62,20 @@
 .modelList { display: flex; flex-direction: column; gap: 8px; }
 .modelListHead { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .modelEntry { border: 0.5px solid var(--dsw-alias-border-l4); border-radius: 10px; padding: 6px; }
-.modelRow { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto auto; align-items: center; gap: 6px; }
+.modelRow { position: relative; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto auto auto; align-items: center; gap: 6px; }
+/* The dragged card dims rather than disappears, so its origin stays readable
+   while the gap it is heading for is the thing being announced. */
+.modelEntryDragging { border: 0.5px solid var(--dsw-alias-border-l4); border-radius: 10px; padding: 6px; opacity: 0.5; }
+.dragHandle { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 28px; border: none; border-radius: 6px; background: transparent; color: var(--dsw-alias-label-tertiary); cursor: grab; touch-action: none; }
+.dragHandle:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
+.dragHandle:active:not(:disabled) { cursor: grabbing; }
+.dragHandle:disabled { cursor: default; opacity: 0.4; }
+/* The gap a release would fill: a 2px brand rule in the same idiom as the
+   active tab underline, drawn inside the row it points at so the list needs
+   no extra markup at its edges. `data-edge` picks which side. */
+.modelDropLine { position: absolute; left: 0; right: 0; height: 2px; border-radius: 2px; background: var(--dsw-alias-brand-primary); pointer-events: none; }
+.modelDropLine[data-edge='before'] { top: -5px; }
+.modelDropLine[data-edge='after'] { bottom: -5px; }
 .iconButton { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: none; border-radius: 6px; background: transparent; color: var(--dsw-alias-label-tertiary); cursor: pointer; }
 .iconButton:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
 .iconButton:disabled { cursor: default; opacity: 0.4; }
