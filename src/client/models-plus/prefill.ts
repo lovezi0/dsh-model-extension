@@ -86,7 +86,11 @@ export function reasoningEffortsFrom(
   }
 
   const beyondOff = Object.keys(efforts).some(level => level !== 'off')
-  return beyondOff ? efforts : false
+  // Every caller writes through this function, so the protocol's accepted set
+  // is applied here rather than at each call site: Gemini takes four fixed
+  // spellings and no Off, and the adapter would otherwise accept the profile
+  // and fail the first request.
+  return narrowEfforts(beyondOff ? efforts : false, api)
 }
 
 /**
@@ -116,4 +120,29 @@ export function compatFrom(
     if (field in compat) next[field] = compat[field]
   }
   return next
+}
+/** Levels the Gemini protocol accepts, each sent under its own name. */
+const GEMINI_LEVELS: readonly string[] = ['minimal', 'low', 'medium', 'high']
+
+/**
+ * Narrow an efforts dict to what a protocol accepts.
+ *
+ * pi-ai's Gemini protocol sends only its four levels and fails a request whose
+ * entry names any other level or whose wire value differs from the level name.
+ * The adapter accepts the profile either way, so the failure only lands at the
+ * first request — which is exactly what this filter prevents.
+ * @param efforts - the mapped dict, or `false` for a non-reasoning model.
+ * @param api - the protocol the row will be judged by.
+ * @returns the dict that protocol accepts.
+ */
+export function narrowEfforts(
+  efforts: Record<string, string | null> | false,
+  api: string | undefined,
+): Record<string, string | null> | false {
+  if (efforts === false || api !== 'google-generative-ai') return efforts
+  const narrowed: Record<string, string | null> = {}
+  for (const level of GEMINI_LEVELS) {
+    if (level in efforts) narrowed[level] = level
+  }
+  return Object.keys(narrowed).length === 0 ? false : narrowed
 }

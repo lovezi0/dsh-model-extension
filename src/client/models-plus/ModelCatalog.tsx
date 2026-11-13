@@ -79,6 +79,30 @@ function adopt(candidate: LlmDiscoveredModel, routeApi: string | undefined): Mod
 }
 
 /**
+ * Give the drag a readable ghost instead of the default row snapshot. The
+ * browser fills the snapshot's transparent pixels with the page colour and the
+ * copy carries every input box, which reads as a row being torn out.
+ * @param event - the dragstart event.
+ * @param label - the text the ghost shows.
+ */
+function dragGhost(event: DragEvent<HTMLElement>, label: string): void {
+  const doc = event.currentTarget.ownerDocument
+  const ghost = doc.createElement('div')
+  ghost.textContent = label.length === 0 ? '模型' : label
+  ghost.style.cssText = 'position:fixed;top:-1000px;left:0;padding:4px 10px;border-radius:8px;'
+    + 'background:var(--dsw-specific-menu);color:var(--dsw-alias-label-primary);'
+    + 'font:inherit;font-size:12px;line-height:18px;'
+  doc.body.append(ghost)
+  try {
+    event.dataTransfer?.setDragImage(ghost, 8, 8)
+  } catch {
+    // A browser may refuse a custom image; the native snapshot still drags.
+  }
+  // The snapshot is taken synchronously; the node only has to exist for it.
+  setTimeout(() => { ghost.remove() }, 0)
+}
+
+/**
  * Render the model catalog with its fetch action.
  * @param props - the drafted rows, probe target, wire face, and mutators.
  * @returns the catalog editor.
@@ -440,8 +464,14 @@ export function ModelCatalog(props: ModelCatalogProps): ReactNode {
                         // The row itself is not draggable, so nothing here has
                         // to stop a drag the inputs may have started.
                         event.dataTransfer.effectAllowed = 'move'
-                        // Firefox refuses to start a drag with no payload.
-                        event.dataTransfer.setData('text/plain', textOf(model, 'id'))
+                        // A CUSTOM mime, never text/plain: a text payload makes
+                        // the browser treat the gesture as dragged text, so a
+                        // release outside a drop target opens its "search the
+                        // dragged text" action instead of ending the drag.
+                        // Firefox still needs a payload to start one, which this
+                        // satisfies.
+                        event.dataTransfer.setData('application/x-dsh-model-order', String(index))
+                        dragGhost(event, textOf(model, 'id'))
                         beginDrag(index)
                       }}
                       onDragEnd={endDrag}

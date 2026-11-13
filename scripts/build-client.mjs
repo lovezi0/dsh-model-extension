@@ -6,11 +6,10 @@
  *   intro:  var module = { exports: {} }; var exports = module.exports;
  *   footer: return module.exports; } });
  *
- * v1.0.0: the UI is fully plugin-owned (src/client/models-plus/). Only the
- * official LOGIC modules (store/operations/schema-operations — zero UI
- * dependencies) are inlined from the host tree, via a strict allowlist: any
- * other relative import that does not exist locally FAILS the build, so no
- * host component can quietly sneak back into the bundle.
+ * v1.4.0-alpha.1: the plugin is an extension seat on the official Models page. The
+ * emitted bundle carries only the seat's own components (src/client/extension/)
+ * plus the shared compat/prefill/index modules; no host UI component is ever
+ * part of it.
  */
 import { resolve, dirname, basename, join, sep } from 'node:path'
 import { existsSync } from 'node:fs'
@@ -21,7 +20,7 @@ import { build } from 'tsdown'
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const PLUGIN_ID = 'dsh-model-extension'
 
-/** Platform module-table baseline (mirrors host packages/client/web/src/platform.ts @ 0.2.1-rc.2). */
+/** Platform module-table baseline (mirrors host packages/client/web/src/platform.ts @ 0.2.2-rc.3). */
 const PLATFORM_EXTERNALS = [
   'react',
   'react/jsx-runtime',

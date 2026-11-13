@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * Vendor drift audit: the three inlined host logic modules must stay verbatim.
+ * Vendor drift audit: the inlined host logic modules must stay verbatim.
  *
- * src/client/vendor/ holds copies of the host's store / operations /
- * schema-operations, each behind a header naming the release it came from, so
+ * src/client/vendor/ holds copies of the host's operations / schema-operations,
+ * each behind a header naming the release it came from, so
  * the build needs no host checkout. A host upgrade that changes any of them
  * silently diverges from the contract this plugin was written against, so this
  * script re-diffs them, header aside, byte for byte.
@@ -24,7 +24,7 @@ import { join } from 'node:path'
 /** Where the copied modules live inside the host tree. */
 const HOST_SUBDIR = 'packages/client/ui-settings-models/src/client'
 /** The copied modules, in the order the build consumes them. */
-const FILES = ['store.ts', 'operations.ts', 'schema-operations.ts']
+const FILES = ['operations.ts', 'schema-operations.ts']
 /** Lines the local vendor header occupies, so the verbatim body starts after it. */
 const HEADER_LINES = 7
 

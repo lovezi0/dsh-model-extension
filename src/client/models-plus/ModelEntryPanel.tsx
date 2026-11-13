@@ -341,6 +341,12 @@ export function ModelEntryPanel(props: ModelEntryPanelProps): ReactNode {
   }
 
   // --- validation (mirrors the host checks) --------------------------------
+  // Gemini accepts four fixed spellings and no Off; the adapter would take the
+  // profile and fail the first request, so the table itself is narrowed.
+  const levelsOnly = api === 'google-generative-ai'
+  const offeredLevels = levelsOnly
+    ? THINKING_LEVELS.filter(level => level === 'minimal' || level === 'low' || level === 'medium' || level === 'high')
+    : THINKING_LEVELS
   const declaredLevels = efforts === undefined ? [] : THINKING_LEVELS.filter(level => level in efforts)
   const hasEmptyWire = declaredLevels.some(level =>
     level !== 'off' && String(efforts?.[level] ?? '').trim().length === 0)
@@ -469,7 +475,7 @@ export function ModelEntryPanel(props: ModelEntryPanelProps): ReactNode {
             <div className={styles['extTHead']}>
               <div>声明</div><div>挡位</div><div>线上取值</div>
             </div>
-            {THINKING_LEVELS.map((level) => {
+            {offeredLevels.map((level) => {
               const declared = efforts !== undefined && level in efforts
               const isOff = level === 'off'
               const wire = declared ? String(efforts?.[level] ?? '') : ''
@@ -495,6 +501,7 @@ export function ModelEntryPanel(props: ModelEntryPanelProps): ReactNode {
                             placeholder={level}
                             aria-label={`${level} 线上取值`}
                             disabled={disabled}
+                            readOnly={levelsOnly}
                             onChange={(event) => { setWireValue(level, event.target.value) }}
                           />
                         )

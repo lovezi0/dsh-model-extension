@@ -1,0 +1,492 @@
+/* Models+ extension seat — one entry line in an official provider card, plus
+ * the model-level editor it opens. Surfaces drawn here: the entry link, the
+ * editor rows, the quick-load popup, and the small form controls. */
+
+.extrasRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.extrasLink {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--dsw-alias-label-secondary);
+  font: inherit;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 500;
+  text-decoration: underline dotted transparent;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .extrasLink:hover { color: var(--dsw-alias-label-primary); text-decoration-color: currentColor; }
+}
+
+.extrasLink:focus-visible {
+  outline: none;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px var(--dsw-alias-border-l3);
+}
+
+.extrasCaret {
+  margin-left: 4px;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.extrasHint,
+.notice {
+  margin: 0;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.error {
+  margin: 0;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-state-error-primary);
+}
+
+.savedNotice {
+  margin: 0;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-state-success-primary);
+}
+
+/* The editor layer itself: wide enough for a model row's switches, capped at a
+ * comfortable reading width. */
+.modelsModal {
+  width: min(720px, 92vw);
+  max-height: 100%;
+}
+
+/* The dialog's content column is the positioning frame for the header action:
+ * the Modal exposes no header slot, so the button rides the header row by
+ * absolute position (22px top padding, 14px right padding, then the 28px close
+ * button and its 8px gap). */
+.modelsModalContent {
+  position: relative;
+}
+
+.headerAction {
+  position: absolute;
+  top: 22px;
+  right: 50px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  border: none;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--dsw-alias-label-secondary);
+  font: inherit;
+  font-size: 12px;
+  line-height: 18px;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .headerAction:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover); }
+}
+
+.headerAction:disabled { opacity: 0.4; cursor: default; }
+
+.headerAction:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--dsw-alias-border-l3);
+}
+
+/* Fixed height so the layer does not resize as rows open and close: the
+ * catalog scrolls inside, the toolbar and the save bar stay put. */
+.modalBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: min(64vh, 560px);
+  min-height: 340px;
+}
+
+.catalogBody {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.secondaryButton {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 12px;
+  border: 0.5px solid var(--dsw-alias-border-l3);
+  border-radius: 14px;
+  background: transparent;
+  color: var(--dsw-alias-label-primary);
+  font: inherit;
+  font-size: 12px;
+  line-height: 18px;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .secondaryButton:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover); }
+}
+
+.secondaryButton:disabled { opacity: 0.4; cursor: default; }
+
+.secondaryButton:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--dsw-alias-border-l3);
+}
+
+.modelList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: min(52vh, 420px);
+  overflow-y: auto;
+}
+
+.modelCard {
+  border: 0.5px solid var(--dsw-alias-border-l4);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.modelHead {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.modelId {
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 500;
+  color: var(--dsw-alias-label-primary);
+}
+
+.modelName {
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.modelHint {
+  margin-left: auto;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.compatRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin-top: 6px;
+}
+
+.compatField {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.compatInput {
+  box-sizing: border-box;
+  width: 104px;
+  height: 24px;
+  padding: 0 6px;
+  border: 0.5px solid var(--dsw-alias-border-l4);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 11px;
+  background: var(--dsw-alias-bg-layer-1);
+  color: var(--dsw-alias-label-primary);
+}
+
+/* Quick-load: a three-step picker; its popup is the only floating surface this
+ * plugin draws, so it carries the menu material and the elevation shadow. */
+.quickWrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.panelRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.input,
+.selectInput {
+  box-sizing: border-box;
+  height: 28px;
+  padding: 0 8px;
+  border: 0.5px solid var(--dsw-alias-border-l4);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 12px;
+  line-height: 18px;
+  background: var(--dsw-alias-bg-layer-1);
+  color: var(--dsw-alias-label-primary);
+}
+
+.selectInput { flex: 0 0 104px; min-width: 0; }
+
+.quickList {
+  position: absolute;
+  top: 34px;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  margin-top: 2px;
+  padding: 4px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--dsw-specific-menu);
+  backdrop-filter: var(--dsw-menu-backdrop-filter);
+  --dsw-elevation-stroke-color: var(--dsw-alias-border-l1);
+  box-shadow: var(--dsw-elevation-prominent);
+  max-height: 264px;
+  overflow-y: auto;
+}
+
+.quickItem {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--dsw-alias-label-primary);
+  font: inherit;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: left;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .quickItem:hover { background: var(--dsw-alias-interactive-bg-hover); }
+}
+
+.quickItemId { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.quickItemApi {
+  flex: none;
+  margin-left: auto;
+  color: var(--dsw-alias-label-tertiary);
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.quickEmpty {
+  display: block;
+  padding: 6px 8px;
+  color: var(--dsw-alias-label-tertiary);
+  font-size: 12px;
+  line-height: 18px;
+}
+/* The per-model extension block, restored from the page-era design: capacity,
+ * modalities, the two switch fields, the reasoning-level table, and the rest of
+ * the declared compat keys. */
+.extBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 10px;
+  border: 0.5px solid var(--dsw-alias-border-l4);
+  border-radius: 10px;
+  background: var(--dsw-alias-bg-layer-1);
+}
+
+.extGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.extGroup + .extGroup {
+  padding-top: 10px;
+  border-top: 0.5px solid var(--dsw-alias-border-l4);
+}
+
+.extLabel {
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 500;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.extField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.capacityRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.capacityRow > * {
+  flex: 1 1 140px;
+  min-width: 0;
+}
+
+.extTable {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.extTHead,
+.extTRow {
+  display: grid;
+  grid-template-columns: 52px 84px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+
+.extTHead {
+  padding-bottom: 4px;
+  border-bottom: 0.5px solid var(--dsw-alias-border-l4);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.extTRow {
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.extTRow input[type="text"] {
+  box-sizing: border-box;
+  width: 100%;
+  height: 26px;
+  padding: 0 6px;
+  border: 0.5px solid var(--dsw-alias-border-l4);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 12px;
+  background: var(--dsw-alias-bg-layer-1);
+  color: var(--dsw-alias-label-primary);
+}
+
+.extCheckbox {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+}
+
+.switchRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.extCheck {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.extHint {
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.modelSummary {
+  margin-left: auto;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.modelToggle {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.modalFoot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+  padding-top: 10px;
+  border-top: 0.5px solid var(--dsw-alias-border-l4);
+}
+
+.primaryButton {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 14px;
+  background: var(--dsw-alias-button-primary-fill);
+  color: var(--dsw-alias-label-primary-foreground);
+  font: inherit;
+  font-size: 12px;
+  line-height: 18px;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .primaryButton:hover:not(:disabled) { background: var(--dsw-alias-button-primary-hover); }
+}
+
+.primaryButton:disabled { opacity: 0.4; cursor: default; }
+
+.primaryButton:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--dsw-alias-border-l3);
+}
+
+.dirtyHint {
+  margin-right: auto;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--dsw-alias-state-warn-label);
+}

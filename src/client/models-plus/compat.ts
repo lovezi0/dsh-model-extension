@@ -5,7 +5,7 @@
  *
  * ⚠️ Fork-copy risk: these must be re-checked against the pinned host sources
  * (packages/client/ui-settings-models/src/client/{ProviderEditor,DeepSeekModelsEditor,ModelReasoningEfforts}.tsx
- * — last verified unchanged @ 0.2.1-rc.2) on every host upgrade.
+ * — last verified unchanged @ 0.2.2-rc.3) on every host upgrade.
  */
 
 /** One model entry kept structurally open so hidden or future fields survive an edit. */
@@ -238,7 +238,7 @@ export function validateModelRows(value: unknown, api?: string): ModelRowsValida
 }
 
 // ---------------------------------------------------------------------------
-// reasoning-efforts validation — copied from ModelReasoningEfforts.tsx @ 0.2.1-rc.2
+// reasoning-efforts validation — copied from ModelReasoningEfforts.tsx @ 0.2.2-rc.3
 // ---------------------------------------------------------------------------
 
 /** The declared levels of one row, as stored. */

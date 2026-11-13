@@ -1,9 +1,9 @@
 /**
- * VENDORED from @deepseek-ai/dsh-client-ui-settings-models @ 0.2.1-rc.2
+ * VENDORED from @deepseek-ai/dsh-client-ui-settings-models @ 0.2.2-rc.3
  * (host tree packages/client/ui-settings-models/src/client/operations.ts) — copied
  * VERBATIM so the build is self-contained (no host checkout required).
  * Re-diff against the host source on every host upgrade (last verified
- * byte-identical @ 0.2.1-rc.2).
+ * byte-identical @ 0.2.2-rc.3).
  */
 /**
  * The Host reads and writes the Models cards perform, as callbacks built in the

@@ -277,1009 +277,938 @@ body { margin: 0; padding: 28px; background: var(--dsw-alias-bg-base); color: va
 .quickItem:hover { background: var(--dsw-alias-interactive-bg-hover); }
 .quickEmpty { padding: 6px 8px; font-size: 12px; line-height: 18px; color: var(--dsw-alias-label-tertiary); }
 .themeBtn { position: fixed; top: 16px; right: 16px; height: 28px; padding: 0 12px; border-radius: 14px; border: 0.5px solid var(--dsw-alias-border-l3); background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-secondary); font: inherit; font-size: 12px; cursor: pointer; z-index: 50; }
+
+/* ===== 实装样式：ui-primitives/Modal.module.css ===== */
+/* Full-viewport layer (figma Mask + Dialog 451:18655): mask + centered card.
+   24px of air on every side; the top/bottom widen to the frame's published
+   overlay inset so a tall card stays clear of it.
+   Cards size against this padding box: consumers cap growth with
+   `max-height: 100%`, never their own viewport calc. */
+.root {
+  pointer-events: auto;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(24px, var(--dsh-frame-overlay-top, 24px)) 24px;
+}
+
+/* Only paint excludes the native caption; the root still blocks background clicks. */
+.mask {
+  position: absolute;
+  inset: var(--dsh-frame-chrome-top, 0px) 0 0;
+  backdrop-filter: var(--dsw-mask-blur);
+}
+
+.mask::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--dsw-alias-bg-mask-1);
+  animation: modalEnter var(--ds-transition-duration) var(--ds-ease-in-out);
+}
+
+/* Dialogs use the prominent elevation on the secondary layer. */
+.dialog {
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: min(380px, 100%);
+  padding: 0 0 24px;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--dsw-radius-panel);
+  background: var(--dsw-alias-bg-layer-2);
+  box-shadow: var(--dsw-elevation-prominent);
+  animation: modalEnter var(--ds-transition-duration) var(--ds-ease-in-out);
+}
+
+@keyframes modalEnter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mask::after, .dialog { animation: none; }
+}
+
+.dialog:focus {
+  outline: none;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Header row (figma Title row): pad l24/t22/r14/b12, SPACE_BETWEEN —
+ * title left, close button right. */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 22px 14px 12px 24px;
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500; /* figma wt510, rendered 500 */
+  color: var(--dsw-alias-label-primary);
+}
+
+.warning .title {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.warningIcon {
+  flex: none;
+  margin-top: 3px;
+  color: var(--dsw-alias-state-warn-primary);
+}
+
+.warning .body {
+  margin-top: 0;
+}
+
+.close {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--dsw-radius-sm);
+  background: transparent;
+  cursor: pointer;
+  color: var(--dsw-alias-label-secondary);
+}
+
+@media (hover: hover) {
+  .close:hover {
+    background: var(--dsw-alias-interactive-bg-hover);
+  }
+}
+
+/* Description and body share the 332px content column (24px side pads). */
+.description {
+  margin: 0;
+  padding: 0 24px;
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 400;
+  color: var(--dsw-alias-label-primary);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin-top: 20px;
+  padding: 0 24px;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 0 24px;
+}
+
+/* ===== 实装样式：extension/extras.module.css ===== */
+/* Models+ extension seat — one entry line in an official provider card, plus
+ * the model-level editor it opens. Surfaces drawn here: the entry link, the
+ * editor rows, the quick-load popup, and the small form controls. */
+
+.extrasRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.extrasLink {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--dsw-alias-label-secondary);
+  font: inherit;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 500;
+  text-decoration: underline dotted transparent;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .extrasLink:hover { color: var(--dsw-alias-label-primary); text-decoration-color: currentColor; }
+}
+
+.extrasLink:focus-visible {
+  outline: none;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px var(--dsw-alias-border-l3);
+}
+
+.extrasCaret {
+  margin-left: 4px;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.extrasHint,
+.notice {
+  margin: 0;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.error {
+  margin: 0;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-state-error-primary);
+}
+
+.savedNotice {
+  margin: 0;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-state-success-primary);
+}
+
+/* The editor layer itself: wide enough for a model row's switches, capped at a
+ * comfortable reading width. */
+.modelsModal {
+  width: min(720px, 92vw);
+  max-height: 100%;
+}
+
+/* The dialog's content column is the positioning frame for the header action:
+ * the Modal exposes no header slot, so the button rides the header row by
+ * absolute position (22px top padding, 14px right padding, then the 28px close
+ * button and its 8px gap). */
+.modelsModalContent {
+  position: relative;
+}
+
+.headerAction {
+  position: absolute;
+  top: 22px;
+  right: 50px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  border: none;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--dsw-alias-label-secondary);
+  font: inherit;
+  font-size: 12px;
+  line-height: 18px;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .headerAction:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover); }
+}
+
+.headerAction:disabled { opacity: 0.4; cursor: default; }
+
+.headerAction:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--dsw-alias-border-l3);
+}
+
+/* Fixed height so the layer does not resize as rows open and close: the
+ * catalog scrolls inside, the toolbar and the save bar stay put. */
+.modalBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: min(64vh, 560px);
+  min-height: 340px;
+}
+
+.catalogBody {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.secondaryButton {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 12px;
+  border: 0.5px solid var(--dsw-alias-border-l3);
+  border-radius: 14px;
+  background: transparent;
+  color: var(--dsw-alias-label-primary);
+  font: inherit;
+  font-size: 12px;
+  line-height: 18px;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .secondaryButton:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover); }
+}
+
+.secondaryButton:disabled { opacity: 0.4; cursor: default; }
+
+.secondaryButton:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--dsw-alias-border-l3);
+}
+
+.modelList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: min(52vh, 420px);
+  overflow-y: auto;
+}
+
+.modelCard {
+  border: 0.5px solid var(--dsw-alias-border-l4);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.modelHead {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.modelId {
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 500;
+  color: var(--dsw-alias-label-primary);
+}
+
+.modelName {
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.modelHint {
+  margin-left: auto;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.compatRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin-top: 6px;
+}
+
+.compatField {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.compatInput {
+  box-sizing: border-box;
+  width: 104px;
+  height: 24px;
+  padding: 0 6px;
+  border: 0.5px solid var(--dsw-alias-border-l4);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 11px;
+  background: var(--dsw-alias-bg-layer-1);
+  color: var(--dsw-alias-label-primary);
+}
+
+/* Quick-load: a three-step picker; its popup is the only floating surface this
+ * plugin draws, so it carries the menu material and the elevation shadow. */
+.quickWrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.panelRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.input,
+.selectInput {
+  box-sizing: border-box;
+  height: 28px;
+  padding: 0 8px;
+  border: 0.5px solid var(--dsw-alias-border-l4);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 12px;
+  line-height: 18px;
+  background: var(--dsw-alias-bg-layer-1);
+  color: var(--dsw-alias-label-primary);
+}
+
+.selectInput { flex: 0 0 104px; min-width: 0; }
+
+.quickList {
+  position: absolute;
+  top: 34px;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  margin-top: 2px;
+  padding: 4px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--dsw-specific-menu);
+  backdrop-filter: var(--dsw-menu-backdrop-filter);
+  --dsw-elevation-stroke-color: var(--dsw-alias-border-l1);
+  box-shadow: var(--dsw-elevation-prominent);
+  max-height: 264px;
+  overflow-y: auto;
+}
+
+.quickItem {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--dsw-alias-label-primary);
+  font: inherit;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: left;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .quickItem:hover { background: var(--dsw-alias-interactive-bg-hover); }
+}
+
+.quickItemId { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.quickItemApi {
+  flex: none;
+  margin-left: auto;
+  color: var(--dsw-alias-label-tertiary);
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.quickEmpty {
+  display: block;
+  padding: 6px 8px;
+  color: var(--dsw-alias-label-tertiary);
+  font-size: 12px;
+  line-height: 18px;
+}
+/* The per-model extension block, restored from the page-era design: capacity,
+ * modalities, the two switch fields, the reasoning-level table, and the rest of
+ * the declared compat keys. */
+.extBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 10px;
+  border: 0.5px solid var(--dsw-alias-border-l4);
+  border-radius: 10px;
+  background: var(--dsw-alias-bg-layer-1);
+}
+
+.extGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.extGroup + .extGroup {
+  padding-top: 10px;
+  border-top: 0.5px solid var(--dsw-alias-border-l4);
+}
+
+.extLabel {
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 500;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.extField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.capacityRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.capacityRow > * {
+  flex: 1 1 140px;
+  min-width: 0;
+}
+
+.extTable {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.extTHead,
+.extTRow {
+  display: grid;
+  grid-template-columns: 52px 84px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+
+.extTHead {
+  padding-bottom: 4px;
+  border-bottom: 0.5px solid var(--dsw-alias-border-l4);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.extTRow {
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.extTRow input[type="text"] {
+  box-sizing: border-box;
+  width: 100%;
+  height: 26px;
+  padding: 0 6px;
+  border: 0.5px solid var(--dsw-alias-border-l4);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 12px;
+  background: var(--dsw-alias-bg-layer-1);
+  color: var(--dsw-alias-label-primary);
+}
+
+.extCheckbox {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+}
+
+.switchRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.extCheck {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.extHint {
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.modelSummary {
+  margin-left: auto;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.modelToggle {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.modalFoot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+  padding-top: 10px;
+  border-top: 0.5px solid var(--dsw-alias-border-l4);
+}
+
+.primaryButton {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 14px;
+  background: var(--dsw-alias-button-primary-fill);
+  color: var(--dsw-alias-label-primary-foreground);
+  font: inherit;
+  font-size: 12px;
+  line-height: 18px;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .primaryButton:hover:not(:disabled) { background: var(--dsw-alias-button-primary-hover); }
+}
+
+.primaryButton:disabled { opacity: 0.4; cursor: default; }
+
+.primaryButton:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--dsw-alias-border-l3);
+}
+
+.dirtyHint {
+  margin-right: auto;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--dsw-alias-state-warn-label);
+}
+/* ===== 实装样式：models-plus/models-plus.module.css ===== */
+/* models-plus styles — the official ModelsSection.module.css classes (as
+ * transcribed and verified in docs/models-settings-demo.html) plus the
+ * extension-block styles, all on --dsw-alias tokens. */
+
+.section { display: flex; flex-direction: column; gap: 12px; max-width: 720px; color: var(--dsw-alias-label-primary); }
+.titleRow { display: flex; align-items: center; gap: 10px; }
+.title { margin: 0; font-size: 16px; line-height: 24px; font-weight: 500; color: var(--dsw-alias-label-primary); }
+.intro { margin: 0; font-size: 14px; line-height: 22px; color: var(--dsw-alias-label-tertiary); }
+.savedNotice { margin: 0; font-size: 12px; line-height: 18px; color: var(--dsw-alias-state-success-primary); }
+.notice { margin: 0; font-size: 12px; line-height: 18px; color: var(--dsw-alias-state-warn-label); }
+.error { margin: 0; font-size: 12px; line-height: 18px; color: var(--dsw-alias-state-error-primary); }
+
+.rows { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.rowCard { border: 0.5px solid var(--dsw-alias-border-l4); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; }
+.rowHead { display: flex; align-items: center; gap: 10px; }
+.rowIdentity { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.rowName { font-size: 14px; line-height: 22px; font-weight: 500; color: var(--dsw-alias-label-primary); }
+.rowTag { flex: none; padding: 1px 6px; border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 4px; font-size: 11px; line-height: 16px; color: var(--dsw-alias-label-secondary); }
+.credentialDot { box-sizing: border-box; display: inline-block; flex: none; width: 8px; height: 8px; border-radius: 50%; }
+.credentialDotConfigured { background: var(--dsw-alias-state-success-primary); }
+.accountStatus { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; line-height: 18px; color: var(--dsw-alias-state-success-primary); }
+.credentialDotMissing { background: var(--dsw-alias-state-error-primary); }
+.rowActions { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; }
+
+.primaryButton, .secondaryButton, .addButton { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; gap: 4px; height: 36px; padding: 0 14px; border: none; border-radius: 18px; font: inherit; font-size: 14px; line-height: 22px; cursor: pointer; }
+.primaryButton { background: var(--dsw-alias-button-primary-fill); color: var(--dsw-alias-label-primary-foreground); }
+.primaryButton:hover:not(:disabled) { background: var(--dsw-alias-button-primary-hover); }
+.secondaryButton, .addButton { border: 0.5px solid var(--dsw-alias-border-l3); background: transparent; color: var(--dsw-alias-label-primary); }
+.secondaryButton:hover:not(:disabled), .addButton:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover); }
+.secondaryButton:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover-solid); }
+.dangerButton { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; height: 36px; padding: 0 14px; border: none; border-radius: 18px; background: transparent; color: var(--dsw-alias-state-error-primary); font: inherit; font-size: 14px; line-height: 22px; cursor: pointer; }
+.dangerButton:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover-danger); }
+.rowActions .secondaryButton, .rowActions .dangerButton { height: 28px; padding: 0 10px; border-radius: 14px; font-size: 12px; line-height: 18px; }
+.primaryButton:disabled, .secondaryButton:disabled, .dangerButton:disabled, .addButton:disabled, .linkButton:disabled, .addModelButton:disabled { opacity: 0.4; cursor: default; }
+.primaryButton:focus-visible, .secondaryButton:focus-visible, .dangerButton:focus-visible, .addButton:focus-visible, .linkButton:focus-visible, .addModelButton:focus-visible, .iconButton:focus-visible, .dragHandle:focus-visible, .customizedSummary:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--dsw-alias-border-l3); }
+
+.editor { border-radius: 12px; background: var(--dsw-alias-bg-module-platform); padding: 14px 16px; display: flex; flex-direction: column; gap: 14px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.fieldLabel { display: inline-flex; align-items: center; gap: 10px; font-size: 12px; line-height: 18px; font-weight: 500; color: var(--dsw-alias-label-secondary); }
+.linkButton { box-sizing: border-box; display: inline-flex; align-items: center; height: 28px; padding: 0 10px; border: none; border-radius: 14px; background: transparent; color: var(--dsw-alias-label-tertiary); font: inherit; font-size: 12px; line-height: 18px; cursor: pointer; }
+.linkButton:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-secondary); }
+.advancedHint { margin: 0; font-size: 12px; line-height: 18px; color: var(--dsw-alias-label-tertiary); }
+/* The credential help bubble: a small text button the official Tooltip anchors. */
+.helpButton { width: 16px; height: 16px; padding: 0; border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 50%; corner-shape: round; background: transparent; color: var(--dsw-alias-label-tertiary); font: inherit; font-size: 11px; line-height: 15px; text-align: center; cursor: help; }
+.helpButton:hover, .helpButton:focus-visible { color: var(--dsw-alias-label-primary); border-color: var(--dsw-alias-label-tertiary); }
+.editorActions { display: flex; justify-content: flex-end; gap: 8px; }
+
+.addBlock { display: flex; flex-direction: column; gap: 12px; }
+.addActions { display: flex; flex-wrap: wrap; gap: 10px; }
+.addButton { flex: 1 1 0; min-width: 180px; gap: 6px; height: 44px; border: 1px dashed var(--dsw-alias-border-l3); border-radius: 16px; }
+.addCard { border-radius: 12px; background: var(--dsw-alias-bg-module-platform); padding: 14px 16px; display: flex; flex-direction: column; gap: 14px; list-style: none; }
+.addCard .editor, .setupCard .editor { background: none; padding: 0; }
+
+
+.tabs { display: flex; flex-direction: column; gap: 12px; }
+.tabBar { display: flex; gap: 4px; border-bottom: 0.5px solid var(--dsw-alias-border-l2); }
+.tabButton { appearance: none; border: none; background: transparent; padding: 6px 12px 8px; font: inherit; font-size: 13px; line-height: 20px; color: var(--dsw-alias-label-tertiary); cursor: pointer; position: relative; }
+.tabButton:hover { color: var(--dsw-alias-label-primary); }
+.tabButton:disabled { opacity: 0.4; cursor: default; }
+.tabButtonActive { color: var(--dsw-alias-label-primary); font-weight: 500; }
+.tabButtonActive::after { content: ''; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 2px; border-radius: 2px; background: var(--dsw-alias-brand-primary); }
+.tabPanel { display: flex; flex-direction: column; gap: 12px; }
+.modelCatalog { display: flex; flex-direction: column; gap: 10px; }
+.modelCatalogHeading { display: flex; flex-direction: column; gap: 2px; }
+.modelCatalogTitle { font-size: 12px; line-height: 18px; font-weight: 500; color: var(--dsw-alias-label-secondary); }
+.modelCatalogMeta, .modelEmpty { margin: 0; color: var(--dsw-alias-label-tertiary); font-size: 12px; line-height: 18px; }
+.modelList { display: flex; flex-direction: column; gap: 8px; }
+.modelListHead { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.modelEntry { border: 0.5px solid var(--dsw-alias-border-l4); border-radius: 10px; padding: 6px; }
+.modelRow { position: relative; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto auto auto; align-items: center; gap: 6px; }
+/* The dragged card dims rather than disappears, so its origin stays readable
+   while the gap it is heading for is the thing being announced. */
+.modelEntryDragging { border: 0.5px solid var(--dsw-alias-border-l4); border-radius: 10px; padding: 6px; opacity: 0.5; }
+.dragHandle { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 28px; border: none; border-radius: 6px; background: transparent; color: var(--dsw-alias-label-tertiary); cursor: grab; touch-action: none; }
+.dragHandle:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
+.dragHandle:active:not(:disabled) { cursor: grabbing; }
+.dragHandle:disabled { cursor: default; opacity: 0.4; }
+/* The gap a release would fill: a 2px brand rule in the same idiom as the
+   active tab underline, drawn inside the row it points at so the list needs
+   no extra markup at its edges. `data-edge` picks which side. */
+.modelDropLine { position: absolute; left: 0; right: 0; height: 2px; border-radius: 2px; background: var(--dsw-alias-brand-primary); pointer-events: none; }
+.modelDropLine[data-edge='before'] { top: -5px; }
+.modelDropLine[data-edge='after'] { bottom: -5px; }
+.iconButton { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: none; border-radius: 6px; background: transparent; color: var(--dsw-alias-label-tertiary); cursor: pointer; }
+.iconButton:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
+.iconButton:disabled { cursor: default; opacity: 0.4; }
+.iconButtonDanger:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover-danger); color: var(--dsw-alias-state-error-primary); }
+.modelAdvanced { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; padding: 8px 4px 2px; }
+/* Capacities share one row: two fields of the same shape, side by side, wrapping
+   to stacked only when the panel is too narrow for both. */
+.capacityRow { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; padding: 0 4px; }
+.modelField { display: flex; flex-direction: column; gap: 4px; }
+.modelFieldLabel { color: var(--dsw-alias-label-tertiary); font-size: 12px; line-height: 18px; }
+.modelEmpty { padding: 12px; border: 1px dashed var(--dsw-alias-border-l3); border-radius: 8px; text-align: center; }
+.addModelButton { box-sizing: border-box; align-self: flex-start; display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 10px; border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 14px; background: transparent; color: var(--dsw-alias-label-primary); font: inherit; font-size: 12px; line-height: 18px; cursor: pointer; }
+.addModelButton:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover); }
+
+.input { box-sizing: border-box; width: 100%; height: 32px; padding: 0 10px; border: 0.5px solid var(--dsw-alias-border-l4); border-radius: 8px; font: inherit; font-size: 14px; line-height: 22px; background: var(--dsw-alias-bg-layer-1); color: var(--dsw-alias-label-primary); }
+select.input { max-width: 240px; cursor: pointer; }
+.input:focus { outline: none; border-color: var(--dsw-alias-brand-primary); }
+.input::placeholder { color: var(--dsw-alias-label-dimmed); }
+.input:disabled { opacity: 0.6; cursor: default; }
+/* Revealable credential field: the input keeps room for the toggle button. */
+.keyInput { position: relative; }
+.keyInputFilled { padding-right: 40px; }
+.keyToggle { position: absolute; inset: 1px 1px 1px auto; display: inline-flex; align-items: center; justify-content: center; width: 32px; padding: 0; border: none; border-radius: var(--dsw-radius-md); background: none; color: var(--dsw-alias-label-secondary); cursor: pointer; }
+.keyToggle:hover:not(:disabled) { color: var(--dsw-alias-label-primary); }
+.keyToggle:focus-visible { outline: var(--dsw-focus-ring-width) solid var(--dsw-focus-ring-color, var(--dsw-alias-state-business-primary)); outline-offset: -2px; }
+.keyToggle:disabled { opacity: 0.6; cursor: default; }
+.selectInput { appearance: none; padding-right: 32px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%2381858C' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 12px 12px; }
+
+.deleteDialog { width: min(480px, 100%); }
+.deleteConfirm:not(:disabled) { border-color: var(--dsw-alias-state-error-primary); color: var(--dsw-alias-state-error-primary); }
+.deleteConfirm:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover-danger); }
+
+.fetchDialog { max-width: 520px; }
+.candidateToolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.candidateSearch { min-width: 0; flex: 1 1 240px; }
+.candidateList { display: flex; flex-direction: column; gap: 2px; max-height: 320px; margin: 0; overflow-y: auto; padding: 0; list-style: none; }
+.candidate { border-radius: 6px; }
+.candidateLabel { display: flex; align-items: center; gap: 8px; padding: 6px 8px; cursor: pointer; }
+.candidateId { flex: 1 1 auto; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; overflow-wrap: anywhere; }
+.candidateEmpty { margin: 24px 0; color: var(--dsw-alias-label-secondary); font-size: 13px; line-height: 20px; text-align: center; }
+
+/* ---- extension block (plugin-owned; official token palette) ---- */
+[hidden] { display: none !important; }
+.extBlock { border: 0.5px solid var(--dsw-alias-border-l3); border-radius: 10px; padding: 10px; margin: 8px 4px 2px; background: var(--dsw-alias-bg-layer-1); display: flex; flex-direction: column; gap: 10px; }
+.extGroup { border-top: 0.5px solid var(--dsw-alias-border-l2); padding-top: 12px; }
+.extGroupFirst { border-top: none; padding-top: 0; }
+.extCheck { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; }
+.extCheckLabel { font-size: 14px; line-height: 22px; color: var(--dsw-alias-label-primary); }
+.extHint { font-size: 12px; line-height: 18px; color: var(--dsw-alias-label-tertiary); }
+.extGated { display: flex; flex-direction: column; gap: 12px; padding-left: 2px; }
+.extField { display: flex; flex-direction: column; gap: 6px; }
+.extLabel { font-size: 12px; line-height: 18px; color: var(--dsw-alias-label-tertiary); }
+.extTable { border: 0.5px solid var(--dsw-alias-border-l4); border-radius: 8px; overflow: hidden; }
+.extTHead { display: grid; grid-template-columns: 64px minmax(0,1fr) minmax(0,1.2fr); font-size: 12px; line-height: 18px; color: var(--dsw-alias-label-tertiary); background: var(--dsw-alias-bg-module-platform); }
+.extTHead > div { padding: 6px 10px; }
+.extTHead > div + div { border-left: 0.5px solid var(--dsw-alias-border-l2); }
+.extTRow { display: grid; grid-template-columns: 64px minmax(0,1fr) minmax(0,1.2fr); align-items: center; border-top: 0.5px solid var(--dsw-alias-border-l2); }
+.extTRow > div { padding: 6px 10px; font-size: 14px; }
+.extTRow > div + div { border-left: 0.5px solid var(--dsw-alias-border-l2); }
+.extTRow input[type="text"] { box-sizing: border-box; width: 100%; height: 32px; padding: 0 10px; border: 0.5px solid var(--dsw-alias-border-l4); border-radius: 8px; font: inherit; font-size: 14px; background: var(--dsw-alias-bg-layer-1); color: var(--dsw-alias-label-primary); }
+.extTRow input[type="text"]:disabled { opacity: 0.6; cursor: default; }
+.extCheckbox { accent-color: var(--dsw-alias-brand-primary); width: 15px; height: 15px; flex: none; }
+.switchRow { display: flex; align-items: center; gap: 8px; font-size: 14px; line-height: 22px; cursor: pointer; }
+.extTag { flex: none; padding: 1px 6px; border: 0.5px solid rgba(65,118,230,0.35); border-radius: 4px; background: var(--dsw-static-deepseek-100); color: var(--dsw-static-deepseek-600); font-size: 11px; line-height: 16px; font-weight: 500; }
+
+/* ---- modal (matches the ui-primitives look closely enough for these two dialogs) ---- */
+.modalMask { position: fixed; inset: 0; background: var(--dsw-alias-bg-mask-1); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 24px; }
+.modal { background: var(--dsw-specific-menu); border-radius: 16px; padding: 20px; width: 100%; box-shadow: 0 12px 40px rgba(0,0,0,0.18); }
+.modalTitle { font-size: 16px; line-height: 24px; font-weight: 500; margin-bottom: 8px; color: var(--dsw-alias-label-primary); }
+.modalDesc { font-size: 14px; line-height: 22px; color: var(--dsw-alias-label-secondary); margin-bottom: 16px; }
+.modalFoot { display: flex; justify-content: flex-end; gap: 8px; }
+
+/* ---- quick-load dropdown (filtered and capped, plugin-rendered for both the
+   provider and the model list — never a native datalist, whose popup position
+   and styling the page cannot control) ---- */
+.quickWrap { position: relative; display: flex; flex-direction: column; gap: 6px; }
+/* The candidate panel is an elevated surface over page content, so it takes the
+   theme's own menu material plus the same filter the host pairs with it
+   (docs/web-styling.md @ 0.1.7-rc.2: `--dsw-specific-menu` is a 58%-opaque fill
+   and only reads as a surface when it blurs what is behind it). The hairline is
+   the elevation shadow's first layer, not a border: the theme spec rejects a
+   `--dsw-alias-border-*` border paired with an elevation shadow. */
+.quickList { position: absolute; top: 100%; left: 0; right: 0; z-index: 20; margin-top: 2px; padding: 4px; border: 0; border-radius: 8px; background: var(--dsw-specific-menu); backdrop-filter: var(--dsw-menu-backdrop-filter); --dsw-elevation-stroke-color: var(--dsw-alias-border-l1); box-shadow: var(--dsw-elevation-prominent); max-height: 264px; overflow-y: auto; }
+.quickItem { display: flex; flex-direction: column; gap: 1px; width: 100%; padding: 6px 8px; border: none; border-radius: 6px; background: transparent; color: var(--dsw-alias-label-primary); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; text-align: left; cursor: pointer; }
+.quickItemId { overflow-wrap: anywhere; }
+.quickItemApi { font-size: 11px; line-height: 14px; color: var(--dsw-alias-label-tertiary); letter-spacing: 0.2px; }
+.quickItem:hover { background: var(--dsw-alias-interactive-bg-hover); }
+.quickEmpty { padding: 6px 8px; font-size: 12px; line-height: 18px; color: var(--dsw-alias-label-tertiary); }
+
+@media (prefers-reduced-motion: reduce) {
+  .customizedSummary::before { transition: none; }
+}
+
+[hidden] { display: none !important; }
 </style>
 </head>
-<body data-page-node-id="xPFUvutkQ8fjJqWUWFbB3v">
-
-<button class="themeBtn" id="themeBtn" data-page-node-id="GWHDFdkMfi02t5ta6Kaoyk">切换深色</button>
-
-<div class="page" data-page-node-id="v6QajjmZR82vsWc6FlY0DJ">
-  <!-- Demo 说明（不属于界面本体，仅为评审标注归属；默认收起，点开再看） -->
-  <details class="demoNote" data-page-node-id="jTYhwSEhvC8XyVfjPC1kWg">
-    <summary>可交互 Demo —— 使用说明（点击展开 / 收起）</summary>
-    界面为插件自写（样式 token 与类名沿用官方设计）；保存管线 vendor 自官方 <code data-page-node-id="QKGybnQtgsdT6B8jJ1JFxJ">ui-settings-models</code>（store / operations / schema-operations）。<br data-page-node-id="35G8y7JADFZDvXvjDSoTvo"/>
-    「供应商」页（Tabs）：显示名称（<b>所有 pi-ai 路由，内置路由也可配</b>——route key 不能改，displayName 是内置路由唯一的改名手段）· API 密钥 · API 地址 · API 协议（仅手声明路由）。　
-    「模型」页：模型目录，条目展开区为一块扩展面板（快速装入 / 容量 / 输入模态 / developer 角色 / 推理开关+挡位 / 其他兼容开关），无标题。<br data-page-node-id="voZTgt0o7R2yfH9a8LcxJ1"/>
-    两级展开：点「编辑」展开编辑卡 → 编辑卡内是 <b>Tabs 标签页</b>（供应商 / 模型，默认停在「供应商」，切页不丢状态）→ 在「模型」页再点条目的「容量」箭头展开扩展区。<br/>
-    标题行：「模型+」+ 「下载/更新元数据」按钮——只服务 <b>models.dev</b> 源（下载并缓存到 DSH home）；<b>llm-pi-ai</b> 源运行时直读宿主已装目录，无需下载。官方「模型」页已通过 bundle patch 禁用，本页为唯一模型设置页。<br/>
-    「快速装入」＝三级收窄选择器 <b>[数据源 ▼][提供方 ▼][model id]</b>：数据源 llm-pi-ai（默认）/ models.dev；同一模型 id 横跨多个提供方（如 glm-5.3-flash 同时在 zai / baseten / together…），先选提供方再搜 id。提供方与 model id 的候选均为<b>插件自绘浮层</b>（datalist 的弹层位置与样式页面控制不了，已弃用）；上限 50 条，超出提示「另有 N 项匹配」。选完提供方自动聚焦 model id 框；选中后输入框保留该 id（同族模型的继续搜索起点）。<br/>
-    预填语义：容量 / 模态 / 挡位 / compat <b>整份替换</b>（切换数据源后重选＝干净重写，不残留另一源的字段）；<b>模型 ID 与显示名称只填空行、绝不覆盖已填值</b>（目录 id 是官方端点的请求 id，走网关时上线字符串常常不同）。pi-ai 源：thinkingLevelMap → reasoningEfforts 按映射转换（<code>null</code> 两侧语义相反：目录里 null=不支持，行里 null=支持但不发送），compat 只写被 offer 的键，其余开关进「其他兼容开关」（清空即移除、回到目录默认）；models.dev 源：清空推理挡位与 compat，只留 supportsReasoningEffort。<br/>
-    推理区显隐：总开关 <b>或</b> 已声明挡位 <b>或</b> 已设思考格式，任一为真即显示——pi-ai 预填常常不写开关（交由适配器按 baseURL 检测），但挡位照样可编辑；此时开关下有灰字提示。取消「端点接受推理挡位参数」→ 挡位与思考格式<b>一并清除</b>且整块隐藏（不留孤儿参数）。「允许以 developer 角色发送系统提示」与「输入模态」不受它控制。<br/>
-    新模型行默认值（v1.0.0）：推理挡位开启且七档全声明、思考格式 openai、输入模态全选、developer 角色继承勾选。「获取可用模型」拉候选 → 「删除」走确认弹窗。<br/>
-    本 Demo 内置示例数据代替真实目录（pi-ai：6 个提供方，含 glm-5.3-flash 的多提供方重名、off:"none" 拼写、无 levelMap、anthropic 协议兜底；models.dev：4 条）。
-  </details>
-
-  <!-- ==================== 界面本体 ==================== -->
-  <div class="section" id="section" data-page-node-id="UCpijZYf0A8uOjRt8DTCUC">
-    <div class="titleRow">
-      <h2 class="title" data-page-node-id="g6O9OuUIZrCH7P8uVzoJ2o">模型+</h2>
-      <span class="rowActions">
-        <button class="linkButton" data-act="download-meta" title="下载/更新 models.dev 元数据（供快速装入预填）">下载/更新元数据</button>
-      </span>
-    </div>
-    <p class="savedNotice" id="metaMessage" hidden style="margin:0"></p>
-    <p class="intro" data-page-node-id="65pLmVSBtoZXn30lG4F3C4">填入各提供方的 API 密钥即可使用其模型。</p>
-    <p class="savedNotice" id="savedNotice" hidden data-page-node-id="qeTGqCU8GYR3Xu2kzZokHy"></p>
-    <ul class="rows" id="rows" data-page-node-id="wakCEJstxtFupCqkfwEYkT"></ul>
-    <div class="addBlock" id="addBlock" data-page-node-id="904sm50ZUzRBTyYRPnsd7c"></div>
-  </div>
+<body>
+<button class="themeBtn" id="themeBtn">切换深色</button>
+<div class="page"><div class="section">
+<div class="titleRow"><h2 class="title">模型</h2></div>
+<p class="intro">填入各提供方的 API 密钥即可使用其模型。</p>
+<ul class="rows">
+<li class="rowCard"><div class="rowHead"><span class="rowIdentity"><span class="rowName">DeepSeek 账号</span><span class="rowTag">账号</span></span><span class="rowActions"><span class="accountStatus">已登录</span></span></div>
+<div style="font-size:12px;line-height:18px;color:var(--dsw-alias-label-tertiary)">deepseek-v4.1-flash &middot; deepseek-v4.1-flash-thinking</div></li>
+<li class="rowCard"><div class="rowHead"><span class="rowIdentity"><span class="rowName">my-gateway</span><span class="rowTag">自定义</span></span>
+<span class="rowActions"><button type="button" class="secondaryButton" style="height:28px;padding:0 10px;font-size:12px">编辑</button>
+<button type="button" class="dangerButton" style="height:28px;padding:0 10px;font-size:12px">删除</button></span></div>
+<div class="extrasRow"><button type="button" class="extrasLink" id="openExtras">Models+<span class="extrasCaret">&#9662;</span></button></div>
+<div style="font-size:12px;line-height:18px;color:var(--dsw-alias-label-tertiary)">deepseek-v4.1-flash &middot; deepseek-v4.1-flash-thinking &middot; glm-5.3-flash</div></li>
+</ul>
+<div class="addBlock"><button type="button" class="addButton" style="height:44px;flex:1 1 0;min-width:180px;border-style:dashed;border-radius:16px">+ 添加提供方</button></div>
+</div></div>
+<div class="root" id="mplus" role="presentation" hidden>
+<div class="mask" id="closeMask"></div>
+<div class="dialog modelsModal" role="dialog" aria-label="my-gateway · 模型扩展">
+<div class="content modelsModalContent">
+<div class="header"><h2 class="title">my-gateway &middot; 模型扩展</h2><button type="button" class="close" id="closeBtn" aria-label="关闭">&times;</button></div>
+<div class="body"><div class="modalBody">
+<button type="button" class="headerAction">更新 models.dev 元数据</button>
+<div class="catalogBody">
+<section class="modelCatalog" aria-label="模型目录">
+<div class="modelListHead"><div class="modelCatalogHeading"><span class="modelCatalogTitle">模型目录</span><span class="modelCatalogMeta">已自定义模型目录</span></div>
+<div style="display:flex;align-items:center;gap:4px"><button type="button" class="linkButton">恢复默认模型</button><button type="button" class="linkButton">获取可用模型</button></div></div>
+<div class="modelList">
+<div class="modelEntry"><div class="modelRow">
+<input class="input" value="deepseek-v4.1-flash" placeholder="模型 ID" aria-label="模型 ID">
+<input class="input" value="deepseek-v4.1-flash" placeholder="显示名称" aria-label="显示名称">
+<button type="button" class="iconButton" aria-label="容量" title="容量"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" style="transform:rotate(90deg)"><path d="M6 3.5L10.5 8L6 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+<button type="button" class="iconButton iconButtonDanger" aria-label="删除模型" title="删除模型"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 4h11M6.5 4V2.5h3V4M4 4l.7 9a1 1 0 001 .9h4.6a1 1 0 001-.9L12 4M6.5 6.8v4.4M9.5 6.8v4.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+<button type="button" class="dragHandle" aria-label="拖动以调整模型顺序" title="拖动以调整顺序（也可用 Alt + ↑/↓）"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5.5 4h.01M5.5 8h.01M5.5 12h.01M10.5 4h.01M10.5 8h.01M10.5 12h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
 </div>
-
+<div class="extBlock">
+<div class="extGroup extGroupFirst"><div class="quickWrap"><span class="extLabel">快速装入</span>
+<div style="display:flex;gap:6px;align-items:center"><select class="input selectInput" aria-label="数据源"><option>llm-pi-ai</option><option>models.dev</option></select>
+<input class="input" style="flex:0 0 132px;min-width:0" value="deepseek" placeholder="提供方：全部" aria-label="提供方">
+<input class="input" style="flex:1 1 auto;min-width:0" value="deepseek-v4.1-flash" placeholder="model id（如 glm）…" aria-label="model id">
+</div></div></div>
+<div class="extGroup"><div class="capacityRow">
+<label class="extField"><span class="extLabel">上下文窗口</span><input class="input" value="128000" placeholder="使用提供方默认值"></label>
+<label class="extField"><span class="extLabel">最大输出 token</span><input class="input" value="8192" placeholder="使用提供方默认值"></label>
+</div></div>
+<div class="extGroup"><span class="extLabel">输入模态</span><div style="display:flex;gap:18px">
+<label class="switchRow"><input type="checkbox" class="extCheckbox" checked>文本</label>
+<label class="switchRow"><input type="checkbox" class="extCheckbox" checked>图像</label></div></div>
+<div class="extGroup"><label class="extCheck"><input type="checkbox" class="extCheckbox" style="margin-top:3px">
+<span style="display:flex;flex-direction:column;gap:2px"><span class="extCheckLabel">允许以 developer 角色发送系统提示</span>
+<span class="extHint">推理模型的系统提示将以 developer 角色发出；网关拒绝该角色时取消勾选，改用 system。</span></span></label></div>
+<div class="extGroup"><label class="switchRow"><input type="checkbox" class="extCheckbox" checked>端点接受推理挡位参数（reasoning_effort）</label></div>
+<div class="extGated"><div class="extField"><span class="extLabel">思考格式</span>
+<select class="input selectInput"><option>openai</option><option>deepseek</option></select></div>
+<div class="extField"><span class="extLabel">推理挡位</span><div class="extTable">
+<div class="extTHead"><div>声明</div><div>挡位</div><div>线上取值</div></div>
+<div class="extTRow"><div style="display:flex;justify-content:center"><input type="checkbox" class="extCheckbox" checked></div><div>off</div><div><span style="font-size:12px;color:var(--dsw-alias-label-tertiary)">&mdash;</span></div></div>
+<div class="extTRow"><div style="display:flex;justify-content:center"><input type="checkbox" class="extCheckbox" checked></div><div>minimal</div><div><input type="text" value="minimal"></div></div>
+<div class="extTRow"><div style="display:flex;justify-content:center"><input type="checkbox" class="extCheckbox" checked></div><div>low</div><div><input type="text" value="low"></div></div>
+<div class="extTRow"><div style="display:flex;justify-content:center"><input type="checkbox" class="extCheckbox" checked></div><div>medium</div><div><input type="text" value="medium"></div></div>
+<div class="extTRow"><div style="display:flex;justify-content:center"><input type="checkbox" class="extCheckbox" checked></div><div>high</div><div><input type="text" value="high"></div></div>
+<div class="extTRow"><div style="display:flex;justify-content:center"><input type="checkbox" class="extCheckbox" checked></div><div>xhigh</div><div><input type="text" value="xhigh"></div></div>
+<div class="extTRow"><div style="display:flex;justify-content:center"><input type="checkbox" class="extCheckbox" checked></div><div>max</div><div><input type="text" value="max"></div></div>
+</div></div></div>
+<div class="extGroup"><span class="extLabel">其他兼容开关</span>
+<div style="display:flex;flex-direction:column;gap:6px">
+<label><span class="extHint">maxTokensField</span><input class="input" value="max_tokens" aria-label="maxTokensField"></label>
+<label><span class="extHint">supportsLongCacheRetention</span><input class="input" value="true" aria-label="supportsLongCacheRetention"></label>
+</div><p class="extHint">这些开关由 pi-ai 目录预填；清空输入框即移除该开关，回到目录默认。</p></div>
+</div>
+</div>
+<div class="modelEntry"><div class="modelRow">
+<input class="input" value="deepseek-v4.1-flash-thinking" placeholder="模型 ID" aria-label="模型 ID">
+<input class="input" value="deepseek-v4.1-flash-thinking" placeholder="显示名称" aria-label="显示名称">
+<button type="button" class="iconButton" aria-label="容量" title="容量"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" style="transform:rotate(90deg)"><path d="M6 3.5L10.5 8L6 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+<button type="button" class="iconButton iconButtonDanger" aria-label="删除模型" title="删除模型"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 4h11M6.5 4V2.5h3V4M4 4l.7 9a1 1 0 001 .9h4.6a1 1 0 001-.9L12 4M6.5 6.8v4.4M9.5 6.8v4.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+<button type="button" class="dragHandle" aria-label="拖动以调整模型顺序" title="拖动以调整顺序（也可用 Alt + ↑/↓）"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5.5 4h.01M5.5 8h.01M5.5 12h.01M10.5 4h.01M10.5 8h.01M10.5 12h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+</div>
+</div>
+<div class="modelEntry"><div class="modelRow">
+<input class="input" value="glm-5.3-flash" placeholder="模型 ID" aria-label="模型 ID">
+<input class="input" value="glm-5.3-flash" placeholder="显示名称" aria-label="显示名称">
+<button type="button" class="iconButton" aria-label="容量" title="容量"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" style="transform:rotate(90deg)"><path d="M6 3.5L10.5 8L6 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+<button type="button" class="iconButton iconButtonDanger" aria-label="删除模型" title="删除模型"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 4h11M6.5 4V2.5h3V4M4 4l.7 9a1 1 0 001 .9h4.6a1 1 0 001-.9L12 4M6.5 6.8v4.4M9.5 6.8v4.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+<button type="button" class="dragHandle" aria-label="拖动以调整模型顺序" title="拖动以调整顺序（也可用 Alt + ↑/↓）"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5.5 4h.01M5.5 8h.01M5.5 12h.01M10.5 4h.01M10.5 8h.01M10.5 12h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+</div>
+</div>
+</div>
+<button type="button" class="addModelButton">+ 添加模型</button>
+</section>
+</div>
+<div class="modalFoot"><span class="dirtyHint">有未保存的改动</span><button type="button" class="primaryButton">保存</button></div>
+</div></div>
+</div></div>
+</div></div>
 <script>
-/* ============ 中文文案：抄自官方 locales.ts 的 zh 字典 ============ */
-const T = {
-  title:'模型', intro:'填入各提供方的 API 密钥即可使用其模型。',
-  edit:'编辑', editProvider:'编辑 {provider}', remove:'删除', removeProvider:'删除 {provider}',
-  deleteTitle:'删除 {provider}？',
-  deleteDescription:'删除 {provider} 会移除其配置；其使用的凭证（如有）由其他位置管理，将会保留。',
-  deleteDescriptionWithCredential:'删除 {provider} 会移除其配置和存储的 API 密钥。',
-  deleteConfirm:'删除 {provider}',
-  add:'添加提供方', provider:'提供方', cancel:'取消', apply:'保存', savedProvider:'已保存 {provider}。',
-  credentialConfigured:'API 密钥已配置', credentialMissing:'API 密钥缺失',
-  keyInput:'API 密钥', keyPlaceholder:'输入 API 密钥',
-  keyPlaceholderNative:'输入 API 密钥，或留空使用环境认证',
-  keyStored:'已配置——输入新值可替换',
-  customized:'自定义设置', baseUrl:'API 地址', baseUrlDefault:'提供方默认',
-  models:'模型目录', modelsInherited:'正在使用适配器默认模型', modelsCustomized:'已自定义模型目录',
-  resetModels:'恢复默认模型', modelId:'模型 ID', modelName:'显示名称',
-  modelAdvanced:'容量', addModel:'添加模型', removeModel:'删除模型',
-  modelContextWindow:'上下文窗口', modelMaxTokens:'最大输出 token',
-  contextWindowPlaceholder:'使用提供方默认值', maxTokensPlaceholder:'使用提供方默认值',
-  modelsEmpty:'模型选择器中将不显示任何模型；目录外 ID 仍可直接发送。',
-  fetchModels:'获取可用模型', fetchTitle:'选择要添加的模型',
-  fetchDescription:'以下是模型提供方的可用模型，勾选要添加的模型。',
-  fetchSearch:'搜索模型', fetchNoMatches:'没有匹配的模型。',
-  fetchSelectAll:'全选', fetchDeselectAll:'取消全选', fetchAdopt:'添加所选',
-  customAdd:'添加自定义提供方', customTitle:'自定义提供方', customTag:'自定义',
-  customRoute:'Provider ID',
-  customRouteHint:'以小写字母开头的标识，在请求中唯一标识该提供方，并用于派生凭据名。',
-  customDisplayName:'显示名称', customApi:'API 协议',
-  customBaseUrlPlaceholder:'https://gateway.example/v1',
-  create:'创建提供方',
-  /* 本 demo 新增的分区标题：官方只有单个「自定义设置」折叠区，
-     此处拆为「供应商 / 模型」两块，各自收拢对应字段。 */
-  sectionProvider:'供应商', sectionModel:'模型',
-};
-
-/* ============ 图标：抄自 ModelListEditor.tsx ============ */
-const CHEVRON = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" style="transition:transform 120ms ease"><path d="M6 3.5L10.5 8L6 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const TRASH = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 4h11M6.5 4V2.5h3V4M4 4l.7 9a1 1 0 001 .9h4.6a1 1 0 001-.9L12 4M6.5 6.8v4.4M9.5 6.8v4.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const PLUS = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
-
-/* ============ 状态 ============ */
-/* 推理挡位 / 思考格式 / 输入模态：抄自 src/client/extension-meta.ts，
-   与 llm-pi-ai 的枚举逐项对齐（挡位 7 档、格式 11 项）。 */
-const LEVELS = [
-  { key:'off', zh:'关闭' }, { key:'minimal', zh:'极小' }, { key:'low', zh:'低' },
-  { key:'medium', zh:'中' }, { key:'high', zh:'高' }, { key:'xhigh', zh:'超高' }, { key:'max', zh:'最大' },
-];
-const FORMATS = ['openai','deepseek','openrouter','together','baseten','zai','qwen',
-  'chat-template','qwen-chat-template','string-thinking','ant-ling'];
-const MODALITIES = [{ key:'text', zh:'文本' }, { key:'image', zh:'图像' }];
-
-/* 模型扩展字段草稿，结构与 ModelEntryPanel.tsx 读写的 draft 一致：
-   - compat.supportsDeveloperRole   三态：未写/true 皆勾选，仅显式 false 不勾
-   - compat.supportsReasoningEffort 严格 ===true 才算开；未写 = 交由适配器按 baseURL 检测
-   - levels            = reasoningEfforts，{ [level]: wire|null }，只含已声明的档位（off 值为 null）
-   - compat.thinkingFormat   空缺 = 未设置
-   - input             = input 模态数组，与推理挡位互不隶属 */
-const extDefault = () => ({
-  // v1.0.0 默认值：推理挡位开启且七档全声明、思考格式 openai、
-  // 输入模态全选；supportsDeveloperRole 三态继承（勾选态不写键）。
-  compat: { supportsReasoningEffort: true, thinkingFormat: 'openai' },
-  levels: { off:null, minimal:'minimal', low:'low', medium:'medium', high:'high', xhigh:'xhigh', max:'max' },
-  input: ['text', 'image'],
-});
-
-/* ============ 快速装入的示例数据 ============
-   真实实现运行时直读宿主已装的 pi-ai 目录（providers/all 投影）与 models.dev 缓存；
-   这里内置一份小样例，字段与真实投影一致。 */
-const PI_AI = {
-  version: '0.85.1（示例）', generatedAt: '2026-09-05', warnings: [],
-  providers: {
-    zai: {
-      'glm-5.3-flash': { name:'GLM-5.3 Flash', api:'openai-completions', contextWindow:204800, maxTokens:131072,
-        input:['text','image'], reasoning:true,
-        thinkingLevelMap:{ off:null, low:'low', medium:'medium', high:'high' },
-        compat:{ supportsDeveloperRole:false, thinkingFormat:'zai' } },
-      'glm-5.3': { name:'GLM-5.3', api:'openai-completions', contextWindow:204800, maxTokens:131072,
-        input:['text'], reasoning:true,
-        thinkingLevelMap:{ off:null, minimal:'minimal', low:'low', medium:'medium', high:'high' },
-        compat:{ supportsDeveloperRole:false, thinkingFormat:'zai' } },
-    },
-    baseten: {
-      'zai-org/GLM-5.3-Flash': { name:'GLM-5.3 Flash (baseten)', api:'openai-completions', contextWindow:204800, maxTokens:131072,
-        input:['text','image'], reasoning:true,
-        thinkingLevelMap:{ off:'none', low:'low', medium:'medium', high:'high' },
-        compat:{ supportsStore:false, maxTokensField:'max_tokens', thinkingFormat:'baseten',
-                 chatTemplateArgs:{ effort:{ $var:'thinking.effort' } } } },
-    },
-    deepseek: {
-      'deepseek-chat': { name:'DeepSeek Chat', api:'openai-completions', contextWindow:131072, maxTokens:8192,
-        input:['text'], reasoning:false,
-        compat:{ supportsStore:false, maxTokensField:'max_tokens' } },
-      'deepseek-reasoner': { name:'DeepSeek Reasoner', api:'openai-completions', contextWindow:131072, maxTokens:65536,
-        input:['text'], reasoning:true,
-        thinkingLevelMap:{ minimal:null, low:'low', medium:null, high:'high', max:'max' },
-        compat:{ supportsStore:false, supportsDeveloperRole:false, maxTokensField:'max_tokens',
-                 requiresReasoningContentOnAssistantMessages:true, thinkingFormat:'deepseek' } },
-    },
-    xiaomi: {
-      'mimo-v2.5-pro': { name:'MiMo v2.5 Pro', api:'openai-completions', contextWindow:1048576, maxTokens:131072,
-        input:['text','image'], reasoning:true,
-        compat:{ requiresReasoningContentOnAssistantMessages:true, thinkingFormat:'deepseek' } },
-    },
-    together: {
-      'glm-5.3-flash': { name:'GLM-5.3 Flash (together)', api:'openai-completions', contextWindow:204800, maxTokens:131072,
-        input:['text','image'], reasoning:true,
-        thinkingLevelMap:{ off:'none', low:'low', medium:'medium', high:'high' },
-        compat:{ supportsDeveloperRole:false, thinkingFormat:'openrouter' } },
-    },
-    anthropic: {
-      'claude-sonnet-4': { name:'Claude Sonnet 4', api:'anthropic-messages', contextWindow:204800, maxTokens:64000,
-        input:['text','image'], reasoning:true,
-        thinkingLevelMap:{ low:'low', medium:'medium', high:'high' },
-        compat:{ forceAdaptiveThinking:true, supportsTemperature:false } },
-    },
-  },
-};
-const MODELS_DEV = {
-  'zhipuai/glm-5.3-flash': { context:204800, output:131072, input:['text','image'], reasoning:true },
-  'xiaomi/mimo-v2.5-pro':  { context:1048576, output:131072, input:['text','image','audio','video'], reasoning:true },
-  'deepseek/deepseek-chat':{ context:131072, output:8192, input:['text'], reasoning:false },
-  'openai/gpt-4o':         { context:128000, output:16384, input:['text','image'], reasoning:false },
-};
-
-/* 被适配器 offer 的 compat 键（抄自 extension-meta.ts；示例只列两个协议，
-   真实实现覆盖 6 个）。宿主对协议不认的字段是「拒绝」而非忽略，预填必须过滤。 */
-const OFFERED_COMPAT = {
-  'openai-completions': [ 'supportsStore','supportsDeveloperRole','supportsReasoningEffort','supportsUsageInStreaming',
-    'supportsFinishReason','maxTokensField','requiresToolResultName','requiresAssistantAfterToolResult',
-    'requiresThinkingAsText','requiresReasoningContentOnAssistantMessages','thinkingFormat','chatTemplateKwargs',
-    'chatTemplateArgs','supportsThinkingTokenBudget','thinkingTokenBudgetField','vllmPriority','supportsStrictMode',
-    'cacheControlFormat','supportsLongCacheRetention' ],
-  'anthropic-messages': [ 'supportsEagerToolInputStreaming','supportsLongCacheRetention','supportsCacheControlOnTools',
-    'supportsTemperature','forceAdaptiveThinking','allowEmptySignature','supportsStrictTools' ],
-};
-
-const LEVEL_KEYS = ['off','minimal','low','medium','high','xhigh','max'];
-
-/* thinkingLevelMap → reasoningEfforts：null 两侧语义相反，必须映射而非照抄。
-   anthropic/bedrock 的 minimal 兑底是 low，mistral 一律 high，其余为档位名。 */
-function defaultWireSpelling(api, level) {
-  if (api === 'anthropic-messages' || api === 'bedrock-converse-stream') return level === 'minimal' ? 'low' : level;
-  if (api === 'mistral-conversations') return 'high';
-  return level;
-}
-function reasoningEffortsFrom(map, api, reasoning) {
-  if (!reasoning) return false;
-  const src = map || {}; const efforts = {};
-  for (const level of LEVEL_KEYS) {
-    if (!(level in src)) {
-      if (level === 'off') { efforts[level] = null; continue; }          // 缺席 off = 支持但不发送
-      if (level === 'xhigh' || level === 'max') continue;                // 缺席 = 不支持
-      efforts[level] = defaultWireSpelling(api, level);
-      continue;
-    }
-    if (src[level] === null) continue;                                   // 显式 null = 不支持
-    efforts[level] = src[level];
-  }
-  return Object.keys(efforts).some(k => k !== 'off') ? efforts : false;  // 只剩 off 的 dict 会被适配器拒绝
-}
-function compatFrom(entry) {
-  const offered = OFFERED_COMPAT[entry.api] || [];
-  const compat = entry.compat || {};
-  return Object.fromEntries(offered.filter(k => k in compat).map(k => [k, compat[k]]));
-}
-function fmtCap(n) {
-  if (n % 1048576 === 0) return (n / 1048576) + 'M';
-  if (n % 1024 === 0) return (n / 1024) + 'K';
-  return String(n);
-}
-function providersOf(source) {
-  if (source === 'pi-ai') return Object.keys(PI_AI.providers);
-  return [...new Set(Object.keys(MODELS_DEV).map(id => id.split('/')[0]))];
-}
-function searchPrefill(source, provider, text) {
-  const entries = source === 'pi-ai' ? PI_ENTRIES : MD_ENTRIES;
-  const needle = text.trim().toLowerCase();
-  const hits = entries.filter(en =>
-    (provider.length === 0 || en.provider === provider) &&
-    (needle.length === 0 || en.id.toLowerCase().includes(needle)));
-  return { hits: hits.slice(0, QUICK_LIMIT), total: hits.length };
-}
-function sourceSummary(source) {
-  if (source === 'pi-ai') {
-    return `pi-ai 目录 v${PI_AI.version}，${PI_ENTRIES.length} 个模型 · ${PI_AI.generatedAt}；选择提供方或输入 model id`;
-  }
-  return `models.dev，${MD_ENTRIES.length} 条；选择提供方或输入 model id`;
-}
-const PI_ENTRIES = Object.entries(PI_AI.providers).flatMap(([provider, models]) =>
-  Object.entries(models).map(([id, raw]) => ({
-    source:'pi-ai', provider, id,
-    name: raw.name, api: raw.api,
-    context: raw.contextWindow, output: raw.maxTokens,
-    input: raw.input || [], reasoning: raw.reasoning === true,
-    thinkingLevelMap: raw.thinkingLevelMap, compat: raw.compat,
-  })));
-const MD_ENTRIES = Object.entries(MODELS_DEV).map(([id, raw]) => ({
-  source:'models.dev', provider: id.split('/')[0], id,
-  context: raw.context, output: raw.output, input: raw.input || [], reasoning: raw.reasoning === true,
-}));
-// 候选项用位置索引用于点选回查：key 里的 \u0000 分隔符经 innerHTML 往返可能被
-// HTML 解析器替换成 U+FFFD，字符串匹配会静默失配。
-PI_ENTRIES.forEach((en, i) => { en.idx = i; });
-MD_ENTRIES.forEach((en, i) => { en.idx = i; });
-
-/* 预填语义（对齐 applyMetadata）：容量/模态/挡位/compat 整份替换；
-   id 与显示名称只填空行——目录 id 是官方端点的请求 id，走网关时常常不同。 */
-function applyPrefill(m, entry) {
-  m.context = entry.context === undefined ? '' : fmtCap(entry.context);
-  m.max = entry.output === undefined ? '' : fmtCap(entry.output);
-  const mods = entry.input.filter(x => x === 'text' || x === 'image');
-  m.ext.input = mods.length > 0 ? mods.slice() : [];
-  if (entry.source === 'pi-ai') {
-    if (String(m.id || '').trim().length === 0) m.id = entry.id;
-    if (String(m.name || '').trim().length === 0 && entry.name) m.name = entry.name;
-    const efforts = reasoningEffortsFrom(entry.thinkingLevelMap, entry.api, entry.reasoning);
-    m.ext.levels = efforts === false ? {} : efforts;
-    m.ext.compat = compatFrom(entry);
-  } else {
-    m.ext.levels = {};
-    m.ext.compat = entry.reasoning ? { supportsReasoningEffort: true } : {};
-  }
-}
-
-/** 按最新草稿重绘某条目的扩展块（保留展开状态）。 */
-function repaintExtBlock(entry) {
-  const p = P(entry.querySelector('[data-act="toggle-adv"]').dataset.p);
-  const m = p.models[Number(entry.dataset.entry)];
-  const old = entry.querySelector('[data-ext]');
-  const wasOpen = !old.hidden;
-  const fresh = document.createElement('div');
-  fresh.innerHTML = extBlockHtml(m);
-  const next = fresh.firstElementChild;
-  if (wasOpen) next.hidden = false;
-  old.replaceWith(next);
-}
-
-/** 从扩展块反查它所属的模型草稿对象。 */
-function modelOfExt(extEl) {
-  const entry = extEl.closest('.modelEntry');
-  const p = P(entry.querySelector('[data-act="toggle-adv"]').dataset.p);
-  return p.models[Number(entry.dataset.entry)];
-}
-/** 重算推理挡位的两条校验（与 ModelExtensionFields.tsx 的 hasEmptyWire / onlyOffDeclared 一致）。 */
-function updateEffortError(extEl) {
-  const m = modelOfExt(extEl);
-  const declared = Object.keys(m.ext.levels);
-  const hasEmptyWire = declared.some(k => k !== 'off' && String(m.ext.levels[k] ?? '').trim().length === 0);
-  const onlyOff = declared.length > 0 && !declared.some(k => k !== 'off');
-  const p = extEl.querySelector('[data-effort-error]');
-  if (!p) return;
-  p.hidden = !(hasEmptyWire || onlyOff);
-  p.textContent = hasEmptyWire ? '除 off 外勾选的挡位必须填写线上取值。' : '至少声明一个 off 以外的挡位。';
-}
-/** 重画某一档位行的「线上取值」单元格：已声明且非 off → 输入框，否则显示 —。 */
-function paintWireCell(rowEl, m) {
-  const key = rowEl.dataset.levelRow;
-  const declared = key in m.ext.levels;
-  const value = String(m.ext.levels[key] ?? '');
-  rowEl.children[1].style.opacity = declared ? '1' : '0.5';
-  rowEl.children[2].style.opacity = declared ? '1' : '0.4';
-  rowEl.children[2].innerHTML = declared && key !== 'off'
-    ? `<input type="text" data-act="ext-wire" data-level="${key}" value="${value.replace(/"/g, '&quot;')}" placeholder="${key}" aria-label="${key} 线上取值">`
-    : '<span style="font-size:12px;color:var(--dsw-alias-label-tertiary)">—</span>';
-}
-const state = {
-  providers: [
-    { id:'deepseek', name:'DeepSeek', route:'deepseek', ns:'deepseek', declared:false, keyConfigured:true,
-      baseURL:'https://api.deepseek.com', overridden:false,
-      models:[ { id:'deepseek-chat', name:'DeepSeek Chat', context:'', max:'', ext:extDefault() },
-               { id:'deepseek-reasoner', name:'DeepSeek Reasoner', context:'', max:'', ext:extDefault() } ] },
-    { id:'xiaomi', name:'Xiaomi', route:'xiaomi', ns:'pi-ai', declared:false, keyConfigured:false,
-      baseURL:'', overridden:false, models:[] },
-    { id:'acme-gateway', name:'Acme Gateway', route:'acme-gateway', ns:'pi-ai', declared:true, keyConfigured:true,
-      baseURL:'https://gateway.example/v1', overridden:true,
-      models:[ { id:'gpt-4o', name:'GPT-4o', context:'128K', max:'16K', ext:extDefault() } ] },
-  ],
-  editing: null,        // provider id | null（官方：一次只开一张卡）
-  addMode: null,        // null | 'add' | 'custom'
-  addRoute: 'moonshot',
-  deleteId: null,
-  fetchFor: null,       // provider id
-  fetchPicked: new Set(),
-  saved: null,
-};
-const addable = [
-  { id:'moonshot', name:'Moonshot' },
-  { id:'siliconflow', name:'SiliconFlow' },
-  { id:'zhipu', name:'智谱' },
-];
-const candidatePool = ['deepseek-chat','deepseek-reasoner','deepseek-coder','deepseek-v3-0324','deepseek-r1-0528'];
-
-/* 新建卡片（添加提供方 / 添加自定义提供方）的模型草稿。它不在 providers 列表里，
-   但必须能被 P() 找到：否则在这两张卡上点「添加模型」，P('__new') 返回 undefined，
-   undefined.models 抛 TypeError，整段脚本从此失效——后续所有交互（含容量展开）全废。 */
-const newProv = { id:'__new', name:'', route:'', ns:'pi-ai', declared:true, keyConfigured:false,
-  baseURL:'', overridden:false, models:[] };
-const P = (id) => state.providers.find(p => p.id === id) || (id === '__new' ? newProv : undefined);
-const esc = (s) => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-
-/* ============ 片段模板 ============ */
-function extBlockHtml(m) {
-  const e = m.ext;
-  const compat = e.compat || {};
-  const gateOn = compat.supportsReasoningEffort === true;
-  const fmt = typeof compat.thinkingFormat === 'string' ? compat.thinkingFormat : '';
-  const levelsDeclared = Object.keys(e.levels || {}).length > 0;
-  // 显隐条件对齐 reasoningAreaShown：开关 或 已声明挡位 或 已设思考格式，任一为真即显示。
-  // pi-ai 预填常常不写开关（交由适配器按 baseURL 检测），但挡位照样要可见可编辑。
-  const shown = gateOn || levelsDeclared || fmt !== '';
-  // 七档常显：真实实现渲染 THINKING_LEVELS 全部行，未声明的行取值列显示「—」。
-  const rows = LEVELS.map(l => {
-    const declared = l.key in (e.levels || {});
-    const value = String((e.levels || {})[l.key] ?? '');
-    const cell = declared && l.key !== 'off'
-      ? `<input type="text" data-act="ext-wire" data-level="${l.key}" value="${esc(value)}" placeholder="${l.key}" aria-label="${l.key} 线上取值">`
-      : '<span style="font-size:12px;color:var(--dsw-alias-label-tertiary)">—</span>';
-    return `
-    <div class="extTRow" data-level-row="${l.key}">
-      <div style="display:flex;justify-content:center">
-        <input type="checkbox" data-act="ext-level" data-level="${l.key}" ${declared ? 'checked' : ''}
-               aria-label="声明 ${l.key}" style="accent-color:var(--dsw-alias-brand-primary);width:15px;height:15px">
-      </div>
-      <div style="opacity:${declared ? 1 : 0.5}">${l.key}</div>
-      <div style="opacity:${declared ? 1 : 0.4}">${cell}</div>
-    </div>`;
-  }).join('');
-  // 其他兼容开关：compat 里除三个基础键外的全部键（字母序）——
-  // pi-ai 目录记录的 compat 面远大于本面板显式建模的三个，看不见的值等于修不了的值。
-  const extra = Object.keys(compat)
-    .filter(k => !['supportsDeveloperRole', 'supportsReasoningEffort', 'thinkingFormat'].includes(k))
-    .sort()
-    .map(k => {
-      const v = compat[k];
-      const text = typeof v === 'string' ? v : JSON.stringify(v);
-      return `
-      <label style="display:flex;flex-direction:column;gap:2px">
-        <span class="extHint">${esc(k)}</span>
-        <input class="input" type="text" data-act="ext-compat" data-key="${esc(k)}" value="${esc(text)}" aria-label="${esc(k)}">
-      </label>`;
-    }).join('');
-  return `
-  <div class="extBlock" hidden data-ext>
-    <!-- ⓪ 快速装入：[数据源][提供方][model id] 三级收窄；两个候选列表均为自绘浮层（非 datalist） -->
-    <div class="extGroup" style="border-top:none;padding-top:0">
-      <div class="quickWrap" data-q-source="pi-ai" data-q-provider="" data-q-text="" data-q-panel="">
-        <span class="extLabel">快速装入</span>
-        <div style="display:flex;gap:6px;align-items:center">
-          <select class="input selectInput" data-act="quick-source" style="flex:0 0 108px;min-width:0" aria-label="数据源">
-            <option value="pi-ai">llm-pi-ai</option>
-            <option value="models.dev">models.dev</option>
-          </select>
-          <input class="input" style="flex:0 0 132px;min-width:0" type="text" data-act="quick-provider"
-                 placeholder="提供方：全部" aria-label="提供方" autocomplete="off">
-          <input class="input" style="flex:1 1 auto;min-width:0" type="text" data-act="quick-text"
-                 placeholder="model id（如 glm）…" aria-label="model id" autocomplete="off">
-        </div>
-      </div>
-    </div>
-    <!-- ① 容量字段并入块顶：上下文窗口 / 最大输出 token -->
-    <div class="extGroup">
-      <div class="modelField" style="padding:0 4px">
-        <label class="modelField"><span class="modelFieldLabel">${T.modelContextWindow}</span>
-          <input class="input" type="text" value="${esc(m.context || '')}" placeholder="${T.contextWindowPlaceholder}" aria-label="${T.modelContextWindow}"></label>
-        <label class="modelField"><span class="modelFieldLabel">${T.modelMaxTokens}</span>
-          <input class="input" type="text" value="${esc(m.max || '')}" placeholder="${T.maxTokensPlaceholder}" aria-label="${T.modelMaxTokens}"></label>
-      </div>
-    </div>
-
-    <!-- 输入模态：与推理挡位互不隶属，不受总开关控制 -->
-    <div class="extGroup">
-      <span class="extLabel" style="margin-bottom:6px">输入模态</span>
-      <div style="display:flex;gap:18px">
-        ${MODALITIES.map(md => `
-          <label class="switchRow">
-            <input type="checkbox" data-act="ext-modal" data-modal="${md.key}" ${(e.input || []).includes(md.key) ? 'checked' : ''}>${md.zh}
-          </label>`).join('')}
-      </div>
-    </div>
-
-    <!-- developer 角色：三态（compat.supportsDeveloperRole 未写/true 皆勾选），不受总开关控制 -->
-    <div class="extGroup">
-      <label class="extCheck">
-        <input type="checkbox" data-act="ext-devrole" ${compat.supportsDeveloperRole !== false ? 'checked' : ''}
-               style="accent-color:var(--dsw-alias-brand-primary);width:15px;height:15px;flex:none;margin-top:3px"
-               aria-label="允许以 developer 角色发送系统提示">
-        <span style="display:flex;flex-direction:column;gap:2px">
-          <span class="extCheckLabel">允许以 developer 角色发送系统提示</span>
-          <span class="extHint">推理模型的系统提示将以 developer 角色发出；网关拒绝该角色时取消勾选，改用 system。</span>
-        </span>
-      </label>
-    </div>
-
-    <!-- 总开关：仅 compat.supportsReasoningEffort === true 才算开；未写 = 交由适配器按 baseURL 检测 -->
-    <div class="extGroup">
-      <label class="switchRow">
-        <input type="checkbox" data-act="ext-master" ${gateOn ? 'checked' : ''}>
-        端点接受推理挡位参数（reasoning_effort）
-      </label>
-      ${!gateOn && shown ? '<p class="extHint" style="margin-top:6px">此项未设置：由 llm-pi-ai 按其 baseURL 检测结果决定是否发送 reasoning_effort；下面的挡位不受影响，仍通过各协议自己的 thinking 参数生效。</p>' : ''}
-    </div>
-
-    <!-- 门控区：开关、挡位、思考格式任一存在即显示（整块隐藏，不是置灰）；门控内先思考格式、后推理挡位 -->
-    <div class="extGated" data-gated ${shown ? '' : 'hidden'}>
-      <div class="extField">
-        <span class="extLabel">思考格式</span>
-        <select class="input selectInput" data-act="ext-thinking" aria-label="思考格式">
-          <option value="" ${fmt === '' ? 'selected' : ''}>—</option>
-          ${FORMATS.map(f => `<option value="${f}" ${fmt === f ? 'selected' : ''}>${f}</option>`).join('')}
-        </select>
-      </div>
-      <div class="extField">
-        <span class="extLabel">推理挡位</span>
-        <div class="extTable">
-          <div class="extTHead"><div>声明</div><div>挡位</div><div>线上取值</div></div>
-          ${rows}
-        </div>
-        <p class="error" data-effort-error hidden style="margin-top:6px"></p>
-      </div>
-    </div>
-
-    ${extra ? `
-    <!-- 其他兼容开关：pi-ai 目录预填、本面板没有专用控件的键；清空即移除、回到目录默认 -->
-    <div class="extGroup">
-      <span class="extLabel" style="margin-bottom:6px">其他兼容开关</span>
-      <div style="display:flex;flex-direction:column;gap:6px">${extra}</div>
-      <p class="extHint" style="margin-top:6px">这些开关由 pi-ai 目录预填；清空输入框即移除该开关，回到目录默认。</p>
-    </div>` : ''}
-  </div>`;
-}
-
-function modelEntryHtml(p, m, i) {
-  return `
-  <div class="modelEntry" data-entry="${i}">
-    <div class="modelRow">
-      <input class="input" type="text" value="${esc(m.id)}" placeholder="${T.modelId}" aria-label="${T.modelId} ${i+1}">
-      <input class="input" type="text" value="${esc(m.name || '')}" placeholder="${T.modelName}" aria-label="${T.modelName} ${i+1}">
-      <button class="iconButton" data-act="toggle-adv" data-p="${p.id}" aria-label="${T.modelAdvanced} ${i+1}" aria-expanded="false" title="${T.modelAdvanced}">${CHEVRON}</button>
-      <button class="iconButton iconButtonDanger" data-act="remove-model" data-p="${p.id}" data-i="${i}" aria-label="${T.removeModel} ${i+1}" title="${T.removeModel}">${TRASH}</button>
-    </div>
-    ${extBlockHtml(m)}
-  </div>`;
-}
-
-function catalogHtml(p) {
-  const list = p.models.length === 0
-    ? `<p class="modelEmpty">${T.modelsEmpty}</p>`
-    : `<div class="modelList">${p.models.map((m,i) => modelEntryHtml(p,m,i)).join('')}</div>`;
-  return `
-  <section class="modelCatalog" aria-label="${T.models}">
-    <div class="modelListHead">
-      <div class="modelCatalogHeading">
-        <span class="modelCatalogTitle">${T.models}</span>
-        <span class="modelCatalogMeta">${p.overridden ? T.modelsCustomized : T.modelsInherited}</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:4px;">
-        ${p.overridden ? `<button class="linkButton" data-act="reset-models" data-p="${p.id}">${T.resetModels}</button>` : ''}
-        <button class="linkButton" data-act="fetch" data-p="${p.id}">${T.fetchModels}</button>
-      </div>
-    </div>
-    ${list}
-    <button class="addModelButton" data-act="add-model" data-p="${p.id}">${PLUS}${T.addModel}</button>
-  </section>`;
-}
-
-function editorHtml(p) {
-  const keyPlaceholder = p.keyConfigured ? T.keyStored
-    : (p.ns === 'pi-ai' && p.declared ? T.keyPlaceholderNative : T.keyPlaceholder);
-  return `
-  <div class="editor">
-    <!-- 分区一：供应商——端点身份与凭据（默认收起） -->
-    <div class="tabs">
-      <div class="tabBar" role="tablist">
-        <button type="button" class="tabButton tabButtonActive" data-act="tab" data-tab="provider" role="tab" aria-selected="true">${T.sectionProvider}</button>
-        <button type="button" class="tabButton" data-act="tab" data-tab="models" role="tab" aria-selected="false">${T.sectionModel}</button>
-      </div>
-      <div class="tabPanel" data-panel="provider">
-        ${p.ns === 'pi-ai' ? `
-        <div class="field">
-          <span class="fieldLabel">${T.customDisplayName}</span>
-          <input class="input" type="text" value="${esc(p.name)}" placeholder="${esc(p.route)}" aria-label="${T.customDisplayName}">
-        </div>` : ''}
-        <div class="field">
-          <span class="fieldLabel">${T.keyInput}</span>
-          <input class="input" type="password" autocomplete="off" placeholder="${esc(keyPlaceholder)}" aria-label="${T.keyInput}">
-        </div>
-        <div class="field">
-          <span class="fieldLabel">${T.baseUrl}</span>
-          <input class="input" type="text" value="${esc(p.baseURL)}" placeholder="${p.ns === 'deepseek' ? 'https://api.deepseek.com' : T.baseUrlDefault}" aria-label="${T.baseUrl}">
-        </div>
-        ${p.ns === 'pi-ai' && p.declared ? `
-        <div class="field">
-          <span class="fieldLabel">${T.customApi}</span>
-          <select class="input selectInput" aria-label="${T.customApi}"><option>openai</option></select>
-        </div>` : ''}
-      </div>
-    
-    <!-- 分区二：模型——模型目录与每条目的容量/扩展字段（默认收起） -->
-      <div class="tabPanel" data-panel="models" hidden>
-        ${catalogHtml(p)}
-      </div>
-    </div>
-    <div class="editorActions">
-      <button class="secondaryButton" data-act="cancel-edit">${T.cancel}</button>
-      <button class="primaryButton" data-act="save" data-p="${p.id}">${T.apply}</button>
-    </div>
-  </div>`;
-}
-
-function rowHtml(p) {
-  const open = state.editing === p.id;
-  return `
-  <li class="rowCard" data-row="${p.id}">
-    <div class="rowHead">
-      <span class="rowIdentity">
-        <span class="rowName">${esc(p.name)}</span>
-        ${p.declared ? `<span class="rowTag">${T.customTag}</span>` : ''}
-        <span class="credentialDot ${p.keyConfigured ? 'credentialDotConfigured' : 'credentialDotMissing'}"
-              role="img" aria-label="${p.keyConfigured ? T.credentialConfigured : T.credentialMissing}"
-              title="${p.keyConfigured ? T.credentialConfigured : T.credentialMissing}"></span>
-      </span>
-      <span class="rowActions">
-        <button class="secondaryButton" data-act="edit" data-p="${p.id}"
-          aria-label="${T.editProvider.replace('{provider}', p.name)}">${T.edit}</button>
-        <button class="dangerButton" data-act="delete" data-p="${p.id}"
-          aria-label="${T.removeProvider.replace('{provider}', p.name)}">${T.remove}</button>
-      </span>
-    </div>
-    ${open ? editorHtml(p) : ''}
-  </li>`;
-}
-
-function customCardHtml() {
-  return `
-  <div class="addCard">
-    <!-- Provider ID 在 Tabs 之外：它决定 route 与凭据引用名，先于两页字段 -->
-    <div class="field">
-      <span class="fieldLabel">${T.customRoute}</span>
-      <input class="input" type="text" placeholder="acme-gateway" aria-label="${T.customRoute}">
-      <p class="advancedHint">${T.customRouteHint}</p>
-    </div>
-    <div class="tabs">
-      <div class="tabBar" role="tablist">
-        <button type="button" class="tabButton tabButtonActive" data-act="tab" data-tab="provider" role="tab" aria-selected="true">${T.sectionProvider}</button>
-        <button type="button" class="tabButton" data-act="tab" data-tab="models" role="tab" aria-selected="false">${T.sectionModel}</button>
-      </div>
-      <div class="tabPanel" data-panel="provider">
-        <div class="field">
-          <span class="fieldLabel">${T.customDisplayName}</span>
-          <input class="input" type="text" placeholder="${T.customDisplayName}" aria-label="${T.customDisplayName}">
-        </div>
-        <div class="field">
-          <span class="fieldLabel">${T.baseUrl}</span>
-          <input class="input" type="text" placeholder="${T.customBaseUrlPlaceholder}" aria-label="${T.baseUrl}">
-        </div>
-        <div class="field">
-          <span class="fieldLabel">${T.customApi}</span>
-          <select class="input selectInput" aria-label="${T.customApi}"><option>openai</option></select>
-        </div>
-        <div class="field">
-          <span class="fieldLabel">${T.keyInput}</span>
-          <input class="input" type="password" autocomplete="off" placeholder="${T.keyPlaceholderNative}" aria-label="${T.keyInput}">
-        </div>
-      </div>
-      <div class="tabPanel" data-panel="models" hidden>
-        ${catalogHtml(newProv)}
-      </div>
-    </div>
-    <div class="editorActions">
-      <button class="secondaryButton" data-act="close-add">${T.cancel}</button>
-      <button class="primaryButton" data-act="create">${T.create}</button>
-    </div>
-  </div>`;
-}
-
-function addCardForExistingHtml() {
-  return `
-  <div class="addCard">
-    <div class="field">
-      <span class="fieldLabel">${T.provider}</span>
-      <select class="input selectInput" data-act="pick-addable" aria-label="${T.provider}">
-        ${addable.map(a => `<option value="${a.id}" ${state.addRoute === a.id ? 'selected' : ''}>${a.name}</option>`).join('')}
-      </select>
-    </div>
-    <div class="editor">
-      <div class="tabs">
-        <div class="tabBar" role="tablist">
-          <button type="button" class="tabButton tabButtonActive" data-act="tab" data-tab="provider" role="tab" aria-selected="true">${T.sectionProvider}</button>
-          <button type="button" class="tabButton" data-act="tab" data-tab="models" role="tab" aria-selected="false">${T.sectionModel}</button>
-        </div>
-        <div class="tabPanel" data-panel="provider">
-          <div class="field">
-            <span class="fieldLabel">${T.keyInput}</span>
-            <input class="input" type="password" autocomplete="off" placeholder="${T.keyPlaceholderNative}" aria-label="${T.keyInput}">
-          </div>
-          <div class="field">
-            <span class="fieldLabel">${T.baseUrl}</span>
-            <input class="input" type="text" placeholder="${T.baseUrlDefault}" aria-label="${T.baseUrl}">
-          </div>
-        </div>
-        <div class="tabPanel" data-panel="models" hidden>
-          ${catalogHtml(newProv)}
-        </div>
-      </div>
-      <div class="editorActions">
-        <button class="secondaryButton" data-act="close-add">${T.cancel}</button>
-        <button class="primaryButton" data-act="close-add">${T.apply}</button>
-      </div>
-    </div>
-  </div>`;
-}
-
-function addBlockHtml() {
-  if (state.addMode === 'custom') return customCardHtml();
-  if (state.addMode === 'add') return addCardForExistingHtml();
-  return `<div class="addActions">
-    <button class="addButton" data-act="add">${PLUS}${T.add}</button>
-    <button class="addButton" data-act="add-custom">${PLUS}${T.customAdd}</button>
-  </div>`;
-}
-
-/* ============ 渲染 ============ */
-function render() {
-  document.getElementById('rows').innerHTML = state.providers.map(rowHtml).join('');
-  document.getElementById('addBlock').innerHTML = addBlockHtml();
-  const notice = document.getElementById('savedNotice');
-  if (state.saved) { notice.textContent = T.savedProvider.replace('{provider}', state.saved); notice.hidden = false; }
-  else { notice.hidden = true; }
-}
-function renderCatalog(p) {
-  // 只重建模型目录，避免整卡重绘丢焦点
-  const sel = p.id === '__new'
-    ? '.addCard .modelCatalog'
-    : `[data-row="${p.id}"] .modelCatalog`;
-  const row = document.querySelector(sel);
-  if (!row) return;
-  const wrap = document.createElement('div');
-  wrap.innerHTML = catalogHtml(p);
-  row.replaceWith(wrap.firstElementChild);
-}
-
-/* ============ 弹窗 ============ */
-function openModal(html) {
-  const mask = document.createElement('div');
-  mask.className = 'modalMask'; mask.id = 'modalMask';
-  mask.innerHTML = html;
-  document.body.appendChild(mask);
-}
-function closeModal() { const m = document.getElementById('modalMask'); if (m) m.remove(); }
-
-function deleteModalHtml(p) {
-  return `<div class="modal deleteDialog" role="dialog" aria-modal="true">
-    <div class="modalTitle">${T.deleteTitle.replace('{provider}', esc(p.name))}</div>
-    <div class="modalDesc">${T.deleteDescriptionWithCredential.replace('{provider}', esc(p.name))}</div>
-    <div class="modalFoot">
-      <button class="secondaryButton" data-act="close-modal">${T.cancel}</button>
-      <button class="secondaryButton deleteConfirm" data-act="confirm-delete">${T.deleteConfirm.replace('{provider}', esc(p.name))}</button>
-    </div>
-  </div>`;
-}
-
-function fetchModalHtml(p) {
-  const known = new Set(p.models.map(m => m.id));
-  const cand = candidatePool.filter(id => !known.has(id));
-  state.fetchPicked = new Set(cand);
-  const list = cand.length === 0
-    ? `<p class="candidateEmpty">${T.fetchNoMatches}</p>`
-    : `<ul class="candidateList">${cand.map(id => `
-        <li class="candidate"><label class="candidateLabel">
-          <input type="checkbox" data-act="pick-candidate" data-id="${id}" checked style="accent-color:var(--dsw-alias-brand-primary)">
-          <span class="candidateId">${id}</span>
-        </label></li>`).join('')}</ul>`;
-  return `<div class="modal fetchDialog" role="dialog" aria-modal="true">
-    <div class="modalTitle">${T.fetchTitle}</div>
-    <div class="modalDesc">${T.fetchDescription}</div>
-    <div class="candidateToolbar">
-      <input class="input candidateSearch" type="search" placeholder="${T.fetchSearch}" aria-label="${T.fetchSearch}" data-act="search">
-      <button class="linkButton" data-act="toggle-all">${T.fetchDeselectAll}</button>
-    </div>
-    <div data-candidates>${list}</div>
-    <div class="modalFoot">
-      <button class="secondaryButton" data-act="close-modal">${T.cancel}</button>
-      <button class="primaryButton" data-act="adopt">${T.fetchAdopt}</button>
-    </div>
-  </div>`;
-}
-
-/* ============ 事件 ============ */
-document.addEventListener('click', (e) => {
-  if (e.target.dataset.act === 'tab') {
-    const tabs = e.target.closest('.tabs');
-    const which = e.target.dataset.tab;
-    tabs.querySelectorAll('[data-act="tab"]').forEach(b => {
-      const on = b.dataset.tab === which;
-      b.classList.toggle('tabButtonActive', on);
-      b.setAttribute('aria-selected', String(on));
-    });
-    tabs.querySelectorAll('[data-panel]').forEach(pn => { pn.hidden = pn.dataset.panel !== which; });
-    return;
-  }
-  if (e.target.dataset.act === 'download-meta') {
-    const btn = e.target;
-    if (btn.dataset.busy === '1') return;
-    btn.dataset.busy = '1';
-    btn.textContent = '正在下载元数据…';
-    window.setTimeout(() => {
-      btn.textContent = '下载/更新元数据';
-      btn.dataset.busy = '0';
-      const note = document.getElementById('metaMessage');
-      note.textContent = 'models.dev 元数据已下载并就绪（llm-pi-ai 源无需下载，运行时直读宿主已装目录）。';
-      note.hidden = false;
-    }, 1200);
-    return;
-  }
-  const el = e.target.closest('[data-act]');
-  if (!el) { if (e.target.id === 'modalMask') closeModal(); return; }
-  const act = el.dataset.act;
-  const pid = el.dataset.p;
-
-  if (act === 'edit') {
-    state.editing = state.editing === pid ? null : pid;   // 官方：一次一张卡
-    state.addMode = null; state.saved = null; render();
-  }
-  else if (act === 'cancel-edit') { state.editing = null; render(); }
-  else if (act === 'save') {
-    const p = P(pid); state.editing = null; state.saved = p.name; render();
-  }
-  else if (act === 'delete') { state.deleteId = pid; openModal(deleteModalHtml(P(pid))); }
-  else if (act === 'confirm-delete') {
-    state.providers = state.providers.filter(x => x.id !== state.deleteId);
-    if (state.editing === state.deleteId) state.editing = null;
-    state.deleteId = null; closeModal(); render();
-  }
-  else if (act === 'close-modal') { closeModal(); }
-  else if (act === 'add') { state.addMode = 'add'; state.editing = null; render(); }
-  else if (act === 'add-custom') { state.addMode = 'custom'; state.editing = null; render(); }
-  else if (act === 'close-add' || act === 'create') { state.addMode = null; render(); }
-
-  else if (act === 'toggle-adv') {
-    const entry = el.closest('.modelEntry');
-    const ext = entry.querySelector('[data-ext]');   // 容量已并入扩展块，只切这一块
-    const open = el.getAttribute('aria-expanded') !== 'true';
-    el.setAttribute('aria-expanded', String(open));
-    el.firstElementChild.style.transform = open ? 'rotate(90deg)' : '';
-    ext.hidden = !open;
-  }
-  else if (act === 'remove-model') {
-    const p = P(pid); p.models.splice(Number(el.dataset.i), 1); p.overridden = true; renderCatalog(p);
-  }
-  else if (act === 'add-model') {
-    const p = P(pid); p.models.push({ id:'', name:'', context:'', max:'', ext:extDefault() }); p.overridden = true; renderCatalog(p);
-  }
-  else if (act === 'reset-models') {
-    const p = P(pid); p.models = []; p.overridden = false; renderCatalog(p);
-  }
-  else if (act === 'fetch') { state.fetchFor = pid; openModal(fetchModalHtml(P(pid))); }
-  else if (act === 'pick-candidate') {
-    el.checked ? state.fetchPicked.add(el.dataset.id) : state.fetchPicked.delete(el.dataset.id);
-    syncToggleAll();
-  }
-  else if (act === 'toggle-all') {
-    const boxes = [...document.querySelectorAll('[data-act="pick-candidate"]')];
-    const allOn = boxes.every(b => b.checked);
-    boxes.forEach(b => { b.checked = !allOn; b.checked ? state.fetchPicked.add(b.dataset.id) : state.fetchPicked.delete(b.dataset.id); });
-    el.textContent = allOn ? T.fetchSelectAll : T.fetchDeselectAll;
-  }
-  else if (act === 'adopt') {
-    const p = P(state.fetchFor);
-    [...state.fetchPicked].forEach(id => {
-      if (!p.models.some(m => m.id === id)) p.models.push({ id, name:'', context:'', max:'', ext:extDefault() });
-    });
-    p.overridden = true; closeModal(); renderCatalog(p);
-  }
-
-  /* ---- 插件扩展字段：语义对齐 ModelEntryPanel.tsx ---- */
-  else if (act === 'ext-devrole') {
-    // 三态：勾选 = 删键回继承态（catalog / baseURL 检测说了算）；取消 = 显式写 false
-    const compat = modelOfExt(el.closest('[data-ext]')).ext.compat;
-    if (el.checked) delete compat.supportsDeveloperRole;
-    else compat.supportsDeveloperRole = false;
-  }
-  else if (act === 'ext-master') {
-    // 一个动作清掉开关与全部被门控的值——不留孤儿参数（对齐 toggleGate）
-    const m = modelOfExt(el.closest('[data-ext]'));
-    if (el.checked) m.ext.compat.supportsReasoningEffort = true;
-    else {
-      delete m.ext.compat.supportsReasoningEffort;
-      delete m.ext.compat.thinkingFormat;
-      m.ext.levels = {};
-    }
-    repaintExtBlock(el.closest('.modelEntry'));
-  }
-  else if (act === 'ext-level') {
-    const ext = el.closest('[data-ext]');
-    const m = modelOfExt(ext);
-    const key = el.dataset.level;
-    // 勾选即声明，默认线上取值=档位名；off 取值为 null（无取值）
-    if (el.checked) m.ext.levels[key] = key === 'off' ? null : key;
-    else delete m.ext.levels[key];
-    paintWireCell(el.closest('.extTRow'), m);
-    updateEffortError(ext);
-  }
-  else if (act === 'ext-thinking') {
-    const m = modelOfExt(el.closest('[data-ext]'));
-    if (el.value === '') delete m.ext.compat.thinkingFormat;
-    else m.ext.compat.thinkingFormat = el.value;
-    // 清空后若开关也未设且无挡位，整块应随之隐藏 → 重绘
-    repaintExtBlock(el.closest('.modelEntry'));
-  }
-  else if (act === 'ext-modal') {
-    const m = modelOfExt(el.closest('[data-ext]'));
-    const key = el.dataset.modal;
-    m.ext.input = el.checked
-      ? [...new Set([...m.ext.input, key])]
-      : m.ext.input.filter(entry => entry !== key);
-  }
-});
-
-document.addEventListener('input', (e) => {
-  if (e.target.dataset.act === 'ext-wire') {
-    // 线上取值：空串落库为 null（与 setWireValue 一致），并实时重算校验
-    const ext = e.target.closest('[data-ext]');
-    const m = modelOfExt(ext);
-    const text = e.target.value.trim();
-    m.ext.levels[e.target.dataset.level] = text.length === 0 ? null : text;
-    updateEffortError(ext);
-    return;
-  }
-  if (e.target.dataset.act === 'search') {
-    const q = e.target.value.trim().toLowerCase();
-    document.querySelectorAll('.candidate').forEach(li => {
-      li.style.display = li.querySelector('.candidateId').textContent.toLowerCase().includes(q) ? '' : 'none';
-    });
-    return;
-  }
-  if (e.target.dataset.act === 'quick-provider' || e.target.dataset.act === 'quick-text') {
-    // 输入只过滤候选列表；恰好输全某个提供方的名字才算选中（chosenProvider 语义）
-    const wrap = quickWrapOf(e.target);
-    wrap.dataset[e.target.dataset.act === 'quick-provider' ? 'qProvider' : 'qText'] = e.target.value;
-    wrap.dataset.qPanel = e.target.dataset.act === 'quick-provider' ? 'provider' : 'model';
-    renderQuickPanel(wrap);
-  }
-});
-function syncToggleAll() {
-  const boxes = [...document.querySelectorAll('[data-act="pick-candidate"]')];
-  const btn = document.querySelector('[data-act="toggle-all"]');
-  if (btn) btn.textContent = boxes.every(b => b.checked) ? T.fetchDeselectAll : T.fetchSelectAll;
-}
-
-/* ---- 快速装入：三级收窄选择器（语义对齐 QuickLoad.tsx） ---- */
-const QUICK_LIMIT = 50;
-function quickWrapOf(el) { return el.closest('.quickWrap'); }
-function renderQuickPanel(wrap) {
-  const old = wrap.querySelector('.quickList');
-  if (old) old.remove();
-  const panel = wrap.dataset.qPanel;
-  if (!panel) return;
-  const div = document.createElement('div');
-  div.className = 'quickList';
-  div.innerHTML = panel === 'provider' ? quickProviderBody(wrap) : quickModelBody(wrap);
-  wrap.appendChild(div);
-}
-function quickProviderBody(wrap) {
-  const providers = providersOf(wrap.dataset.qSource);
-  if (providers.length === 0) return '<span class="quickEmpty">该数据源没有提供方信息</span>';
-  const needle = (wrap.dataset.qProvider || '').trim().toLowerCase();
-  const matches = needle.length === 0 ? providers : providers.filter(n => n.toLowerCase().includes(needle));
-  return '<button type="button" class="quickItem" data-act="quick-pick-provider" data-name="">全部（不限提供方）</button>'
-    + matches.map(n => `<button type="button" class="quickItem" data-act="quick-pick-provider" data-name="${esc(n)}">${esc(n)}</button>`).join('')
-    + (matches.length === 0 ? '<span class="quickEmpty">没有匹配的提供方</span>' : '');
-}
-function quickModelBody(wrap) {
-  const source = wrap.dataset.qSource;
-  const providers = providersOf(source);
-  // 半截输入只过滤候选列表；恰好是某个提供方的全名才算选中（chosenProvider 语义）
-  const providerRaw = wrap.dataset.qProvider || '';
-  const chosen = providers.includes(providerRaw) ? providerRaw : '';
-  const text = wrap.dataset.qText || '';
-  if (chosen.length === 0 && text.trim().length === 0) {
-    const warn = source === 'pi-ai' && PI_AI.warnings.length > 0
-      ? `<span class="error" style="padding:0 8px">${esc(PI_AI.warnings.join('；'))}</span>` : '';
-    return `<span class="quickEmpty">${esc(sourceSummary(source))}</span>${warn}`;
-  }
-  const { hits, total } = searchPrefill(source, chosen, text);
-  if (hits.length === 0) return '<span class="quickEmpty">没有匹配的模型</span>';
-  return hits.map(en => `<button type="button" class="quickItem" data-act="quick-pick-model" data-idx="${en.idx}">${esc(en.id)}</button>`).join('')
-    + (total > hits.length ? `<span class="quickEmpty">另有 ${total - hits.length} 项匹配——继续输入或选定提供方以缩小范围</span>` : '');
-}
-function pickPrefill(itemEl, idx) {
-  const wrap = quickWrapOf(itemEl);
-  const list = wrap.dataset.qSource === 'pi-ai' ? PI_ENTRIES : MD_ENTRIES;
-  const entry = list[Number(idx)];
-  if (entry === undefined) return;
-  const modelEl = itemEl.closest('.modelEntry');
-  applyPrefill(modelOfExt(itemEl.closest('[data-ext]')), entry);
-  // 保留刚选中的 id：选完变空白看不出装了什么，且它是同族模型的搜索起点
-  wrap.dataset.qPanel = '';
-  wrap.dataset.qText = entry.id;
-  repaintExtBlock(modelEl);
-  const fresh = modelEl.querySelector('.quickWrap');
-  fresh.querySelector('[data-act="quick-text"]').value = entry.id;
-}
-document.addEventListener('mousedown', (e) => {
-  const el = e.target.closest('[data-act="quick-pick-provider"], [data-act="quick-pick-model"]');
-  if (!el) return;
-  // mousedown 先于 blur：preventDefault 保住输入框焦点，点选才不会先收起浮层
-  e.preventDefault();
-  const wrap = quickWrapOf(el);
-  if (el.dataset.act === 'quick-pick-provider') {
-    wrap.dataset.qProvider = el.dataset.name;
-    wrap.dataset.qText = '';
-    wrap.querySelector('[data-act="quick-text"]').focus();  // 选完提供方直接进入 id 输入
-  } else {
-    pickPrefill(el, el.dataset.idx);
-  }
-});
-document.addEventListener('focusin', (e) => {
-  const act = e.target.dataset ? e.target.dataset.act : undefined;
-  if (act !== 'quick-provider' && act !== 'quick-text') return;
-  const wrap = quickWrapOf(e.target);
-  wrap.dataset.qPanel = act === 'quick-provider' ? 'provider' : 'model';
-  renderQuickPanel(wrap);
-});
-document.addEventListener('focusout', (e) => {
-  const wrap = e.target.closest ? e.target.closest('.quickWrap') : null;
-  if (!wrap) return;
-  window.requestAnimationFrame(() => {
-    if (!wrap.contains(document.activeElement)) { wrap.dataset.qPanel = ''; renderQuickPanel(wrap); }
-  });
-});
-document.addEventListener('change', (e) => {
-  const act = e.target.dataset.act;
-  if (act === 'quick-source') {
-    // 提供方列表属于数据源：切源清掉旧选择，否则结果被筛空还以为源是空的
-    const wrap = quickWrapOf(e.target);
-    wrap.dataset.qProvider = ''; wrap.dataset.qText = ''; wrap.dataset.qPanel = '';
-    wrap.querySelector('[data-act="quick-provider"]').value = '';
-    wrap.querySelector('[data-act="quick-text"]').value = '';
-    renderQuickPanel(wrap);
-    return;
-  }
-  if (act === 'ext-compat') {
-    // blur 提交：清空 = 移除该开关、回到目录默认；其余按原值类型回读
-    const compat = modelOfExt(e.target.closest('[data-ext]')).ext.compat;
-    const key = e.target.dataset.key;
-    const raw = e.target.value.trim();
-    if (raw.length === 0) delete compat[key];
-    else {
-      const prev = compat[key];
-      if (typeof prev === 'boolean') compat[key] = raw === 'true';
-      else if (typeof prev === 'number') { const n = Number(raw); compat[key] = Number.isNaN(n) ? prev : n; }
-      else if (typeof prev === 'string') compat[key] = raw;
-      else { try { compat[key] = JSON.parse(raw); } catch { /* 读不回就保持原值 */ } }
-    }
-    repaintExtBlock(e.target.closest('.modelEntry'));
-  }
-});
-
-document.getElementById('themeBtn').addEventListener('click', () => {
-  const dark = document.body.toggleAttribute('data-ds-dark-theme');
-  document.getElementById('themeBtn').textContent = dark ? '切换浅色' : '切换深色';
-});
-
-render();
+var modal = document.getElementById("mplus")
+function openModal(){ modal.hidden = false }
+function closeModal(){ modal.hidden = true }
+document.getElementById("openExtras").addEventListener("click", openModal)
+document.getElementById("closeBtn").addEventListener("click", closeModal)
+document.getElementById("closeMask").addEventListener("click", closeModal)
+document.getElementById("themeBtn").addEventListener("click", function(){
+  var dark = document.body.hasAttribute("data-ds-dark-theme")
+  if (dark) document.body.removeAttribute("data-ds-dark-theme")
+  else document.body.setAttribute("data-ds-dark-theme","")
+  this.textContent = dark ? "切换深色" : "切换浅色"
+})
+if (location.hash === "#modal") openModal()
 </script>
 </body>
 </html>
